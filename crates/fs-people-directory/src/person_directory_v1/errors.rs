@@ -1,14 +1,16 @@
 //! Typisierte Fehler des Ordners `person_directory_v1/`. Jede Ursache ist eine Variante mit typisierten Zusatzfeldern;
 //! `Display` dient nur der Anzeige (Entwicklertext, englisch); die Person sieht Übersetzungen über die Kennungen
-//! (ADR 0057). "Nicht gefunden" ist KEIN Fehler, sondern `Resolved::Unknown`/`Deleted`/`NotShared`.
+//! (ADR 0057). Eine nicht gefundene Person ist KEIN Fehler, sondern `Resolved::Unknown`/`Deleted`/`NotShared`; nur
+//! eine unbekannte Einwilligungs-Id beim Widerruf ist einer (`UnknownConsent`), weil dort geschrieben wird.
 //!
 //! Pattern: Error Enum (typisierte Ursache + Zusatzfelder), `Display` nur zur Anzeige.
 
 use super::{BasicValue, ObjectId, PersonRef, Problem, TypeProblem};
 use std::fmt;
 
-/// Warum der Anbieter gerade nicht antwortet.
+/// Warum der Anbieter gerade nicht antwortet. `non_exhaustive`: Verbraucher brauchen einen Rest-Arm.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Unreachable {
     /// Dienst läuft nicht (Socket fehlt, Programm nicht installiert).
     NotRunning,
@@ -21,7 +23,7 @@ pub enum Unreachable {
 }
 
 /// Warum `excerpt` keinen Auszug liefert. `Unknown` lässt ein `CompositeDirectory` den nächsten Anbieter fragen,
-/// `Deleted` und `NotShared` sind endgültig für diese Anfrage (ADR 0085 §4).
+/// `Deleted`, `NotShared` und `NoConsent` sind endgültig für diese Anfrage (ADR 0085 §4).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum NoExcerptReason {
@@ -31,18 +33,25 @@ pub enum NoExcerptReason {
     NotShared,
     /// Dem Anbieter unbekannter Verweis.
     Unknown,
+    /// Der Zweck braucht eine Einwilligung (`Purpose::needs_consent`), und keine aktive passt (`check_consent`).
+    /// Endgültig für diese Anfrage; der Verweis selbst löst weiter auf.
+    NoConsent,
 }
 
-/// Fehler des Verzeichnisses.
+/// Fehler des Verzeichnisses. `non_exhaustive`: Verbraucher brauchen einen Rest-Arm.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Error {
     /// Der Anbieter kann es ausdrücklich nicht (ADR 0045), mit Fähigkeitskennung.
     Unsupported { capability: String, reason: String },
-    /// Die fragende Person darf es nicht (z. B. Vorschlag in einem fremden Adressbuch), mit Fähigkeitskennung.
+    /// Die fragende Person darf es nicht (Vorschlag in einem fremden Adressbuch; Einwilligungen ohne Recht; jede
+    /// Einwilligungs-Methode, wenn eine KI fragt, unabhängig vom Ziel), mit Fähigkeitskennung.
     Forbidden { capability: String },
-    /// Eingabe ungültig (leerer Vorschlag, `limit` außerhalb 1 bis 50, Feldliste leer); nichts geschrieben.
+    /// Eingabe ungültig (leerer Vorschlag, `limit` außerhalb 1 bis 50, Feldliste leer, Einwilligung für einen
+    /// Verweis, der nicht `Found` ist, `AiAssistance` ohne `scope`); nichts geschrieben.
     Invalid(Vec<Problem>),
-    /// `excerpt` auf einen gelöschten, nicht freigegebenen oder unbekannten Verweis: kein Auszug (ADR 0085 §4).
+    /// `excerpt` auf einen gelöschten, nicht freigegebenen oder unbekannten Verweis oder ohne nötige Einwilligung:
+    /// kein Auszug (ADR 0085 §4).
     NoExcerpt {
         person: PersonRef,
         reason: NoExcerptReason,
@@ -50,6 +59,8 @@ pub enum Error {
     /// `propose` an einen Stapel, der nicht (mehr) offen ist; auch eine nie geöffnete oder von einem anderen Anbieter
     /// ausgegebene Id.
     BatchClosed(ObjectId),
+    /// `withdraw_consent` mit einer Id, die dieser Anbieter nicht (mehr) kennt.
+    UnknownConsent(ObjectId),
     /// Der Anbieter ist nicht erreichbar (Dienst, Zeitlimit, gesperrter oder defekter Speicher); ein
     /// `CompositeDirectory` fragt dann den nächsten Anbieter, am Ende bleibt `Unavailable`.
     Unavailable(Unreachable),
@@ -73,6 +84,7 @@ impl fmt::Display for Error {
                 write!(f, "no excerpt for {} ({reason:?})", person.id.canonical())
             }
             Self::BatchClosed(_) => write!(f, "proposal batch is closed"),
+            Self::UnknownConsent(_) => write!(f, "unknown consent record"),
             Self::Unavailable(u) => write!(f, "directory unavailable: {u:?}"),
         }
     }

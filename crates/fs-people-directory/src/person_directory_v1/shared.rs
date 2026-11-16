@@ -6,7 +6,7 @@
 
 pub use fs_types::PageCursor as Place;
 pub use fs_types::{
-    Address, BasicValue, Capabilities, ContactAddress, EmailAddress, FileRef, MediaType, Name,
-    ObjectId, Page, PersonArt, PersonRef, PhoneNumber, Problem, Reference, Revision, Text,
+    Address, BasicValue, Capabilities, ContactAddress, Date, EmailAddress, FileRef, MediaType,
+    Name, ObjectId, Page, PersonArt, PersonRef, PhoneNumber, Problem, Reference, Revision, Text,
     TypeProblem, Utc,
 };

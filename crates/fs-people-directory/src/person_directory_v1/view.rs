@@ -6,7 +6,9 @@
 use super::{ContactAddress, FileRef, PersonArt, PersonRef, Reference, Revision, Utc};
 
 /// Stand eines Eintrags (ADR 0058: vorgeschlagen, dann bestätigt; abgelehnte Paare kommen nicht wieder).
+/// `non_exhaustive`: Verbraucher brauchen einen Rest-Arm.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum EntryState {
     /// Von einem Menschen angelegt oder bestätigt.
     Confirmed,
@@ -25,7 +27,8 @@ pub struct PersonView {
     pub display: String,
     /// Sortierschlüssel ("Nachname, Vorname"), Kleinschreibung, NFC.
     pub sort_key: String,
-    /// Bevorzugte Adresse (kleinster `pref`, sonst erste), wenn es eine gibt und sie gezeigt werden darf.
+    /// Bevorzugte Adresse (kleinster `pref`, sonst erste), wenn es eine gibt und sie gezeigt werden darf; fragt eine
+    /// KI, immer `None` (KI-Regel wie `ExcerptField::sensitive`).
     pub address: Option<ContactAddress>,
     pub state: EntryState,
     /// KI-Markierung (ADR 0054, 0076): eine `Person` mit Markierung, keine eigene Art.
@@ -38,8 +41,10 @@ pub struct PersonView {
     pub rev: Revision,
 }
 
-/// Ergebnis der Auflösung eines Verweises. Nie ein Fehler, wenn der Anbieter erreichbar ist.
+/// Ergebnis der Auflösung eines Verweises. Nie ein Fehler, wenn der Anbieter erreichbar ist. `non_exhaustive`:
+/// Verbraucher brauchen einen Rest-Arm (wie `Unknown` behandeln).
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 // `Found` ist der Regelfall, die anderen Varianten sind klein: Boxen würde jede Übereinstimmung für alle Anbieter
 // ändern.
 #[allow(clippy::large_enum_variant)]
