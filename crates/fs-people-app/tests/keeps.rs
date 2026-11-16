@@ -45,7 +45,7 @@ fn rich() -> Card {
         "relatedTo": {"urn:uuid:other": {"relation": {"friend": true}}},
         "personalInfo": {"pi1": {"@type": "PersonalInfo", "kind": "expertise", "value": "maths"}},
         "cryptoKeys": {"k1": {"@type": "CryptoKey", "uri": "https://x.org/key"}},
-        "freesynergy.net:source": "https://x.org/ada",
+        "freesynergy.net:source": "https://x.org/amara",
         "example.org:anything": {"deep": [1, 2, {"three": true}]}
     }))
     .unwrap();
@@ -246,7 +246,7 @@ fn roles_and_the_mark_of_an_ai_survive_an_edit_and_are_shown_read_only() {
 #[test]
 fn a_change_by_someone_else_is_a_conflict_and_writing_knowingly_keeps_their_other_change() {
     let w = World::in_memory();
-    let key = w.add(person("Ada", "ada@x.org"));
+    let key = w.add(person("Amara", "amara@x.org"));
     let id = key.parse().unwrap();
     let mut s = w.state();
     s.begin_edit();
@@ -259,7 +259,7 @@ fn a_change_by_someone_else_is_a_conflict_and_writing_knowingly_keeps_their_othe
     s.save();
     let edit = s.editing().expect("the draft stays");
     assert!(edit.error.as_deref().unwrap().contains("Someone else"));
-    assert_eq!(w.card(&key).display_name(), "Ada", "nothing was written");
+    assert_eq!(w.card(&key).display_name(), "Amara", "nothing was written");
 
     s.save();
     assert!(s.editing().is_none());

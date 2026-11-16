@@ -23,10 +23,10 @@ fn names(world: &World, term: &str) -> Vec<String> {
 #[test]
 fn the_list_is_in_name_order_and_paged_by_offset_and_limit() {
     let w = World::in_memory();
-    for name in ["Cid", "ada", "Bob"] {
+    for name in ["Cid", "amara", "Bob"] {
         w.add(person(name, &format!("{name}@x.org")));
     }
-    assert_eq!(names(&w, ""), ["ada", "Bob", "Cid"]);
+    assert_eq!(names(&w, ""), ["amara", "Bob", "Cid"]);
     let page = w.adapter.rows("", 1, 1).unwrap();
     assert_eq!(page.len(), 1);
     assert_eq!(page[0].cells, ["Bob", "Bob@x.org"]);
@@ -35,15 +35,15 @@ fn the_list_is_in_name_order_and_paged_by_offset_and_limit() {
 #[test]
 fn search_finds_by_name_mail_phone_and_organisation_and_pages_too() {
     let w = World::in_memory();
-    let mut ada = person("Ada", "ada@x.org");
-    ada.add_phone("+49 30 123456");
-    ada.add_organization("Engines Ltd");
-    w.add(ada);
+    let mut amara = person("Amara", "amara@x.org");
+    amara.add_phone("+49 30 123456");
+    amara.add_organization("Engines Ltd");
+    w.add(amara);
     w.add(person("Bob", "bob@y.org"));
-    assert_eq!(names(&w, "ada"), ["Ada"]);
+    assert_eq!(names(&w, "amara"), ["Amara"]);
     assert_eq!(names(&w, "y.org"), ["Bob"]);
-    assert_eq!(names(&w, "123456"), ["Ada"]);
-    assert_eq!(names(&w, "engines"), ["Ada"]);
+    assert_eq!(names(&w, "123456"), ["Amara"]);
+    assert_eq!(names(&w, "engines"), ["Amara"]);
     assert_eq!(names(&w, "nothing"), [] as [String; 0]);
     assert_eq!(w.adapter.rows("org", 1, 5).unwrap().len(), 1);
 }
@@ -65,21 +65,21 @@ fn more_people_than_a_page_are_reached_through_the_state_machine() {
 #[test]
 fn a_person_is_read_as_sections_and_what_is_not_shown_is_named() {
     let w = World::in_memory();
-    let mut card = person("Ada", "ada@x.org");
+    let mut card = person("Amara", "amara@x.org");
     card.add_phone("+49 30 1");
     card.add_organization("Engines");
     card.extra
         .insert("example.org:thing".into(), serde_json::json!(1));
     let key = w.add(card);
     let sheet = w.adapter.read(&key).unwrap();
-    assert_eq!(sheet.title, "Ada");
+    assert_eq!(sheet.title, "Amara");
     let all: Vec<(String, String)> = sheet
         .sections
         .iter()
         .flat_map(|s| s.fields.iter())
         .map(|f| (f.label.clone(), f.value.clone()))
         .collect();
-    assert!(all.contains(&("E-mail".into(), "ada@x.org".into())));
+    assert!(all.contains(&("E-mail".into(), "amara@x.org".into())));
     assert!(all.contains(&("Phone".into(), "+49 30 1".into())));
     assert!(all.contains(&("Organisation".into(), "Engines".into())));
     assert!(all.iter().any(|(_, v)| v.contains("example.org:thing")));
@@ -90,8 +90,8 @@ fn a_new_person_is_stored_listed_and_selected() {
     let w = World::in_memory();
     let mut s = w.state();
     s.begin_create();
-    s.set_field("name/full", "Grace");
-    s.set_field("emails/+0", " grace@x.org ");
+    s.set_field("name/full", "Mirela");
+    s.set_field("emails/+0", " mirela@x.org ");
     s.set_field("phones/+0", "+1 202 555");
     s.set_field("organizations/+0", "Navy");
     s.save();
@@ -102,9 +102,9 @@ fn a_new_person_is_stored_listed_and_selected() {
     );
     let key = s.selected().unwrap().to_string();
     let card = w.card(&key);
-    assert_eq!(card.display_name(), "Grace");
+    assert_eq!(card.display_name(), "Mirela");
     assert_eq!(card.kind(), "individual");
-    assert_eq!(card.emails["e1"].address, "grace@x.org", "trimmed");
+    assert_eq!(card.emails["e1"].address, "mirela@x.org", "trimmed");
     assert_eq!(card.phones["p1"].number, "+1 202 555");
     assert_eq!(card.organizations["o1"].name.as_deref(), Some("Navy"));
     assert_eq!(s.rows().len(), 1);
@@ -140,12 +140,12 @@ fn a_new_person_may_be_only_a_mail_address_and_is_called_by_it() {
 #[test]
 fn deleting_takes_two_presses_and_takes_the_roles_along() {
     let w = World::in_memory();
-    let ada = w.add(person("Ada", "ada@x.org"));
+    let amara = w.add(person("Amara", "amara@x.org"));
     w.add(person("Bob", "bob@x.org"));
-    let id = ada.parse().unwrap();
+    let id = amara.parse().unwrap();
     w.runtime.block_on(w.repo.mark_ai(id)).unwrap();
     let mut s = w.state();
-    assert_eq!(s.selected(), Some(ada.as_str()));
+    assert_eq!(s.selected(), Some(amara.as_str()));
     s.ask_delete();
     assert_eq!(names(&w, "").len(), 2, "only asked");
     s.confirm_delete();
@@ -157,7 +157,7 @@ fn deleting_takes_two_presses_and_takes_the_roles_along() {
 #[test]
 fn a_person_gone_or_a_key_that_names_nobody_is_not_found() {
     let w = World::in_memory();
-    let key = w.add(person("Ada", "ada@x.org"));
+    let key = w.add(person("Amara", "amara@x.org"));
     w.runtime
         .block_on(w.repo.delete(key.parse().unwrap()))
         .unwrap();
@@ -221,7 +221,7 @@ fn someone_sensitive_is_marked_in_the_list_in_search_and_in_the_form_and_not_ope
 #[test]
 fn after_a_delete_someone_sensitive_is_not_opened_alone() {
     let w = World::in_memory();
-    w.add(person("Ada Open", "a@x.org"));
+    w.add(person("Amara Open", "a@x.org"));
     w.add(secret("Bob Secret"));
     let mut s = w.state();
     s.ask_delete();
@@ -234,7 +234,7 @@ fn after_a_delete_someone_sensitive_is_not_opened_alone() {
 fn e_mail_and_phone_fields_are_checked_by_the_core_values_with_the_programs_words() {
     use fs_components_workbenches::people::FieldCheck;
     let w = World::in_memory();
-    let key = w.add(person("Ada", "ada@x.org"));
+    let key = w.add(person("Amara", "amara@x.org"));
     let draft = w.adapter.draft(&key).unwrap();
     let kinds: Vec<(String, FieldCheck)> =
         draft.fields().map(|f| (f.key.clone(), f.check)).collect();
@@ -244,14 +244,14 @@ fn e_mail_and_phone_fields_are_checked_by_the_core_values_with_the_programs_word
     );
     assert!(
         w.adapter
-            .check(FieldCheck::Email, "ada@bücher.example")
+            .check(FieldCheck::Email, "amara@bücher.example")
             .is_none()
     );
     assert!(
         w.adapter.check(FieldCheck::Email, "").is_none(),
         "empty removes the value"
     );
-    let said = w.adapter.check(FieldCheck::Email, "ada").unwrap();
+    let said = w.adapter.check(FieldCheck::Email, "amara").unwrap();
     assert!(said.contains('@'), "{said}");
     assert!(
         w.adapter
@@ -281,7 +281,7 @@ fn the_photo_of_a_card_is_a_data_uri_and_a_web_address_is_never_fetched() {
     let with = |uri: &str| -> Card {
         serde_json::from_value(serde_json::json!({
             "@type": "Card", "version": "1.0", "uid": ObjectId::new().to_string(),
-            "name": {"full": "Ada"},
+            "name": {"full": "Amara"},
             "media": {"m1": {"@type": "Media", "kind": "photo", "uri": uri}},
         }))
         .unwrap()
@@ -289,7 +289,7 @@ fn the_photo_of_a_card_is_a_data_uri_and_a_web_address_is_never_fetched() {
     let pixel = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
     let key = w.add(with(pixel));
     assert_eq!(w.adapter.read(&key).unwrap().image.as_deref(), Some(pixel));
-    let key = w.add(with("https://example.org/ada.png"));
+    let key = w.add(with("https://example.org/amara.png"));
     assert_eq!(
         w.adapter.read(&key).unwrap().image,
         None,

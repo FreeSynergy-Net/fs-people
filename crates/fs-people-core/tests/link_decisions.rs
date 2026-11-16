@@ -89,13 +89,13 @@ async fn the_user_links_by_hand_also_a_rejected_pair_and_unlinking_does_not_ask_
 async fn a_hand_made_link_needs_no_proposal() {
     let r = repo().await;
     let a = r
-        .create(person("Ada", "a@example.org"))
+        .create(person("Amara", "a@example.org"))
         .await
         .unwrap()
         .envelope
         .id;
     let b = r
-        .create(person("Grace", "g@example.org"))
+        .create(person("Mirela", "g@example.org"))
         .await
         .unwrap()
         .envelope
@@ -180,7 +180,7 @@ async fn a_sensitive_card_is_never_named_in_a_rejection() {
     let mut secret = person("Secret", "same@example.org");
     secret.mark_sensitive(["pd:HealthRecord"]);
     let a = r
-        .create(person("Ada", "same@example.org"))
+        .create(person("Amara", "same@example.org"))
         .await
         .unwrap()
         .envelope

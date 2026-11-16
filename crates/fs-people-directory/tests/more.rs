@@ -48,9 +48,9 @@ async fn sample_covers_every_state() {
     assert!(
         matches!(d.resolve(&r(11)).await, Ok(Resolved::Found(v)) if v.state == EntryState::Proposed)
     );
-    let ada = fs_types::ContactAddress::parse("mailto:amara@example.org").expect("address");
+    let amara = fs_types::ContactAddress::parse("mailto:amara@example.org").expect("address");
     let ids: Vec<_> = d
-        .find_by_address(&ada)
+        .find_by_address(&amara)
         .await
         .expect("find")
         .into_iter()

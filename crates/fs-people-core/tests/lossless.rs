@@ -98,14 +98,14 @@ async fn a_configuration_that_was_stored_always_starts_again() {
 #[tokio::test]
 async fn a_card_made_in_code_cannot_carry_a_negative_zero() {
     let r = repo().await;
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     card.extra.insert("example.org:n".into(), json!(-0.0));
     assert!(r.create(card).await.is_err());
 }
 
 #[test]
 fn a_fractional_vendor_property_comes_out_as_a_number() {
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     card.extra.insert("example.com:ratio".into(), json!(1.5));
     let text = VCardFormat.export(&card).unwrap();
     assert!(
@@ -118,8 +118,7 @@ fn a_fractional_vendor_property_comes_out_as_a_number() {
 #[tokio::test]
 async fn a_float_in_a_vcard_survives_import_and_export() {
     let r = repo().await;
-    let vcf =
-        "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:u1\r\nFN:Ada\r\nX-FOO;VALUE=FLOAT:1.5\r\nEND:VCARD\r\n";
+    let vcf = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:u1\r\nFN:Amara\r\nX-FOO;VALUE=FLOAT:1.5\r\nEND:VCARD\r\n";
     let report = r.import_vcard(vcf).await.unwrap();
     assert_eq!(report.created.len(), 1, "{report:?}");
     let text = r.export_vcard(report.created[0]).await.unwrap();
@@ -130,7 +129,7 @@ async fn a_float_in_a_vcard_survives_import_and_export() {
 #[tokio::test]
 async fn a_double_comes_back_through_store_undo_and_export() {
     let (r, store) = common::setup().await;
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     card.extra
         .insert("example.com:lat".into(), json!(13.049_435_775_302_797));
     let id = r.create(card.clone()).await.unwrap().envelope.id;

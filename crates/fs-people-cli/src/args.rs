@@ -135,13 +135,13 @@ mod tests {
         assert_eq!(a.socket, Some("/x/y".into()));
         assert_eq!(a.command, Some(Command::List(None)));
         assert_eq!(
-            parse(&words("list --term ada")).unwrap().command,
-            Some(Command::List(Some("ada".into())))
+            parse(&words("list --term amara")).unwrap().command,
+            Some(Command::List(Some("amara".into())))
         );
         assert_eq!(
-            parse(&words("add Ada --email a@x.org")).unwrap().command,
+            parse(&words("add Amara --email a@x.org")).unwrap().command,
             Some(Command::Add {
-                name: "Ada".into(),
+                name: "Amara".into(),
                 email: Some("a@x.org".into())
             })
         );

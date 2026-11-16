@@ -78,7 +78,12 @@ fn consumers_recognise_the_ai_role_in_both_forms() {
 #[tokio::test]
 async fn the_ai_role_with_a_wrong_kind_stays_refused_by_full_id() {
     let r = repo().await;
-    let human = r.create(Card::individual("Ada")).await.unwrap().envelope.id;
+    let human = r
+        .create(Card::individual("Amara"))
+        .await
+        .unwrap()
+        .envelope
+        .id;
     let by_full = r.assign_role(human, AI_ROLE_IRI, None, Map::new()).await;
     assert!(matches!(by_full, Err(Error::Conflict(_))));
     assert!(!r.is_ai(human).await.unwrap());
@@ -111,8 +116,13 @@ async fn customers_and_suppliers_may_be_organisations() {
 #[tokio::test]
 async fn lead_prospect_and_customer_are_three_roles_with_no_stage() {
     let r = repo().await;
-    let ada = r.create(Card::individual("Ada")).await.unwrap().envelope.id;
-    r.assign_role(ada, "lead", Some(CLUB), Map::new())
+    let amara = r
+        .create(Card::individual("Amara"))
+        .await
+        .unwrap()
+        .envelope
+        .id;
+    r.assign_role(amara, "lead", Some(CLUB), Map::new())
         .await
         .unwrap();
     assert_eq!(r.people_with_role("prospect", None).await.unwrap(), []);
@@ -129,14 +139,19 @@ async fn my_customer_and_our_customer_are_two_roles_and_files_survive_a_restart(
         "roles": [{"id": "customer", "names": {"de": "Stammkunde"}, "owner": "kal", "scope": "group"}]
     });
     r.store_role_config(&file.to_string()).await.unwrap();
-    let ada = r.create(Card::individual("Ada")).await.unwrap().envelope.id;
-    r.assign_role(ada, "customer", Some(CLUB), Map::new())
+    let amara = r
+        .create(Card::individual("Amara"))
+        .await
+        .unwrap()
+        .envelope
+        .id;
+    r.assign_role(amara, "customer", Some(CLUB), Map::new())
         .await
         .unwrap();
-    r.assign_role(ada, &format!("{MINE}customer"), Some(CLUB), Map::new())
+    r.assign_role(amara, &format!("{MINE}customer"), Some(CLUB), Map::new())
         .await
         .unwrap();
-    assert_eq!(r.roles_of(ada).await.unwrap().len(), 2);
+    assert_eq!(r.roles_of(amara).await.unwrap().len(), 2);
     assert!(r.role("member").await.unwrap().is_some(), "ours stays");
 
     let again = PeopleRepo::new(store, ME);

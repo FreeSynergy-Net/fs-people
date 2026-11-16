@@ -21,7 +21,7 @@ fn with_marked_name_part() -> Card {
     serde_json::from_value(json!({
         "@type": "Card", "version": "1.0", "uid": "urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae4",
         "name": {"components": [
-            {"kind": "given", "value": "Ada", KEY: ["pd:HealthRecord"]},
+            {"kind": "given", "value": "Amara", KEY: ["pd:HealthRecord"]},
             {"kind": "surname", "value": "L"}
         ]},
         "emails": {"e1": {"address": "a@x.org", KEY: ["pd:Religion"]}, "e2": {"address": "b@x.org"}}
@@ -101,7 +101,7 @@ fn item_f_an_unclear_marking_moved_to_card_level_stays_unclear() {
     let w = World::in_memory();
     let card: Card = serde_json::from_value(json!({
         "@type": "Card", "version": "1.0", "uid": "urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae5",
-        "name": {"full": "Ada"},
+        "name": {"full": "Amara"},
         "emails": {"e1": {"address": "a@x.org", KEY: true}, "e2": {"address": "b@x.org"}}
     }))
     .unwrap();
@@ -128,7 +128,7 @@ fn item_f_beside_named_categories_an_unclear_marking_still_reads_as_unclear() {
     let w = World::in_memory();
     let card: Card = serde_json::from_value(json!({
         "@type": "Card", "version": "1.0", "uid": "urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae6",
-        "name": {"full": "Ada"},
+        "name": {"full": "Amara"},
         KEY: ["pd:Religion"],
         "emails": {"e1": {"address": "a@x.org", KEY: true}, "e2": {"address": "b@x.org"}}
     }))

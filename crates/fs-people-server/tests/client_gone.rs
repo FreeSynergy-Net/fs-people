@@ -56,8 +56,8 @@ where
 async fn a_person_with_a_link_and_a_role(root: &people::Client) -> (Uuid, Uuid) {
     let persons = persons_of(root).await;
     let roles = roles_of(root).await;
-    let a = create(&persons, "uid-1", "Ada", "ada@x.org").await;
-    let b = create(&persons, "uid-2", "A. King", "ada@x.org").await;
+    let a = create(&persons, "uid-1", "Amara", "amara@x.org").await;
+    let b = create(&persons, "uid-2", "A. King", "amara@x.org").await;
     let mut assign = roles.assign_request();
     write_uuid(assign.get().init_person(), Some(a));
     assign.get().set_role("member");

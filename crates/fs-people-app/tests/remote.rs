@@ -51,13 +51,13 @@ fn create_list_search_read_edit_delete_over_the_socket() {
     let runtime = tokio::runtime::Runtime::new().unwrap();
     let adapter = PeopleAdapter::new(remote.clone(), Arc::new(NoRoles), runtime.handle().clone());
 
-    let ada = runtime
+    let amara = runtime
         .block_on(remote.create(person("Amara Zolenko", "amara@example.org")))
         .unwrap();
     runtime
         .block_on(remote.create(person("Soo-jin Marchetti", "soojin@example.org")))
         .unwrap();
-    let key = ada.envelope.id.to_string();
+    let key = amara.envelope.id.to_string();
 
     assert_eq!(adapter.rows("", 0, 100).unwrap().len(), 2);
     let found = adapter.rows("zolenko", 0, 100).unwrap();
@@ -115,10 +115,10 @@ fn two_windows_on_one_server_a_stale_save_is_a_conflict_and_writes_nothing() {
         runtime.handle().clone(),
     );
     let b = PeopleAdapter::new(b_remote, Arc::new(NoRoles), runtime.handle().clone());
-    let ada = runtime
+    let amara = runtime
         .block_on(a_remote.create(person("Amara Zolenko", "amara@example.org")))
         .unwrap();
-    let key = ada.envelope.id.to_string();
+    let key = amara.envelope.id.to_string();
 
     let mut in_a = a.draft(&key).unwrap();
     let mut in_b = b.draft(&key).unwrap();
@@ -157,18 +157,18 @@ fn the_roles_of_a_person_are_read_over_the_socket_with_their_names() {
     let remote = Arc::new(RemotePeople::connect(&socket).unwrap());
     let runtime = tokio::runtime::Runtime::new().unwrap();
     let adapter = PeopleAdapter::new(remote.clone(), remote.clone(), runtime.handle().clone());
-    let ada = runtime
+    let amara = runtime
         .block_on(remote.create(person("Amara Zolenko", "amara@example.org")))
         .unwrap();
     runtime
         .block_on(repo.assign_role(
-            ada.envelope.id,
+            amara.envelope.id,
             "user",
             Some("https://example.org/groups/team"),
             serde_json::Map::new(),
         ))
         .unwrap();
-    let sheet = adapter.read(&ada.envelope.id.to_string()).unwrap();
+    let sheet = adapter.read(&amara.envelope.id.to_string()).unwrap();
     let roles: Vec<String> = sheet
         .sections
         .iter()

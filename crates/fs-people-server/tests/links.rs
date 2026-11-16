@@ -10,7 +10,7 @@ use fs_interfaces::rpc::{read_uuid, write_uuid};
 async fn relations_stay_on_the_card() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-1", "Amara", "amara@x.org").await;
 
         let mut relate = persons.relate_request();
         write_uuid(relate.get().init_id(), Some(id));
@@ -46,8 +46,8 @@ async fn relations_stay_on_the_card() {
 async fn proposals_link_and_unlink() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let a = create(&persons, "uid-1", "Ada", "ada@x.org").await;
-        let b = create(&persons, "uid-2", "A. King", "ada@x.org").await;
+        let a = create(&persons, "uid-1", "Amara", "amara@x.org").await;
+        let b = create(&persons, "uid-2", "A. King", "amara@x.org").await;
         create(&persons, "uid-3", "Bob", "bob@x.org").await;
 
         let answer = persons.proposals_request().send().promise.await.unwrap();
@@ -61,7 +61,7 @@ async fn proposals_link_and_unlink() {
         pair.sort_unstable();
         assert_eq!(pair, [a, b]);
         let reason = proposal.get_reasons().unwrap().get(0).unwrap();
-        assert_eq!(reason.to_str().unwrap(), "email:ada@x.org");
+        assert_eq!(reason.to_str().unwrap(), "email:amara@x.org");
 
         let mut confirm = persons.confirm_same_request();
         write_uuid(confirm.get().init_a(), Some(a));
@@ -111,8 +111,8 @@ async fn state_of(
 async fn a_no_is_kept_and_taken_back() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let a = create(&persons, "uid-1", "Ada", "ada@x.org").await;
-        let b = create(&persons, "uid-2", "A. King", "ada@x.org").await;
+        let a = create(&persons, "uid-1", "Amara", "amara@x.org").await;
+        let b = create(&persons, "uid-2", "A. King", "amara@x.org").await;
         assert!(matches!(state_of(&persons, a, b).await, SameState::Open));
 
         let mut reject = persons.reject_same_request();
@@ -159,7 +159,7 @@ async fn a_no_is_kept_and_taken_back() {
 async fn lists_hold_people() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let ada = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let amara = create(&persons, "uid-1", "Amara", "amara@x.org").await;
 
         let mut make = persons.create_list_request();
         make.get().set_name("Friends");
@@ -170,7 +170,7 @@ async fn lists_hold_people() {
 
         let mut add = persons.add_to_list_request();
         write_uuid(add.get().init_list(), Some(list));
-        write_uuid(add.get().init_member(), Some(ada));
+        write_uuid(add.get().init_member(), Some(amara));
         let answer = add.send().promise.await.unwrap();
         let card = json_of(answer.get().unwrap().get_person().unwrap());
         assert_eq!(card["members"]["uid-1"], true);
@@ -180,10 +180,10 @@ async fn lists_hold_people() {
         let answer = members.send().promise.await.unwrap();
         let items = answer.get().unwrap().get_items().unwrap();
         assert_eq!(items.len(), 1);
-        assert_eq!(id_of(items.get(0)), ada);
+        assert_eq!(id_of(items.get(0)), amara);
 
         let mut of = persons.lists_of_request();
-        write_uuid(of.get().init_member(), Some(ada));
+        write_uuid(of.get().init_member(), Some(amara));
         let answer = of.send().promise.await.unwrap();
         let items = answer.get().unwrap().get_items().unwrap();
         assert_eq!(items.len(), 1);
@@ -191,21 +191,21 @@ async fn lists_hold_people() {
 
         let mut remove = persons.remove_from_list_request();
         write_uuid(remove.get().init_list(), Some(list));
-        write_uuid(remove.get().init_member(), Some(ada));
+        write_uuid(remove.get().init_member(), Some(amara));
         let answer = remove.send().promise.await.unwrap();
         let card = json_of(answer.get().unwrap().get_person().unwrap());
         assert!(card.get("members").is_none());
 
         let mut from_a_person = persons.remove_from_list_request();
-        write_uuid(from_a_person.get().init_list(), Some(ada));
+        write_uuid(from_a_person.get().init_list(), Some(amara));
         write_uuid(from_a_person.get().init_member(), Some(list));
         expect_problem(from_a_person.send().promise.await, CONFLICT);
         let mut of_a_person = persons.list_members_request();
-        write_uuid(of_a_person.get().init_list(), Some(ada));
+        write_uuid(of_a_person.get().init_list(), Some(amara));
         expect_problem(of_a_person.send().promise.await, CONFLICT);
 
         let mut into_a_person = persons.add_to_list_request();
-        write_uuid(into_a_person.get().init_list(), Some(ada));
+        write_uuid(into_a_person.get().init_list(), Some(amara));
         write_uuid(into_a_person.get().init_member(), Some(list));
         expect_problem(into_a_person.send().promise.await, CONFLICT);
     })
@@ -216,17 +216,17 @@ async fn lists_hold_people() {
 async fn a_deleted_member_is_gone_from_the_list_and_an_untyped_relation_can_be_named() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let ada = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let amara = create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let mut make = persons.create_list_request();
         make.get().set_name("Friends");
         let answer = make.send().promise.await.unwrap();
         let list = id_of(answer.get().unwrap().get_person().unwrap());
         let mut add = persons.add_to_list_request();
         write_uuid(add.get().init_list(), Some(list));
-        write_uuid(add.get().init_member(), Some(ada));
+        write_uuid(add.get().init_member(), Some(amara));
         add.send().promise.await.unwrap();
         let mut delete = persons.delete_request();
-        write_uuid(delete.get().init_id(), Some(ada));
+        write_uuid(delete.get().init_id(), Some(amara));
         delete.send().promise.await.unwrap();
         let mut get = persons.get_request();
         write_uuid(get.get().init_id(), Some(list));

@@ -118,9 +118,9 @@ fn the_card_of_the_fixture_passes_the_check_of_its_own_description() {
     let rules = BasicRules::standard();
     assert_eq!(
         person
-            .check_value(&rules, "emails", " Ada@Example.org ")
+            .check_value(&rules, "emails", " Amara@Example.org ")
             .unwrap(),
-        "Ada@example.org"
+        "Amara@example.org"
     );
 }
 

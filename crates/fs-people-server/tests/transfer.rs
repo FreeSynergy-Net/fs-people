@@ -104,7 +104,7 @@ async fn export_writes_the_format_asked_for_and_never_a_role() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let id = create(&persons, "uid-1", "Ada", "amara@x.org").await;
+        let id = create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let mut assign = roles.assign_request();
         write_uuid(assign.get().init_person(), Some(id));
         assign.get().set_role("member");
@@ -134,7 +134,7 @@ async fn export_writes_the_format_asked_for_and_never_a_role() {
 async fn a_media_type_without_a_format_is_not_possible() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "uid-1", "Ada", "amara@x.org").await;
+        let id = create(&persons, "uid-1", "Amara", "amara@x.org").await;
 
         let mut import = persons.import_text_request();
         import.get().set_media_type("text/csv");
@@ -157,7 +157,13 @@ const UUID: &str = "9f8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d";
 async fn the_other_spelling_of_a_uid_is_skipped_not_failed() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, &format!("urn:uuid:{UUID}"), "Ada", "amara@x.org").await;
+        let id = create(
+            &persons,
+            &format!("urn:uuid:{UUID}"),
+            "Amara",
+            "amara@x.org",
+        )
+        .await;
         let mut import = persons.import_text_request();
         import.get().set_media_type("application/jscontact+json");
         let upper = UUID.to_uppercase();

@@ -11,8 +11,8 @@
 //! | 4 | Person | "Assistent Sol", `ai` set |
 //! | 5 | Group | "Quillon Team" (members live in fs-groups) |
 //! | 6 | Organization | "Tamarind Works Ltd" |
-//! | 7 | Person | "Charles Deleted", deleted (tombstone) |
-//! | 8 | Person | "Hedy Hidden", no longer shared |
+//! | 7 | Person | "Brannoc Deleted", deleted (tombstone) |
+//! | 8 | Person | "Ilvy Hidden", no longer shared |
 //! | 9 | Profile | "Soo-jin M.", merged into 10 |
 //! | 10 | Person | "Soo-jin Marchetti", `tel:+49305550123` |
 //! | 11 | Profile | "Import Tariq", `Proposed`, `mailto:tariq@example.org` |
@@ -46,7 +46,7 @@ fn row(n: u8, display: &str, address: Option<&str>) -> Option<Entry> {
     Some(e)
 }
 
-fn ada() -> Option<Entry> {
+fn amara() -> Option<Entry> {
     let mut e = row(1, "Amara Zolenko", Some("mailto:amara@example.org"))?;
     if let Ok(name) = Name::new("Amara Zolenko", &[]) {
         e.excerpt.push(ExcerptValue::FullName(name));
@@ -78,14 +78,14 @@ pub fn sample() -> FakeDirectory {
         e
     });
     let rows = [
-        ada(),
+        amara(),
         linked,
         row(3, "A. Zolenko", Some("mailto:amara@example.org")),
         ai,
         row(5, "Quillon Team", None),
         row(6, "Tamarind Works Ltd", None),
-        row(7, "Charles Deleted", None),
-        row(8, "Hedy Hidden", None),
+        row(7, "Brannoc Deleted", None),
+        row(8, "Ilvy Hidden", None),
         row(9, "Soo-jin M.", None),
         row(10, "Soo-jin Marchetti", Some("tel:+49305550123")),
         proposed,

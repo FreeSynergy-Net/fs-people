@@ -14,13 +14,16 @@ use fs_people_core::{
 #[tokio::test]
 async fn contact_book_works_as_a_trait_object() {
     let book: Arc<dyn People> = Arc::new(repo().await);
-    let o = book.create(person("Ada", "ada@example.org")).await.unwrap();
-    assert_eq!(book.search("ada").await.unwrap().len(), 1);
+    let o = book
+        .create(person("Amara", "amara@example.org"))
+        .await
+        .unwrap();
+    assert_eq!(book.search("amara").await.unwrap().len(), 1);
     assert!(
         book.export_vcard(o.envelope.id)
             .await
             .unwrap()
-            .contains("FN:Ada")
+            .contains("FN:Amara")
     );
     book.delete(o.envelope.id).await.unwrap();
     assert!(book.get(o.envelope.id).await.unwrap().is_none());
@@ -48,7 +51,7 @@ impl Importer for OneLine {
 #[tokio::test]
 async fn a_new_format_plugs_in_as_an_importer() {
     let r = repo().await;
-    let rep = r.import(&OneLine, "Ada\nBob").await.unwrap();
+    let rep = r.import(&OneLine, "Amara\nBob").await.unwrap();
     assert_eq!(rep.created.len(), 2);
     assert_eq!(VCardFormat.output_media_type(), "text/vcard");
     let json = JsContactFormat.export(&Card::individual("Cy")).unwrap();

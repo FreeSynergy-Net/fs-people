@@ -9,7 +9,7 @@ use fs_components_workbenches::people::PeopleSource;
 use fs_people_app::{export_all, import_file};
 use fs_people_core::{Card, vcard::card_to_vcard};
 
-const TWO: &str = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae1\r\nFN:Ada\r\nEMAIL:ada@x.org\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:3.0\r\nFN:Bob\r\nTEL:+49 30 1\r\nEND:VCARD\r\n";
+const TWO: &str = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae1\r\nFN:Amara\r\nEMAIL:amara@x.org\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:3.0\r\nFN:Bob\r\nTEL:+49 30 1\r\nEND:VCARD\r\n";
 
 fn sensitive_vcard() -> String {
     let mut card = person("Secret", "s@x.org");
@@ -74,9 +74,9 @@ fn a_plain_store_refusing_a_sensitive_card_is_an_error_in_plain_words_and_earlie
 #[test]
 fn everyone_is_exported_and_comes_back_elsewhere_and_a_taken_file_is_not_replaced() {
     let (w, dir) = (World::in_memory(), Scratch::new());
-    let mut ada = person("Ada", "ada@x.org");
-    ada.add_phone("+49 30 1");
-    w.add(ada);
+    let mut amara = person("Amara", "amara@x.org");
+    amara.add_phone("+49 30 1");
+    w.add(amara);
     w.add(Card::individual("Bob"));
     let file = dir.file("out.vcf");
     let report = export_all(w.repo.as_ref(), w.runtime.handle(), &file, &[]).unwrap();
@@ -85,7 +85,7 @@ fn everyone_is_exported_and_comes_back_elsewhere_and_a_taken_file_is_not_replace
     let back = import_file(other.repo.as_ref(), other.runtime.handle(), &file).unwrap();
     assert_eq!(back.created, 2, "{}", back.message());
     let rows = other.adapter.rows("", 0, 10).unwrap();
-    assert_eq!(rows[0].cells, ["Ada", "ada@x.org"]);
+    assert_eq!(rows[0].cells, ["Amara", "amara@x.org"]);
 
     let before = std::fs::read_to_string(&file).unwrap();
     let again = export_all(w.repo.as_ref(), w.runtime.handle(), &file, &[]);
@@ -145,7 +145,7 @@ fn an_export_after_an_edit_says_the_new_name_not_the_imported_one() {
     assert!(text.contains("augusta@x.org"), "{text}");
     assert!(!text.contains("Zolenko"), "the old name lives on: {text}");
     assert!(
-        !text.contains("ada@x.org"),
+        !text.contains("amara@x.org"),
         "the old address lives on: {text}"
     );
 }

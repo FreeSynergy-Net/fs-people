@@ -9,7 +9,7 @@ use serde_json::json;
 #[tokio::test]
 async fn a_relation_of_any_shape_can_be_edited() {
     let r = repo().await;
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     card.related_to.insert("odd".into(), json!("not an object"));
     card.related_to
         .insert("odd2".into(), json!({"relation": 5}));
@@ -25,7 +25,7 @@ async fn a_relation_of_any_shape_can_be_edited() {
 async fn a_card_cannot_grow_past_what_fits_an_answer() {
     let r = repo().await;
     let id = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -44,7 +44,7 @@ async fn a_card_cannot_grow_past_what_fits_an_answer() {
 #[tokio::test]
 async fn lines_outside_a_complete_vcard_are_reported() {
     let r = repo().await;
-    let good = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:u1\r\nFN:Ada\r\nEND:VCARD\r\n";
+    let good = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:u1\r\nFN:Amara\r\nEND:VCARD\r\n";
     let report = r
         .import_vcard(&format!("junk\r\n{good}BEGIN:VCARD\r\nFN:Cut off\r\n"))
         .await

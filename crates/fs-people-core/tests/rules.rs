@@ -9,8 +9,8 @@ use serde_json::{Map, json};
 
 const CLUB: &str = "https://x/groups/club";
 
-async fn ada(r: &PeopleRepo) -> ObjectId {
-    r.create(person("Ada", "a@x.org"))
+async fn amara(r: &PeopleRepo) -> ObjectId {
+    r.create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -27,7 +27,7 @@ fn conflict<T: std::fmt::Debug>(answer: fs_people_core::Result<T>) -> String {
 #[tokio::test]
 async fn a_marked_ai_keeps_its_kind_and_is_only_an_ai_with_both() {
     let r = repo().await;
-    let id = ada(&r).await;
+    let id = amara(&r).await;
     r.mark_ai(id).await.unwrap();
     let mut card = r.get_card(id).await.unwrap().unwrap();
 
@@ -40,7 +40,7 @@ async fn a_marked_ai_keeps_its_kind_and_is_only_an_ai_with_both() {
 
     // An update that keeps the kind is no problem.
     card.kind = Some("application".into());
-    card.name.as_mut().unwrap().full = Some("Ada 2".into());
+    card.name.as_mut().unwrap().full = Some("Amara 2".into());
     r.update(id, card).await.unwrap();
 
     // Plain software is `application` too, and is no AI.
@@ -60,7 +60,7 @@ async fn a_role_that_asks_another_kind_stops_the_marking_and_the_update() {
     let mut needs = RoleDefinition::new("guide", "Guide", "fs-people", RoleScope::Personal);
     needs.card_kind = Some("individual".into());
     r.define_role(needs).await.unwrap();
-    let id = ada(&r).await;
+    let id = amara(&r).await;
     r.assign_role(id, "guide", None, Map::new()).await.unwrap();
 
     conflict(r.mark_ai(id).await);
@@ -79,7 +79,7 @@ fn role(id: &str, scope: &str, kind: Option<&str>) -> serde_json::Value {
 #[tokio::test]
 async fn a_configuration_cannot_orphan_or_misfit_who_holds_a_role() {
     let r = repo().await;
-    let id = ada(&r).await;
+    let id = amara(&r).await;
     r.assign_role(id, "member", Some(CLUB), Map::new())
         .await
         .unwrap();

@@ -14,8 +14,8 @@ async fn what_a_personal_role_and_a_held_one_answer() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let (ada, bob) = (
-            create(&persons, "uid-1", "Ada", "ada@x.org").await,
+        let (amara, bob) = (
+            create(&persons, "uid-1", "Amara", "amara@x.org").await,
             create(&persons, "uid-2", "Bob", "bob@x.org").await,
         );
         let mut define = roles.define_request();
@@ -31,7 +31,7 @@ async fn what_a_personal_role_and_a_held_one_answer() {
         define.send().promise.await.unwrap();
 
         let mut assign = roles.assign_request();
-        write_uuid(assign.get().init_person(), Some(ada));
+        write_uuid(assign.get().init_person(), Some(amara));
         assign.get().set_role("coach");
         assign.get().set_details(r#"{"n":1.5}"#);
         let answer = assign.send().promise.await.unwrap();
@@ -51,7 +51,7 @@ async fn what_a_personal_role_and_a_held_one_answer() {
         assert!(detail.contains("kept exactly"), "{detail}");
 
         let mut again = roles.assign_request();
-        write_uuid(again.get().init_person(), Some(ada));
+        write_uuid(again.get().init_person(), Some(amara));
         again.get().set_role("coach");
         again.get().set_details(r#"{"n":1}"#);
         expect_problem(again.send().promise.await, CONFLICT);
@@ -64,7 +64,7 @@ async fn what_a_personal_role_and_a_held_one_answer() {
         let mut with = roles.people_with_request();
         with.get().set_role("coach");
         let answer = with.send().promise.await.unwrap();
-        assert_eq!(uuids(answer.get().unwrap().get_ids().unwrap()), [ada]);
+        assert_eq!(uuids(answer.get().unwrap().get_ids().unwrap()), [amara]);
 
         let mut unknown = roles.undefine_request();
         unknown.get().set_id("nobody");

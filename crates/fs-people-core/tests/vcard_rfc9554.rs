@@ -88,7 +88,7 @@ fn the_ids_of_the_sub_objects_survive_the_round_trip() {
 
 #[test]
 fn a_vcard_without_a_property_we_know_still_comes_in_whole() {
-    let vcf = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Grace\r\nX-FUTURE;FOO=1:bar\r\nEND:VCARD\r\n";
+    let vcf = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Mirela\r\nX-FUTURE;FOO=1:bar\r\nEND:VCARD\r\n";
     let card = card_from_vcard(vcf).unwrap();
     // What calcard cannot place stays on the card (extension `vCard`), so it can go out again.
     let out = card_to_vcard(&card).unwrap();

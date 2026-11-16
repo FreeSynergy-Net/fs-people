@@ -35,13 +35,13 @@ async fn a_held_role_survives_an_array_and_a_restart() {
     r.store_role_config(&ours(&[own("ai"), own("trainer")]))
         .await
         .unwrap();
-    let ada = r
-        .create(common::person("Ada", "a@x.org"))
+    let amara = r
+        .create(common::person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
-    r.assign_role(ada, "trainer", Some(CLUB), Map::new())
+    r.assign_role(amara, "trainer", Some(CLUB), Map::new())
         .await
         .unwrap();
     r.store_role_config(&json!([own("coach")]).to_string())
@@ -87,13 +87,13 @@ async fn the_second_scenario_is_the_same_running_and_restarted() {
 #[tokio::test]
 async fn an_array_cannot_drop_what_is_held_and_cannot_orphan() {
     let (r, _) = setup().await;
-    let ada = r
-        .create(common::person("Ada", "a@x.org"))
+    let amara = r
+        .create(common::person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
-    r.assign_role(ada, "member", Some(CLUB), Map::new())
+    r.assign_role(amara, "member", Some(CLUB), Map::new())
         .await
         .unwrap();
     // Replacing the file without `member` is refused; the array only adds, so it passes.

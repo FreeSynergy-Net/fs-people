@@ -25,7 +25,7 @@ const CLUB: &str = "https://x/groups/club";
 #[derive(Clone)]
 struct Fixture {
     r: Arc<PeopleRepo>,
-    ada: ObjectId,
+    amara: ObjectId,
     bob: ObjectId,
     list: ObjectId,
     held: ObjectId,
@@ -51,9 +51,9 @@ macro_rules! write {
 
 fn writes() -> Vec<(&'static str, Second)> {
     vec![
-        write!("relate", |f| People::relate(&*f.r, f.ada, "u", "friend")),
+        write!("relate", |f| People::relate(&*f.r, f.amara, "u", "friend")),
         write!("unrelate", |f| People::unrelate(
-            &*f.r, f.ada, "u", "friend"
+            &*f.r, f.amara, "u", "friend"
         )),
         write!("create", |f| People::create(&*f.r, Card::individual("New"))),
         write!("update", |f| People::update(
@@ -71,10 +71,10 @@ fn writes() -> Vec<(&'static str, Second)> {
         write!("create_group", |f| People::create_group(&*f.r, "New")),
         write!("add_member", |f| People::add_member(&*f.r, f.list, f.bob)),
         write!("remove_member", |f| People::remove_member(
-            &*f.r, f.list, f.ada
+            &*f.r, f.list, f.amara
         )),
         write!("confirm", |f| People::confirm_same_person(
-            &*f.r, f.ada, f.bob
+            &*f.r, f.amara, f.bob
         )),
         write!("unlink", |f| People::unlink(&*f.r, f.link)),
         write!("define", |f| RoleBook::define_role(
@@ -99,8 +99,8 @@ async fn fixture() -> (Fixture, Arc<Gated>) {
     let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
     let gated = Arc::new(Gated::new(store));
     let r = PeopleRepo::with_backend(gated.clone(), gated.clone(), ME);
-    let ada = r
-        .create(person("Ada", "a@x.org"))
+    let amara = r
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -118,13 +118,18 @@ async fn fixture() -> (Fixture, Arc<Gated>) {
         .envelope
         .id;
     let list = r.create_group("List").await.unwrap().envelope.id;
-    r.add_member(list, ada).await.unwrap();
+    r.add_member(list, amara).await.unwrap();
     let held = r
-        .assign_role(ada, "member", Some(CLUB), Map::new())
+        .assign_role(amara, "member", Some(CLUB), Map::new())
         .await
         .unwrap()
         .id;
-    let link = r.confirm_same_person(ada, carl).await.unwrap().envelope.id;
+    let link = r
+        .confirm_same_person(amara, carl)
+        .await
+        .unwrap()
+        .envelope
+        .id;
     r.define_role(RoleDefinition::new(
         "coach",
         "Coach",
@@ -137,7 +142,7 @@ async fn fixture() -> (Fixture, Arc<Gated>) {
     (
         Fixture {
             r,
-            ada,
+            amara,
             bob,
             list,
             held,
@@ -153,8 +158,9 @@ async fn every_write_waits_for_the_one_before() {
         let (f, gated) = fixture().await;
         gated.armed.store(1, Ordering::SeqCst);
         let r = f.r.clone();
-        let ada = f.ada;
-        let first = tokio::spawn(async move { People::relate(&*r, ada, "first", "friend").await });
+        let amara = f.amara;
+        let first =
+            tokio::spawn(async move { People::relate(&*r, amara, "first", "friend").await });
         gated.arrived.notified().await;
         let before = gated.calls.load(Ordering::SeqCst);
         let second = tokio::spawn(write(f));

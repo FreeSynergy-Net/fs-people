@@ -39,9 +39,9 @@ fn query(text: &str, limit: u16) -> Suggest {
 }
 
 fn seeded() -> FakeDirectory {
-    let mut ada = Entry::new(person(1, PersonArt::Person), "Amara Zolenko");
-    ada.address = Some(addr("mailto:amara@example.org"));
-    ada.excerpt = vec![
+    let mut amara = Entry::new(person(1, PersonArt::Person), "Amara Zolenko");
+    amara.address = Some(addr("mailto:amara@example.org"));
+    amara.excerpt = vec![
         ExcerptValue::FullName(Name::new("Amara Zolenko", &[]).expect("name")),
         ExcerptValue::Surname(Text::parse("Zolenko").expect("text")),
     ];
@@ -52,7 +52,7 @@ fn seeded() -> FakeDirectory {
     FakeDirectory::new()
         .with_asker(Some(person(1, PersonArt::Person)))
         .with_entry(profile)
-        .with_entry(ada)
+        .with_entry(amara)
         .with_entry(team)
 }
 
@@ -81,14 +81,14 @@ async fn find_by_address_orders_person_before_profile() {
 #[tokio::test]
 async fn trash_states_and_restored() {
     let d = seeded();
-    let ada = person(1, PersonArt::Person);
+    let amara = person(1, PersonArt::Person);
     let team = person(3, PersonArt::Group);
-    assert!(d.delete(&ada));
+    assert!(d.delete(&amara));
     assert!(matches!(
-        d.resolve(&ada).await,
+        d.resolve(&amara).await,
         Ok(Resolved::Deleted { .. })
     ));
-    let gone = d.excerpt(&ada, &[ExcerptField::FullName]).await;
+    let gone = d.excerpt(&amara, &[ExcerptField::FullName]).await;
     assert!(matches!(
         gone,
         Err(Error::NoExcerpt {
@@ -101,7 +101,7 @@ async fn trash_states_and_restored() {
             .await
             .expect("find")
             .iter()
-            .all(|v| v.person.id != ada.id)
+            .all(|v| v.person.id != amara.id)
     );
     assert!(d.unshare(&team));
     assert!(matches!(d.resolve(&team).await, Ok(Resolved::NotShared)));
@@ -115,8 +115,8 @@ async fn trash_states_and_restored() {
     ));
     let hidden_team = d.suggest(&query("Quillon", 5)).await.expect("suggest");
     assert_eq!(hidden_team.len(), 0);
-    assert!(d.restore(&ada));
-    assert!(matches!(d.resolve(&ada).await, Ok(Resolved::Found(_))));
+    assert!(d.restore(&amara));
+    assert!(matches!(d.resolve(&amara).await, Ok(Resolved::Found(_))));
     let page = d
         .changes(Some(&Place("0".to_owned())), 100)
         .await
@@ -130,10 +130,10 @@ async fn trash_states_and_restored() {
 #[tokio::test]
 async fn merged_profile_resolves_to_target() {
     let d = seeded();
-    let (profile, ada) = (person(2, PersonArt::Profile), person(1, PersonArt::Person));
-    assert!(d.merge(&profile, &ada));
+    let (profile, amara) = (person(2, PersonArt::Profile), person(1, PersonArt::Person));
+    assert!(d.merge(&profile, &amara));
     match d.resolve(&profile).await {
-        Ok(Resolved::Found(v)) => assert_eq!(v.person.id, ada.id),
+        Ok(Resolved::Found(v)) => assert_eq!(v.person.id, amara.id),
         other => panic!("expected Found, got {other:?}"),
     }
 }
@@ -141,14 +141,17 @@ async fn merged_profile_resolves_to_target() {
 #[tokio::test]
 async fn excerpt_lists_missing_and_asker_works() {
     let d = seeded();
-    let ada = person(1, PersonArt::Person);
+    let amara = person(1, PersonArt::Person);
     let x = d
-        .excerpt(&ada, &[ExcerptField::FullName, ExcerptField::Phone])
+        .excerpt(&amara, &[ExcerptField::FullName, ExcerptField::Phone])
         .await
         .expect("excerpt");
     assert_eq!(x.values.len(), 1);
     assert_eq!(x.missing, vec![ExcerptField::Phone]);
-    assert_eq!(d.asker().await.expect("asker").map(|p| p.id), Some(ada.id));
+    assert_eq!(
+        d.asker().await.expect("asker").map(|p| p.id),
+        Some(amara.id)
+    );
     assert!(FakeDirectory::new().asker().await.expect("asker").is_none());
 }
 
@@ -187,9 +190,12 @@ async fn composite_chain_rules() {
         Box::new(ReadOnly),
         Box::new(seeded()),
     ]);
-    let ada = person(1, PersonArt::Person);
+    let amara = person(1, PersonArt::Person);
     // Down and ReadOnly pass the question on; the fake answers.
-    assert!(matches!(chain.resolve(&ada).await, Ok(Resolved::Found(_))));
+    assert!(matches!(
+        chain.resolve(&amara).await,
+        Ok(Resolved::Found(_))
+    ));
     // Unknown with a member that is down is not "unknown": the chain cannot tell.
     assert!(matches!(
         chain.resolve(&person(99, PersonArt::Person)).await,
@@ -200,7 +206,12 @@ async fn composite_chain_rules() {
         up.resolve(&person(99, PersonArt::Person)).await,
         Ok(Resolved::Unknown)
     ));
-    assert!(chain.excerpt(&ada, &[ExcerptField::FullName]).await.is_ok());
+    assert!(
+        chain
+            .excerpt(&amara, &[ExcerptField::FullName])
+            .await
+            .is_ok()
+    );
     let nobody = up
         .excerpt(&person(99, PersonArt::Person), &[ExcerptField::FullName])
         .await;
@@ -213,9 +224,12 @@ async fn composite_chain_rules() {
     ));
     assert_eq!(
         chain.asker().await.expect("asker").map(|p| p.id),
-        Some(ada.id.clone())
+        Some(amara.id.clone())
     );
-    let many = chain.resolve_many(&[ada.clone(), ada]).await.expect("many");
+    let many = chain
+        .resolve_many(&[amara.clone(), amara])
+        .await
+        .expect("many");
     assert_eq!(many.len(), 2);
     // person.propose goes to the first member that offers it (the fake), batch ids stay with their issuer.
     let origin = Reference::parse("urn:uuid:00000000-0000-7000-8000-00000000abcd").expect("ref");

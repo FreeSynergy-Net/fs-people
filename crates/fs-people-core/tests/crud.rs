@@ -98,13 +98,16 @@ async fn name_is_derived_even_without_full() {
 #[tokio::test]
 async fn describes_is_an_envelope_field() {
     let r = repo().await;
-    let mut c = person("Ada", "amara@example.org");
-    c.set_vendor("freesynergy.net:describes", json!("did:example:ada"));
+    let mut c = person("Amara", "amara@example.org");
+    c.set_vendor("freesynergy.net:describes", json!("did:example:amara"));
     let o = r.create(c).await.unwrap();
-    assert_eq!(o.envelope.describes.as_deref(), Some("did:example:ada"));
+    assert_eq!(o.envelope.describes.as_deref(), Some("did:example:amara"));
     assert!(!o.index.contains_key("describes"));
     assert_eq!(
-        r.find_by_describes("did:example:ada").await.unwrap().len(),
+        r.find_by_describes("did:example:amara")
+            .await
+            .unwrap()
+            .len(),
         1
     );
     assert_eq!(
@@ -117,7 +120,7 @@ async fn describes_is_an_envelope_field() {
     let o = r.update(o.envelope.id, c).await.unwrap();
     assert_eq!(o.envelope.describes.as_deref(), Some("did:example:ada2"));
     assert_eq!(
-        r.find_by_describes("did:example:ada").await.unwrap(),
+        r.find_by_describes("did:example:amara").await.unwrap(),
         [] as [fs_objects::StoredObject; 0]
     );
 }

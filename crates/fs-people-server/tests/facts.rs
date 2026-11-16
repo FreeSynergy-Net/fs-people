@@ -41,12 +41,12 @@ async fn not_found_names_the_object_and_its_kind() {
 async fn a_changed_card_is_a_conflict_about_that_person() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let old = revision_now(&persons, id).await;
         let mut edit = persons.update_request();
         write_uuid(edit.get().init_id(), Some(id));
         edit.get()
-            .set_jscontact(card("uid-1", "Ada L", "a@x.org").as_str());
+            .set_jscontact(card("uid-1", "Amara L", "a@x.org").as_str());
         edit.send().promise.await.unwrap();
         let late = update_if(&persons, id, old, &card("uid-1", "Late", "a@x.org")).await;
         let problem = problem_of(late);
@@ -74,7 +74,7 @@ async fn a_sensitive_card_says_which_one() {
         assert_eq!(problem.ext("kind"), Some("person"));
         assert_eq!(problem.ext("who"), Some("s: Secret"));
 
-        let other = create(&persons, "uid-2", "A. King", "ada@x.org").await;
+        let other = create(&persons, "uid-2", "A. King", "amara@x.org").await;
         let mut confirm = persons.confirm_same_request();
         write_uuid(confirm.get().init_a(), Some(secret));
         write_uuid(confirm.get().init_b(), Some(other));

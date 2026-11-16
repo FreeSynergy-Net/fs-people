@@ -46,28 +46,30 @@ fn add(name: &str, email: &str) -> Command {
 #[tokio::test(flavor = "current_thread")]
 async fn add_list_find_show_export_delete() {
     with_cli(|root| async move {
-        let ada = run(&root, add("Ada", "ada@example.org")).await.unwrap();
-        run(&root, add("Grace", "grace@example.org")).await.unwrap();
-        let id = ada.split("  ").next().unwrap().to_string();
-        assert!(ada.ends_with("  Ada  ada@example.org"), "{ada}");
+        let amara = run(&root, add("Amara", "amara@example.org")).await.unwrap();
+        run(&root, add("Mirela", "mirela@example.org"))
+            .await
+            .unwrap();
+        let id = amara.split("  ").next().unwrap().to_string();
+        assert!(amara.ends_with("  Amara  amara@example.org"), "{amara}");
 
         let all = run(&root, Command::List(None)).await.unwrap();
         assert_eq!(all.lines().count(), 2, "{all}");
-        let some = run(&root, Command::List(Some("grace".into())))
+        let some = run(&root, Command::List(Some("mirela".into())))
             .await
             .unwrap();
-        assert!(some.contains("Grace") && !some.contains("Ada"), "{some}");
+        assert!(some.contains("Mirela") && !some.contains("Amara"), "{some}");
 
-        let found = run(&root, Command::Find("ada@example.org".into()))
+        let found = run(&root, Command::Find("amara@example.org".into()))
             .await
             .unwrap();
-        assert_eq!(found, ada);
+        assert_eq!(found, amara);
 
         let shown = run(&root, Command::Show(id.clone())).await.unwrap();
-        assert!(shown.contains("\"full\": \"Ada\""), "{shown}");
+        assert!(shown.contains("\"full\": \"Amara\""), "{shown}");
         let vcard = run(&root, Command::Export(id.clone())).await.unwrap();
         assert!(
-            vcard.contains("BEGIN:VCARD") && vcard.contains("Ada"),
+            vcard.contains("BEGIN:VCARD") && vcard.contains("Amara"),
             "{vcard}"
         );
 
@@ -88,7 +90,7 @@ async fn import_reports_created_then_skipped() {
         let file = dir.path().join("in.vcf");
         std::fs::write(
             &file,
-            "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1b91a-0000-7000-8000-000000000001\r\nFN:Linus\r\nEND:VCARD\r\n",
+            "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1b91a-0000-7000-8000-000000000001\r\nFN:Teodor\r\nEND:VCARD\r\n",
         )
         .unwrap();
         let first = run(&root, Command::Import(file.clone())).await.unwrap();

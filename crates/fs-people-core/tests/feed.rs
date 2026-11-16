@@ -24,7 +24,7 @@ async fn cards_are_told_until_the_subscription_is_dropped() {
     let subscription = r.subscribe(seen.clone()).unwrap();
 
     let id = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -49,13 +49,13 @@ async fn cards_are_told_until_the_subscription_is_dropped() {
 async fn roles_and_links_are_no_part_of_the_feed() {
     let r = repo().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
     let b = r
-        .create(person("Ada K", "a@x.org"))
+        .create(person("Amara K", "a@x.org"))
         .await
         .unwrap()
         .envelope

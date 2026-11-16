@@ -30,7 +30,7 @@ fn unknown_and_vendor_properties_survive() {
 
 #[test]
 fn validation_rules() {
-    let ok = person("Ada", "ada@example.org");
+    let ok = person("Amara", "amara@example.org");
     assert!(validate::validate(&ok).is_ok());
     let mut c = ok.clone();
     c.uid = String::new();

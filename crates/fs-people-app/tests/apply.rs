@@ -17,7 +17,7 @@ fn error_of(s: &fs_components_workbenches::people::PeopleState) -> String {
 #[test]
 fn item_9_a_freed_organisation_id_is_not_reused_and_the_title_lets_go_of_it() {
     let w = World::in_memory();
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     let org = card.add_organization("Engines");
     card.titles.insert(
         "t1".into(),
@@ -59,7 +59,7 @@ fn item_9_a_freed_organisation_id_is_not_reused_and_the_title_lets_go_of_it() {
 #[test]
 fn item_9_a_title_keeps_an_organisation_that_stays() {
     let w = World::in_memory();
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     let org = card.add_organization("Engines");
     card.titles.insert(
         "t1".into(),
@@ -79,12 +79,12 @@ fn item_9_a_title_keeps_an_organisation_that_stays() {
 #[test]
 fn item_11_a_name_with_sort_as_can_be_emptied_and_more_than_that_says_why_not() {
     let w = World::in_memory();
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     card.name
         .as_mut()
         .unwrap()
         .extra
-        .insert("sortAs".into(), json!("ADA"));
+        .insert("sortAs".into(), json!("AMARA"));
     let key = w.add(card);
     let mut s = w.state();
     s.begin_edit();
@@ -112,14 +112,14 @@ fn item_11_a_name_with_sort_as_can_be_emptied_and_more_than_that_says_why_not() 
 #[test]
 fn item_12_save_cannot_empty_what_create_refuses() {
     let w = World::in_memory();
-    let key = w.add(person("Ada", "a@x.org"));
+    let key = w.add(person("Amara", "a@x.org"));
     let mut s = w.state();
     s.begin_edit();
     s.set_field("name/full", "");
     s.set_field("emails/e1", "");
     s.save();
     assert!(error_of(&s).contains("at least"), "{}", error_of(&s));
-    assert_eq!(w.card(&key).display_name(), "Ada");
+    assert_eq!(w.card(&key).display_name(), "Amara");
 }
 
 #[test]
@@ -166,7 +166,7 @@ fn export_sensitive_naming_nobody_writes_nothing() {
 #[test]
 fn item_12_an_organisation_of_units_alone_is_not_something_to_call_a_person_by() {
     let w = World::in_memory();
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     let org = card.add_organization("Engines");
     let entry = card.organizations.get_mut(&org).unwrap();
     entry.units = vec![fs_people_core::card::OrgUnit {
@@ -181,5 +181,5 @@ fn item_12_an_organisation_of_units_alone_is_not_something_to_call_a_person_by()
     s.set_field(&format!("organizations/{org}"), "");
     s.save();
     assert!(error_of(&s).contains("at least"), "{}", error_of(&s));
-    assert_eq!(w.card(&key).display_name(), "Ada");
+    assert_eq!(w.card(&key).display_name(), "Amara");
 }

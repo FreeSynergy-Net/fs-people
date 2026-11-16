@@ -161,17 +161,17 @@ async fn assignments_come_and_go() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let ada = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let amara = create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let bob = create(&persons, "uid-2", "Bob", "bob@x.org").await;
 
         let mut assign = roles.assign_request();
-        write_uuid(assign.get().init_person(), Some(ada));
+        write_uuid(assign.get().init_person(), Some(amara));
         assign.get().set_role("member");
         assign.get().set_scope(CLUB);
         let answer = assign.send().promise.await.unwrap();
         let held = answer.get().unwrap().get_assignment().unwrap();
         let id = read_uuid(held.get_id().unwrap()).unwrap();
-        assert_eq!(read_uuid(held.get_person().unwrap()), Some(ada));
+        assert_eq!(read_uuid(held.get_person().unwrap()), Some(amara));
         assert_eq!(held.get_scope().unwrap().to_str().unwrap(), CLUB);
 
         let mut elsewhere = roles.assign_request();
@@ -183,7 +183,7 @@ async fn assignments_come_and_go() {
         elsewhere.send().promise.await.unwrap();
 
         let mut of = roles.roles_of_request();
-        write_uuid(of.get().init_person(), Some(ada));
+        write_uuid(of.get().init_person(), Some(amara));
         let answer = of.send().promise.await.unwrap();
         let items = answer.get().unwrap().get_items().unwrap();
         assert_eq!(items.len(), 1);
@@ -194,7 +194,7 @@ async fn assignments_come_and_go() {
         );
         assert_eq!(items.get(0).get_details().unwrap().to_str().unwrap(), "{}");
         assert_eq!(read_uuid(items.get(0).get_id().unwrap()), Some(id));
-        assert_eq!(read_uuid(items.get(0).get_person().unwrap()), Some(ada));
+        assert_eq!(read_uuid(items.get(0).get_person().unwrap()), Some(amara));
         assert_eq!(items.get(0).get_scope().unwrap().to_str().unwrap(), CLUB);
 
         // Empty is personal, and these two hold it within groups.
@@ -213,7 +213,7 @@ async fn assignments_come_and_go() {
         with.get().set_role("member");
         with.get().set_scope(CLUB);
         let answer = with.send().promise.await.unwrap();
-        assert_eq!(uuids(answer.get().unwrap().get_ids().unwrap()), [ada]);
+        assert_eq!(uuids(answer.get().unwrap().get_ids().unwrap()), [amara]);
 
         let mut unassign = roles.unassign_request();
         write_uuid(unassign.get().init_assignment(), Some(id));

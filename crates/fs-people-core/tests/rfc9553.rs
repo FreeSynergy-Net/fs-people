@@ -107,7 +107,7 @@ fn the_typed_members_hold_the_values() {
         Some("Mastodon")
     );
     assert_eq!(card.preferred_languages["l1"].language, "en");
-    assert_eq!(card.calendars["c1"].uri, "https://cal.example/ada");
+    assert_eq!(card.calendars["c1"].uri, "https://cal.example/amara");
     assert_eq!(
         card.scheduling_addresses["a1"].uri,
         "mailto:amara@example.org"
@@ -141,7 +141,7 @@ fn the_typed_members_hold_the_values() {
     );
     assert_eq!(
         card.notes["n1"].author.as_ref().unwrap().name.as_deref(),
-        Some("Charles")
+        Some("Nuru")
     );
     assert_eq!(card.personal_info["i1"].level.as_deref(), Some("high"));
 }
@@ -171,7 +171,7 @@ fn a_name_sorts_by_a_map_of_kinds_and_an_older_card_by_one_string() {
         json!({"surname": "Zolenko", "given": "Amara"}),
         json!("AMARA"),
     ] {
-        let card = json!({"@type": "Card", "version": "1.0", "uid": "u", "name": {"full": "Ada", "sortAs": sort_as}});
+        let card = json!({"@type": "Card", "version": "1.0", "uid": "u", "name": {"full": "Amara", "sortAs": sort_as}});
         let parsed: Card = serde_json::from_value(card.clone()).unwrap();
         assert_eq!(serde_json::to_value(&parsed).unwrap(), card);
     }

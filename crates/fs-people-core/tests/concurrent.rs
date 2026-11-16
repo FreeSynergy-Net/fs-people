@@ -33,7 +33,7 @@ async fn a_uid_is_taken_once_and_a_role_held_once() {
     let mut calls = tokio::task::JoinSet::new();
     for _ in 0..8 {
         let r = r.clone();
-        let mut card = Card::individual("Ada");
+        let mut card = Card::individual("Amara");
         card.uid = "one".into();
         calls.spawn(async move { People::create(&*r, card).await });
     }

@@ -40,7 +40,7 @@ async fn a_missing_method_says_not_possible() {
         p.list(&ListFilter::default()).await.unwrap(),
         [] as [fs_objects::StoredObject; 0]
     );
-    let Err(Error::Unsupported(u)) = p.create(Card::individual("Ada")).await else {
+    let Err(Error::Unsupported(u)) = p.create(Card::individual("Amara")).await else {
         panic!("expected an explicit not possible");
     };
     assert_eq!(u.capability(), "person.create");

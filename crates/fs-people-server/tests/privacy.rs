@@ -13,15 +13,15 @@ async fn no_answer_about_a_person_carries_a_role() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let ada = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let amara = create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let mut assign = roles.assign_request();
-        write_uuid(assign.get().init_person(), Some(ada));
+        write_uuid(assign.get().init_person(), Some(amara));
         assign.get().set_role("member");
         assign.get().set_scope(CLUB);
         assign.send().promise.await.unwrap();
 
         let mut get = persons.get_request();
-        write_uuid(get.get().init_id(), Some(ada));
+        write_uuid(get.get().init_id(), Some(amara));
         let got = get.send().promise.await.unwrap();
         let person = got.get().unwrap().get_person().unwrap();
         assert_eq!(person.get_roles().unwrap().len(), 0);
@@ -36,7 +36,7 @@ async fn no_answer_about_a_person_carries_a_role() {
         );
 
         let mut by_mail = persons.find_by_email_request();
-        by_mail.get().set_email("ada@x.org");
+        by_mail.get().set_email("amara@x.org");
         let answer = by_mail.send().promise.await.unwrap();
         let items = answer.get().unwrap().get_items().unwrap();
         assert_eq!(items.get(0).get_roles().unwrap().len(), 0);
@@ -49,8 +49,8 @@ async fn a_relationship_is_no_person_and_stays_what_it_is() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let a = create(&persons, "uid-1", "Ada", "ada@x.org").await;
-        let b = create(&persons, "uid-2", "A. King", "ada@x.org").await;
+        let a = create(&persons, "uid-1", "Amara", "amara@x.org").await;
+        let b = create(&persons, "uid-2", "A. King", "amara@x.org").await;
 
         let mut assign = roles.assign_request();
         write_uuid(assign.get().init_person(), Some(a));
@@ -97,7 +97,7 @@ async fn a_relationship_is_no_person_and_stays_what_it_is() {
         write_uuid(get.get().init_id(), Some(a));
         let answer = get.send().promise.await.unwrap();
         let person = answer.get().unwrap().get_person().unwrap();
-        assert_eq!(name_of(person), "Ada");
+        assert_eq!(name_of(person), "Amara");
         id_of(person);
     })
     .await;
@@ -107,13 +107,13 @@ async fn a_relationship_is_no_person_and_stays_what_it_is() {
 async fn sensitive_cards_are_not_proposed_or_linked() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let text = r#"{"@type":"Card","version":"1.0","uid":"uid-1","name":{"full":"Ada"},
-            "emails":{"e1":{"address":"ada@x.org"}},"freesynergy.net:sensitive":["pd:HealthRecord"]}"#;
+        let text = r#"{"@type":"Card","version":"1.0","uid":"uid-1","name":{"full":"Amara"},
+            "emails":{"e1":{"address":"amara@x.org"}},"freesynergy.net:sensitive":["pd:HealthRecord"]}"#;
         let mut req = persons.create_request();
         req.get().set_jscontact(text);
         let answer = req.send().promise.await.unwrap();
         let a = id_of(answer.get().unwrap().get_person().unwrap());
-        let b = create(&persons, "uid-2", "A. King", "ada@x.org").await;
+        let b = create(&persons, "uid-2", "A. King", "amara@x.org").await;
 
         let answer = persons.proposals_request().send().promise.await.unwrap();
         assert_eq!(answer.get().unwrap().get_items().unwrap().len(), 0);

@@ -62,14 +62,17 @@ mod tests {
     #[test]
     fn a_list_export_names_the_list_and_each_member_held_back() {
         let list = fs_objects::ObjectId::new();
-        let held = vec!["a: Ada".to_string(), "b: Bo".to_string()];
+        let held = vec!["a: Amara".to_string(), "b: Bea".to_string()];
         let p = problem(Error::SensitiveMembers(
             Subject::new(Kind::List, list),
             held,
         ));
         assert_eq!(p.ext("id"), Some(list.to_string().as_str()));
         assert_eq!(p.ext("kind"), Some("list"));
-        assert_eq!(p.ext_all(MEMBER).collect::<Vec<_>>(), ["a: Ada", "b: Bo"]);
+        assert_eq!(
+            p.ext_all(MEMBER).collect::<Vec<_>>(),
+            ["a: Amara", "b: Bea"]
+        );
     }
 
     #[test]

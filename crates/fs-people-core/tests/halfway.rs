@@ -22,8 +22,8 @@ fn broken_list(members: &serde_json::Value) -> StoredObject {
 #[tokio::test]
 async fn a_list_that_does_not_read_blocks_no_delete_and_no_proposals() {
     let (r, store) = setup().await;
-    let ada = r
-        .create(person("Ada", "a@x.org"))
+    let amara = r
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -34,7 +34,7 @@ async fn a_list_that_does_not_read_blocks_no_delete_and_no_proposals() {
         .unwrap()
         .envelope
         .id;
-    let uid = r.get_card(ada).await.unwrap().unwrap().uid;
+    let uid = r.get_card(amara).await.unwrap().unwrap().uid;
     let holds = broken_list(&json!({uid.clone(): true, "other": true}));
     let holds_id = holds.envelope.id;
     store.put(holds, ME).await.unwrap();
@@ -54,7 +54,7 @@ async fn a_list_that_does_not_read_blocks_no_delete_and_no_proposals() {
     assert_eq!(bad.len(), 2);
     assert!(bad.contains(&holds_id) && bad.contains(&other_id));
 
-    r.delete(ada).await.unwrap();
+    r.delete(amara).await.unwrap();
     let left = store.get(holds_id).await.unwrap().unwrap();
     assert_eq!(left.content["members"], json!({"other": true}));
     assert_eq!(left.index["member"], ["other"]);
@@ -64,22 +64,22 @@ async fn a_list_that_does_not_read_blocks_no_delete_and_no_proposals() {
 #[tokio::test]
 async fn deleting_a_group_card_ends_the_roles_held_within_it() {
     let (r, _) = setup().await;
-    let ada = r
-        .create(person("Ada", "a@x.org"))
+    let amara = r
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
     let group = r.create_group("Club").await.unwrap();
     let iri = group.envelope.iri.clone().unwrap();
-    r.assign_role(ada, "member", Some(&iri), Map::new())
+    r.assign_role(amara, "member", Some(&iri), Map::new())
         .await
         .unwrap();
-    r.assign_role(ada, "member", Some(CLUB), Map::new())
+    r.assign_role(amara, "member", Some(CLUB), Map::new())
         .await
         .unwrap();
     r.delete(group.envelope.id).await.unwrap();
-    let left = r.roles_of(ada).await.unwrap();
+    let left = r.roles_of(amara).await.unwrap();
     assert_eq!(left.len(), 1);
     assert_eq!(left[0].scope.as_deref(), Some(CLUB));
 }
@@ -87,9 +87,9 @@ async fn deleting_a_group_card_ends_the_roles_held_within_it() {
 #[tokio::test]
 async fn lists_are_found_by_a_member_in_any_spelling() {
     let (r, store) = setup().await;
-    let mut ada = Card::individual("Ada");
-    ada.uid = format!("urn:uuid:{}", V7.to_uppercase());
-    let id = r.create(ada).await.unwrap().envelope.id;
+    let mut amara = Card::individual("Amara");
+    amara.uid = format!("urn:uuid:{}", V7.to_uppercase());
+    let id = r.create(amara).await.unwrap().envelope.id;
     let list = r.create_group("New").await.unwrap().envelope.id;
     r.add_member(list, id).await.unwrap();
     let stored = store.get(list).await.unwrap().unwrap();
@@ -111,7 +111,7 @@ async fn lists_are_found_by_a_member_in_any_spelling() {
 async fn role_rules_after_the_second_review() {
     let (r, store) = setup().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope

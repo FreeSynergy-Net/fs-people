@@ -105,8 +105,8 @@ async fn a_subscriber_does_not_learn_of_roles_or_links() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let a = create(&persons, "uid-1", "Ada", "ada@x.org").await;
-        let b = create(&persons, "uid-2", "A. King", "ada@x.org").await;
+        let a = create(&persons, "uid-1", "Amara", "amara@x.org").await;
+        let b = create(&persons, "uid-2", "A. King", "amara@x.org").await;
 
         let seen = Seen::default();
         let listener: change_listener::Client = new_client(seen.clone());

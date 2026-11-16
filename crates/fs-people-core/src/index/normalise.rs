@@ -75,8 +75,8 @@ mod tests {
     #[test]
     fn email() {
         assert_eq!(
-            normalise_email("  MailTo:Ada@Example.ORG "),
-            "ada@example.org"
+            normalise_email("  MailTo:Amara@Example.ORG "),
+            "amara@example.org"
         );
     }
 

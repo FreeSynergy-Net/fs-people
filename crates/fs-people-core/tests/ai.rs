@@ -48,7 +48,7 @@ async fn an_existing_card_can_be_marked_and_marking_twice_changes_nothing() {
 async fn the_role_needs_the_kind_and_a_group_is_no_ai() {
     let r = repo().await;
     let human = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope

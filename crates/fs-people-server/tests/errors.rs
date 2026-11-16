@@ -16,7 +16,7 @@ async fn errors_arrive_typed() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let id = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-1", "Amara", "amara@x.org").await;
 
         let mut twice = persons.create_request();
         twice
@@ -39,7 +39,7 @@ async fn errors_arrive_typed() {
         write_uuid(other_uid.get().init_id(), Some(id));
         other_uid
             .get()
-            .set_jscontact(card("uid-other", "Ada", "a@x.org").as_str());
+            .set_jscontact(card("uid-other", "Amara", "a@x.org").as_str());
         expect_problem(other_uid.send().promise.await, CONFLICT);
 
         let mut unknown = persons.delete_request();
@@ -85,7 +85,7 @@ async fn an_empty_value_is_a_malformed_request() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let id = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let by_uid = persons.get_by_uid_request();
         expect_problem(by_uid.send().promise.await, BAD_REQUEST);
         let email = persons.find_by_email_request();

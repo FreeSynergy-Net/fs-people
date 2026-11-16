@@ -77,9 +77,9 @@ async fn what_could_not_come_back_is_not_taken() {
         import.get().set_text(too_much.as_str());
         expect_problem(import.send().promise.await, TOO_LARGE);
 
-        let ada = common::create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let amara = common::create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let mut scope = roles.assign_request();
-        write_uuid(scope.get().init_person(), Some(ada));
+        write_uuid(scope.get().init_person(), Some(amara));
         scope.get().set_role("member");
         scope
             .get()
@@ -97,7 +97,7 @@ async fn what_could_not_come_back_is_not_taken() {
         d.set_owner("fs-people");
         define.send().promise.await.unwrap();
         let mut details = roles.assign_request();
-        write_uuid(details.get().init_person(), Some(ada));
+        write_uuid(details.get().init_person(), Some(amara));
         details.get().set_role("coach");
         details
             .get()
@@ -105,7 +105,7 @@ async fn what_could_not_come_back_is_not_taken() {
         expect_problem(details.send().promise.await, TOO_LARGE);
 
         let mut delete = persons.delete_request();
-        write_uuid(delete.get().init_id(), Some(ada));
+        write_uuid(delete.get().init_id(), Some(amara));
         delete.send().promise.await.unwrap();
 
         let mut config = roles.load_config_request();

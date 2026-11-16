@@ -77,7 +77,7 @@ async fn with_failing_store() -> (PeopleRepo, Arc<Failing>) {
 async fn item_14_a_refused_delete_of_the_card_leaves_links_and_roles_in_place() {
     let (r, failing) = with_failing_store().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -109,7 +109,7 @@ async fn item_14_a_refused_delete_of_the_card_leaves_links_and_roles_in_place() 
 async fn item_14_a_failed_clean_up_is_said_and_a_second_delete_finishes_it() {
     let (r, failing) = with_failing_store().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -145,7 +145,7 @@ async fn item_14_a_failed_clean_up_is_said_and_a_second_delete_finishes_it() {
 async fn a_failed_card_delete_after_a_list_changed_says_so() {
     let (r, failing) = with_failing_store().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope

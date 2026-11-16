@@ -24,7 +24,7 @@ fn code(e: &Error) -> Vec<(String, String)> {
 #[tokio::test]
 async fn the_values_replace_the_field_and_an_entry_that_stays_keeps_its_details() {
     let r = repo().await;
-    let id = stored(&r, person("Ada", "ada@example.org")).await;
+    let id = stored(&r, person("Amara", "amara@example.org")).await;
     // The details a form does not show.
     let rich: Card = {
         let mut c = r.get_card(id).await.unwrap().unwrap();
@@ -35,7 +35,7 @@ async fn the_values_replace_the_field_and_an_entry_that_stays_keeps_its_details(
     let edit = Edit::new().set(
         &["emails"],
         BasicType::Email,
-        &["ada@example.org", "second@example.com"],
+        &["amara@example.org", "second@example.com"],
     );
     let done = People::change(&r, id, &edit).await.unwrap();
     let card: Card = serde_json::from_value(done.content).unwrap();
@@ -56,7 +56,7 @@ async fn the_values_replace_the_field_and_an_entry_that_stays_keeps_its_details(
 #[tokio::test]
 async fn no_values_clear_the_field_and_a_field_not_named_stays() {
     let r = repo().await;
-    let mut c = person("Ada", "ada@example.org");
+    let mut c = person("Amara", "amara@example.org");
     c.add_phone("+49 30 123456");
     let id = stored(&r, c).await;
     let edit = Edit::new().clear(&["phones"], BasicType::Phone);
@@ -64,22 +64,22 @@ async fn no_values_clear_the_field_and_a_field_not_named_stays() {
         serde_json::from_value(People::change(&r, id, &edit).await.unwrap().content).unwrap();
     assert!(card.phones.is_empty());
     assert_eq!(card.emails.len(), 1);
-    assert_eq!(card.name.unwrap().full.as_deref(), Some("Ada"));
+    assert_eq!(card.name.unwrap().full.as_deref(), Some("Amara"));
 }
 
 #[tokio::test]
 async fn entries_that_show_no_value_stay() {
     let r = repo().await;
-    let mut c = person("Ada", "ada@example.org");
+    let mut c = person("Amara", "amara@example.org");
     c.online_services.insert(
         "s1".into(),
-        serde_json::from_value(json!({"service": "Mastodon", "user": "ada"})).unwrap(),
+        serde_json::from_value(json!({"service": "Mastodon", "user": "amara"})).unwrap(),
     );
     let id = stored(&r, c).await;
     let edit = Edit::new().set(
         &["onlineServices"],
         BasicType::Link,
-        &["https://social.example/@ada"],
+        &["https://social.example/@amara"],
     );
     let card: Card =
         serde_json::from_value(People::change(&r, id, &edit).await.unwrap().content).unwrap();
@@ -88,13 +88,13 @@ async fn entries_that_show_no_value_stay() {
         2,
         "the entry with only a user is not the form's to drop"
     );
-    assert_eq!(card.online_services["s1"].user.as_deref(), Some("ada"));
+    assert_eq!(card.online_services["s1"].user.as_deref(), Some("amara"));
 }
 
 #[tokio::test]
 async fn single_fields_name_kind_gender_keywords() {
     let r = repo().await;
-    let id = stored(&r, person("Ada", "ada@example.org")).await;
+    let id = stored(&r, person("Amara", "amara@example.org")).await;
     let edit = Edit::new()
         .set(&["name"], BasicType::Name, &["Amara Brandt"])
         .set(&["grammaticalGender"], BasicType::Choice, &["feminine"])
@@ -126,7 +126,7 @@ async fn single_fields_name_kind_gender_keywords() {
 #[tokio::test]
 async fn what_is_wrong_is_a_path_and_a_code_and_nothing_is_written() {
     let r = repo().await;
-    let id = stored(&r, person("Ada", "ada@example.org")).await;
+    let id = stored(&r, person("Amara", "amara@example.org")).await;
     let before = r.get(id).await.unwrap().unwrap().content;
     for (edit, expected) in [
         (
@@ -171,9 +171,9 @@ async fn what_is_wrong_is_a_path_and_a_code_and_nothing_is_written() {
 #[tokio::test]
 async fn an_edit_that_changes_nothing_writes_nothing() {
     let r = repo().await;
-    let id = stored(&r, person("Ada", "ada@example.org")).await;
+    let id = stored(&r, person("Amara", "amara@example.org")).await;
     let before = r.get(id).await.unwrap().unwrap();
-    let edit = Edit::new().set(&["emails"], BasicType::Email, &["ada@example.org"]);
+    let edit = Edit::new().set(&["emails"], BasicType::Email, &["amara@example.org"]);
     let again = People::change(&r, id, &edit).await.unwrap();
     assert_eq!(again.content, before.content);
 }
@@ -271,7 +271,7 @@ async fn what_a_form_shows_sent_back_unchanged_changes_nothing() {
 #[tokio::test]
 async fn a_new_value_never_takes_the_id_of_an_entry_still_there_or_just_gone() {
     let r = repo().await;
-    let mut c = person("Ada", "a@example.org");
+    let mut c = person("Amara", "a@example.org");
     c.add_email("b@example.org");
     let id = stored(&r, c).await;
     let edit = Edit::new().set(

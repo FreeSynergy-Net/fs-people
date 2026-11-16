@@ -47,7 +47,7 @@ async fn a_shown_value_that_is_older_than_the_rules_sent_back_is_not_a_change() 
 #[tokio::test]
 async fn a_path_named_twice_is_refused_even_when_one_of_them_is_the_shown_value() {
     let r = repo().await;
-    let id = stored(&r, Card::individual("Ada")).await;
+    let id = stored(&r, Card::individual("Amara")).await;
     let before = r.get(id).await.unwrap().unwrap().content;
     let edit = Edit::new()
         .set(&["kind"], BasicType::Choice, &["group"])
@@ -60,7 +60,7 @@ async fn a_path_named_twice_is_refused_even_when_one_of_them_is_the_shown_value(
 #[tokio::test]
 async fn a_whole_form_sent_back_with_one_real_change_changes_only_that() {
     let r = repo().await;
-    let id = stored(&r, Card::individual("Ada")).await;
+    let id = stored(&r, Card::individual("Amara")).await;
     let card = r.get_card(id).await.unwrap().unwrap();
     let mut edit = Edit::new();
     for f in <Card as fs_types::DescribesType>::describe().fields {
@@ -77,13 +77,13 @@ async fn a_whole_form_sent_back_with_one_real_change_changes_only_that() {
     let done = People::change(&r, id, &edit).await.unwrap();
     let after: Card = serde_json::from_value(done.content).unwrap();
     assert_eq!(after.phones.values().next().unwrap().number, "+4930123456");
-    assert_eq!(after.name.unwrap().full.as_deref(), Some("Ada"));
+    assert_eq!(after.name.unwrap().full.as_deref(), Some("Amara"));
 }
 
 #[tokio::test]
 async fn an_empty_text_box_sent_back_for_a_read_only_field_is_no_change() {
     let r = repo().await;
-    let id = stored(&r, Card::individual("Ada")).await;
+    let id = stored(&r, Card::individual("Amara")).await;
     let before = r.get(id).await.unwrap().unwrap().content;
     let edit = Edit::new().set(&["prodId"], BasicType::Text, &[""]);
     let done = People::change(&r, id, &edit).await.unwrap();
@@ -93,7 +93,7 @@ async fn an_empty_text_box_sent_back_for_a_read_only_field_is_no_change() {
 #[tokio::test]
 async fn a_stored_blank_shown_and_sent_back_is_no_change() {
     let r = repo().await;
-    let mut c = Card::individual("Ada");
+    let mut c = Card::individual("Amara");
     c.prod_id = Some(String::new());
     let id = stored(&r, c).await;
     let before = r.get(id).await.unwrap().unwrap().content;
@@ -104,7 +104,7 @@ async fn a_stored_blank_shown_and_sent_back_is_no_change() {
 #[tokio::test]
 async fn a_stored_blank_can_still_be_cleared() {
     let r = repo().await;
-    let mut c = Card::individual("Ada");
+    let mut c = Card::individual("Amara");
     c.notes.insert(
         "n1".into(),
         serde_json::from_value(json!({"note": "   "})).unwrap(),

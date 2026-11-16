@@ -50,7 +50,7 @@ async fn what_a_provider_does_not_offer_says_so() {
                 let mut create = persons.create_request();
                 create
                     .get()
-                    .set_jscontact(card("u", "Ada", "a@x.org").as_str());
+                    .set_jscontact(card("u", "Amara", "a@x.org").as_str());
                 let detail = expect_problem(create.send().promise.await, NOT_POSSIBLE);
                 assert!(detail.starts_with("person.create:"), "{detail}");
 

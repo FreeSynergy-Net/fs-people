@@ -41,8 +41,8 @@ mod tests {
 
     #[test]
     fn a_line_has_three_columns_and_dashes_for_gaps() {
-        let c = r#"{"name":{"full":"Ada"},"emails":{"e1":{"address":"a@x.org"}}}"#;
-        assert_eq!(line("1", c), "1  Ada  a@x.org");
+        let c = r#"{"name":{"full":"Amara"},"emails":{"e1":{"address":"a@x.org"}}}"#;
+        assert_eq!(line("1", c), "1  Amara  a@x.org");
         assert_eq!(line("2", "not json"), "2  -  -");
     }
 }

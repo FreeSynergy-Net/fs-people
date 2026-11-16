@@ -7,8 +7,8 @@ use fs_objects::ObjectId;
 use fs_people_core::{Card, Error, PeopleRepo};
 use serde_json::json;
 
-async fn a_list_with_ada(r: &PeopleRepo) -> (ObjectId, ObjectId, String) {
-    let card = r.create(person("Ada", "a@x.org")).await.unwrap();
+async fn a_list_with_amara(r: &PeopleRepo) -> (ObjectId, ObjectId, String) {
+    let card = r.create(person("Amara", "a@x.org")).await.unwrap();
     let id = card.envelope.id;
     let uid = r.get_card(id).await.unwrap().unwrap().uid;
     let list = r.create_group("L").await.unwrap().envelope.id;
@@ -19,11 +19,11 @@ async fn a_list_with_ada(r: &PeopleRepo) -> (ObjectId, ObjectId, String) {
 #[tokio::test]
 async fn a_deleted_member_leaves_the_list_and_does_not_come_back() {
     let r = repo().await;
-    let (list, id, uid) = a_list_with_ada(&r).await;
+    let (list, id, uid) = a_list_with_amara(&r).await;
     r.delete(id).await.unwrap();
     assert!(r.get_card(list).await.unwrap().unwrap().members.is_empty());
 
-    let mut again = person("Ada again", "a@x.org");
+    let mut again = person("Amara again", "a@x.org");
     again.uid = uid;
     r.create(again).await.unwrap();
     assert!(r.members(list).await.unwrap().is_empty(), "came back");
@@ -34,7 +34,7 @@ async fn removal_goes_by_the_uid_in_any_spelling_and_also_when_the_card_is_gone(
     let r = repo().await;
     let list = r.create_group("L").await.unwrap().envelope.id;
     let plain = "01a1aaef-ba80-7f7a-8dff-0000000000ab";
-    let mut card = Card::individual("Ada");
+    let mut card = Card::individual("Amara");
     card.uid = plain.into();
     let id = r.create(card).await.unwrap().envelope.id;
     let mut group = r.get_card(list).await.unwrap().unwrap();
@@ -64,7 +64,7 @@ async fn removal_goes_by_the_uid_in_any_spelling_and_also_when_the_card_is_gone(
 #[tokio::test]
 async fn a_card_that_is_no_list_says_so_everywhere() {
     let r = repo().await;
-    let (_, id, _) = a_list_with_ada(&r).await;
+    let (_, id, _) = a_list_with_amara(&r).await;
     let other = r
         .create(person("Bob", "b@x.org"))
         .await
@@ -85,7 +85,7 @@ async fn a_card_that_is_no_list_says_so_everywhere() {
 #[tokio::test]
 async fn unrelate_keeps_what_is_not_its_own_and_an_untyped_relation_shows() {
     let r = repo().await;
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     card.related_to.insert(
         "with-more".into(),
         json!({"@type": "Relation", "relation": {"friend": true}, "example.org:note": "keep"}),
@@ -137,7 +137,7 @@ async fn unrelate_keeps_what_is_not_its_own_and_an_untyped_relation_shows() {
 #[tokio::test]
 async fn a_word_with_digits_is_no_phone_number() {
     let r = repo().await;
-    let mut card = person("Ada", "a@x.org");
+    let mut card = person("Amara", "a@x.org");
     card.add_phone("+49 30 555");
     r.create(card).await.unwrap();
     assert_eq!(

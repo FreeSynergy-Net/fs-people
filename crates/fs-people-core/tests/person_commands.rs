@@ -14,24 +14,24 @@ fn patch(v: serde_json::Value) -> PatchObject {
 #[tokio::test]
 async fn a_patch_sets_removes_and_leaves_the_rest() {
     let r = repo().await;
-    let mut c = person("Ada", "ada@example.org");
+    let mut c = person("Amara", "amara@example.org");
     c.add_phone("+49 30 123456");
     let id = r.create(c).await.unwrap().envelope.id;
     let before = r.get_card(id).await.unwrap().unwrap();
     let phone_id = before.phones.keys().next().unwrap().clone();
     let email_id = before.emails.keys().next().unwrap().clone();
     let p = patch(json!({
-        format!("emails/{email_id}/address"): "ada@example.com",
+        format!("emails/{email_id}/address"): "amara@example.com",
         format!("phones/{phone_id}"): null,
         "nicknames": {"n1": {"name": "Countess"}},
-        "name/full": "Ada L."
+        "name/full": "Amara L."
     }));
     let stored = People::patch(&r, id, &p).await.unwrap();
     let after: Card = serde_json::from_value(stored.content).unwrap();
-    assert_eq!(after.emails[&email_id].address, "ada@example.com");
+    assert_eq!(after.emails[&email_id].address, "amara@example.com");
     assert!(after.phones.is_empty());
     assert_eq!(after.nicknames["n1"].name, "Countess");
-    assert_eq!(after.name.unwrap().full.as_deref(), Some("Ada L."));
+    assert_eq!(after.name.unwrap().full.as_deref(), Some("Amara L."));
     assert_eq!(after.uid, before.uid);
 }
 
@@ -39,7 +39,7 @@ async fn a_patch_sets_removes_and_leaves_the_rest() {
 async fn a_path_through_what_is_not_there_is_refused_not_made_up() {
     let r = repo().await;
     let id = r
-        .create(person("Ada", "ada@example.org"))
+        .create(person("Amara", "amara@example.org"))
         .await
         .unwrap()
         .envelope
@@ -55,7 +55,7 @@ async fn a_path_through_what_is_not_there_is_refused_not_made_up() {
 async fn a_patch_that_cannot_be_applied_changes_nothing() {
     let r = repo().await;
     let id = r
-        .create(person("Ada", "ada@example.org"))
+        .create(person("Amara", "amara@example.org"))
         .await
         .unwrap()
         .envelope
@@ -85,7 +85,7 @@ async fn a_patch_that_cannot_be_applied_changes_nothing() {
 async fn a_key_with_a_slash_is_written_with_tilde_one() {
     let r = repo().await;
     let id = r
-        .create(person("Ada", "ada@example.org"))
+        .create(person("Amara", "amara@example.org"))
         .await
         .unwrap()
         .envelope
@@ -111,7 +111,7 @@ async fn a_patch_of_nobody_is_not_found_and_a_text_that_is_no_object_is_refused(
 #[tokio::test]
 async fn check_reports_the_values_that_break_a_rule_of_their_basic_type() {
     let r = repo().await;
-    let mut c = person("Ada", "ada@example.org");
+    let mut c = person("Amara", "amara@example.org");
     c.add_phone("+49 30 123456");
     let id = r.create(c).await.unwrap().envelope.id;
     let problems = People::check(&r, id).await.unwrap();
@@ -152,14 +152,14 @@ async fn suggest_completes_an_address_with_the_domains_in_the_book() {
     ] {
         r.create(person(n, e)).await.unwrap();
     }
-    let all = People::suggest(&r, "emails", "ada").await.unwrap();
+    let all = People::suggest(&r, "emails", "amara").await.unwrap();
     assert_eq!(
         all,
-        ["ada@example.org", "ada@corp.test", "ada@example.com"],
+        ["amara@example.org", "amara@corp.test", "amara@example.com"],
         "most used first, then by name"
     );
-    let some = People::suggest(&r, "emails", "ada@ex").await.unwrap();
-    assert_eq!(some, ["ada@example.org", "ada@example.com"]);
+    let some = People::suggest(&r, "emails", "amara@ex").await.unwrap();
+    assert_eq!(some, ["amara@example.org", "amara@example.com"]);
     let none = People::suggest(&r, "emails", "").await.unwrap();
     assert_eq!(none.len(), 0);
 }

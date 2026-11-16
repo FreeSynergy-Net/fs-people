@@ -11,20 +11,20 @@ const CLUB: &str = "https://local.invalid/groups/club";
 #[tokio::test]
 async fn one_person_has_many_roles_without_a_second_record() {
     let r = repo().await;
-    let ada = r
-        .create(person("Ada", "ada@x.org"))
+    let amara = r
+        .create(person("Amara", "amara@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
-    r.assign_role(ada, "customer", Some(CLUB), Map::new())
+    r.assign_role(amara, "customer", Some(CLUB), Map::new())
         .await
         .unwrap();
-    r.assign_role(ada, "member", Some(CLUB), Map::new())
+    r.assign_role(amara, "member", Some(CLUB), Map::new())
         .await
         .unwrap();
     let mut held: Vec<_> = r
-        .roles_of(ada)
+        .roles_of(amara)
         .await
         .unwrap()
         .into_iter()
@@ -41,7 +41,7 @@ async fn one_person_has_many_roles_without_a_second_record() {
     );
     assert_eq!(
         r.people_with_role("member", Some(CLUB)).await.unwrap(),
-        [ada]
+        [amara]
     );
     assert_eq!(
         r.people_with_role("member", Some("https://x/groups/other"))
@@ -54,28 +54,28 @@ async fn one_person_has_many_roles_without_a_second_record() {
 #[tokio::test]
 async fn assigning_twice_keeps_one_and_unknown_roles_are_refused() {
     let r = repo().await;
-    let ada = r
-        .create(person("Ada", "a@x.org"))
+    let amara = r
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
     let one = r
-        .assign_role(ada, "member", Some(CLUB), Map::new())
+        .assign_role(amara, "member", Some(CLUB), Map::new())
         .await
         .unwrap();
     let two = r
-        .assign_role(ada, "member", Some(CLUB), Map::new())
+        .assign_role(amara, "member", Some(CLUB), Map::new())
         .await
         .unwrap();
     assert_eq!(one.id, two.id);
     assert!(matches!(
-        r.assign_role(ada, "wizard", None, Map::new()).await,
+        r.assign_role(amara, "wizard", None, Map::new()).await,
         Err(Error::Conflict(_))
     ));
     r.unassign_role(one.id).await.unwrap();
     assert_eq!(
-        r.roles_of(ada).await.unwrap(),
+        r.roles_of(amara).await.unwrap(),
         [] as [fs_people_core::RoleAssignment; 0]
     );
 }
@@ -83,18 +83,18 @@ async fn assigning_twice_keeps_one_and_unknown_roles_are_refused() {
 #[tokio::test]
 async fn a_role_never_leaves_with_the_card() {
     let r = repo().await;
-    let ada = r
-        .create(person("Ada", "a@x.org"))
+    let amara = r
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
-    r.assign_role(ada, "customer", Some(CLUB), Map::new())
+    r.assign_role(amara, "customer", Some(CLUB), Map::new())
         .await
         .unwrap();
-    let vcard = r.export_vcard(ada).await.unwrap();
+    let vcard = r.export_vcard(amara).await.unwrap();
     assert!(!vcard.to_lowercase().contains("customer"), "{vcard}");
-    let card = serde_json::to_string(&r.get_card(ada).await.unwrap().unwrap()).unwrap();
+    let card = serde_json::to_string(&r.get_card(amara).await.unwrap().unwrap()).unwrap();
     assert!(!card.contains("customer"), "{card}");
 }
 
@@ -116,14 +116,14 @@ async fn own_roles_are_defined_like_ours_and_survive_as_objects() {
         Err(Error::Conflict(_))
     ));
 
-    let ada = r
-        .create(person("Ada", "a@x.org"))
+    let amara = r
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
     let held = r
-        .assign_role(ada, "coach", Some(CLUB), Map::new())
+        .assign_role(amara, "coach", Some(CLUB), Map::new())
         .await
         .unwrap();
     assert!(matches!(
@@ -158,16 +158,16 @@ async fn role_config_is_checked_first_then_swapped() {
 #[tokio::test]
 async fn deleting_a_person_ends_their_roles() {
     let r = repo().await;
-    let ada = r
-        .create(person("Ada", "a@x.org"))
+    let amara = r
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
-    r.assign_role(ada, "member", Some(CLUB), Map::new())
+    r.assign_role(amara, "member", Some(CLUB), Map::new())
         .await
         .unwrap();
-    r.delete(ada).await.unwrap();
+    r.delete(amara).await.unwrap();
     assert_eq!(
         r.people_with_role("member", None).await.unwrap(),
         [] as [fs_objects::ObjectId; 0]

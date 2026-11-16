@@ -48,7 +48,7 @@ async fn the_server_reports_the_description_of_person() {
 async fn patch_changes_what_it_names_and_a_bad_patch_is_a_problem() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "uid-p", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-p", "Amara", "amara@x.org").await;
 
         let mut patch = persons.patch_request();
         write_uuid(patch.get().init_id(), Some(id));
@@ -61,7 +61,7 @@ async fn patch_changes_what_it_names_and_a_bad_patch_is_a_problem() {
         let content = json_of(person);
         assert_eq!(content["name"]["full"], "Amara Brandt");
         assert_eq!(content["emails"]["e1"]["label"], "main");
-        assert_eq!(content["emails"]["e1"]["address"], "ada@x.org");
+        assert_eq!(content["emails"]["e1"]["address"], "amara@x.org");
 
         for bad in ["[1]", "not json", r#"{"nope/x":1}"#, r#"{"uid":"other"}"#] {
             let mut patch = persons.patch_request();
@@ -83,7 +83,7 @@ async fn patch_changes_what_it_names_and_a_bad_patch_is_a_problem() {
 async fn check_names_what_breaks_a_rule_and_leaves_the_card_alone() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "uid-c", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-c", "Amara", "amara@x.org").await;
         let mut ask = persons.check_request();
         write_uuid(ask.get().init_id(), Some(id));
         let ok = ask.send().promise.await.unwrap();
@@ -124,11 +124,11 @@ async fn suggest_completes_from_the_book_and_refuses_a_field_it_does_not_know() 
         create(&persons, "uid-s2", "B", "b@example.org").await;
         let mut ask = persons.suggest_request();
         ask.get().set_field("emails");
-        ask.get().set_typed("ada");
+        ask.get().set_typed("amara");
         let got = ask.send().promise.await.unwrap();
         let got = got.get().unwrap().get_suggestions().unwrap();
         assert_eq!(got.len(), 1);
-        assert_eq!(got.get(0).unwrap().to_str().unwrap(), "ada@example.org");
+        assert_eq!(got.get(0).unwrap().to_str().unwrap(), "amara@example.org");
 
         let mut ask = persons.suggest_request();
         ask.get().set_field("nope");
@@ -142,7 +142,7 @@ async fn suggest_completes_from_the_book_and_refuses_a_field_it_does_not_know() 
 async fn change_takes_typed_values_field_by_field() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "uid-ch", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-ch", "Amara", "amara@x.org").await;
         let send = |emails: &'static [&'static str]| {
             let persons = persons.clone();
             async move {
@@ -160,10 +160,10 @@ async fn change_takes_typed_values_field_by_field() {
                 req.send().promise.await
             }
         };
-        let done = send(&["ada@x.org", "second@y.org"]).await.unwrap();
+        let done = send(&["amara@x.org", "second@y.org"]).await.unwrap();
         let content = json_of(done.get().unwrap().get_person().unwrap());
         assert_eq!(content["emails"].as_object().unwrap().len(), 2);
-        assert_eq!(content["emails"]["e1"]["address"], "ada@x.org");
+        assert_eq!(content["emails"]["e1"]["address"], "amara@x.org");
         // A value that breaks the rule of its basic type is a problem, and nothing is written.
         let bad = problem_of(send(&["nonsense"]).await);
         assert_eq!(bad.status, 422);
@@ -175,7 +175,7 @@ async fn change_takes_typed_values_field_by_field() {
 async fn change_of_a_read_only_field_is_refused() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "uid-ro", "Ada", "ada@x.org").await;
+        let id = create(&persons, "uid-ro", "Amara", "amara@x.org").await;
         let mut req = persons.change_request();
         write_uuid(req.get().init_id(), Some(id));
         let mut fields = req.get().init_edit().init_fields(1);

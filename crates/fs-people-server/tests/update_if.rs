@@ -20,7 +20,7 @@ async fn every_answer_carries_a_revision_and_each_write_changes_it() {
         let persons = persons_of(&root).await;
         let mut make = persons.create_request();
         make.get()
-            .set_jscontact(card("u1", "Ada", "a@x.org").as_str());
+            .set_jscontact(card("u1", "Amara", "a@x.org").as_str());
         let created = make.send().promise.await.unwrap();
         let person = created.get().unwrap().get_person().unwrap();
         let id = id_of(person);
@@ -35,7 +35,7 @@ async fn every_answer_carries_a_revision_and_each_write_changes_it() {
         write_uuid(update.get().init_id(), Some(id));
         update
             .get()
-            .set_jscontact(card("u1", "Ada K", "a@x.org").as_str());
+            .set_jscontact(card("u1", "Amara K", "a@x.org").as_str());
         let done = update.send().promise.await.unwrap();
         let second = revision_of(done.get().unwrap().get_person().unwrap());
         assert_ne!(second, first);
@@ -48,19 +48,19 @@ async fn every_answer_carries_a_revision_and_each_write_changes_it() {
 async fn update_if_writes_on_the_revision_read_and_refuses_a_stale_one() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "u1", "Ada", "a@x.org").await;
+        let id = create(&persons, "u1", "Amara", "a@x.org").await;
         let read = revision_now(&persons, id).await;
 
-        let done = update_if(&persons, id, read, &card("u1", "Ada B", "a@x.org"))
+        let done = update_if(&persons, id, read, &card("u1", "Amara B", "a@x.org"))
             .await
             .unwrap();
         let person = done.get().unwrap().get_person().unwrap();
-        assert_eq!(name_of(person), "Ada B");
+        assert_eq!(name_of(person), "Amara B");
         let now = revision_of(person);
         assert_ne!(now, read);
 
         let detail = expect_problem(
-            update_if(&persons, id, read, &card("u1", "Ada C", "a@x.org")).await,
+            update_if(&persons, id, read, &card("u1", "Amara C", "a@x.org")).await,
             CONFLICT,
         );
         assert!(detail.starts_with("conflict:"), "{detail}");
@@ -70,7 +70,7 @@ async fn update_if_writes_on_the_revision_read_and_refuses_a_stale_one() {
         write_uuid(get.get().init_id(), Some(id));
         let got = get.send().promise.await.unwrap();
         let card_now = json_of(got.get().unwrap().get_person().unwrap());
-        assert_eq!(card_now["name"]["full"], "Ada B");
+        assert_eq!(card_now["name"]["full"], "Amara B");
 
         let ghost = common::unknown_id();
         expect_problem(
@@ -85,7 +85,7 @@ async fn update_if_writes_on_the_revision_read_and_refuses_a_stale_one() {
 async fn of_two_writers_on_one_revision_exactly_one_wins() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
-        let id = create(&persons, "u1", "Ada", "a@x.org").await;
+        let id = create(&persons, "u1", "Amara", "a@x.org").await;
         for round in 0..10 {
             let read = revision_now(&persons, id).await;
             let (card_a, card_b) = (

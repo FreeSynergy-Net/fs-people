@@ -10,15 +10,15 @@ async fn ai_marking_shows_in_kind_and_role() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let ada = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let amara = create(&persons, "uid-1", "Amara", "amara@x.org").await;
 
         let mut is_ai = roles.is_ai_request();
-        write_uuid(is_ai.get().init_person(), Some(ada));
+        write_uuid(is_ai.get().init_person(), Some(amara));
         let answer = is_ai.send().promise.await.unwrap();
         assert!(!answer.get().unwrap().get_ai());
 
         let mut mark = roles.mark_ai_request();
-        write_uuid(mark.get().init_person(), Some(ada));
+        write_uuid(mark.get().init_person(), Some(amara));
         let answer = mark.send().promise.await.unwrap();
         let held = answer.get().unwrap().get_assignment().unwrap();
         assert_eq!(
@@ -27,12 +27,12 @@ async fn ai_marking_shows_in_kind_and_role() {
         );
 
         let mut is_ai = roles.is_ai_request();
-        write_uuid(is_ai.get().init_person(), Some(ada));
+        write_uuid(is_ai.get().init_person(), Some(amara));
         let answer = is_ai.send().promise.await.unwrap();
         assert!(answer.get().unwrap().get_ai());
 
         let mut get = persons.get_request();
-        write_uuid(get.get().init_id(), Some(ada));
+        write_uuid(get.get().init_id(), Some(amara));
         let answer = get.send().promise.await.unwrap();
         let person = answer.get().unwrap().get_person().unwrap();
         assert_eq!(json_of(person)["kind"], "application");
@@ -46,20 +46,20 @@ async fn an_ai_cannot_be_updated_out_of_its_kind() {
     with_server(|root| async move {
         let persons = persons_of(&root).await;
         let roles = roles_of(&root).await;
-        let ada = create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        let amara = create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let mut mark = roles.mark_ai_request();
-        write_uuid(mark.get().init_person(), Some(ada));
+        write_uuid(mark.get().init_person(), Some(amara));
         mark.send().promise.await.unwrap();
 
         let mut update = persons.update_request();
-        write_uuid(update.get().init_id(), Some(ada));
+        write_uuid(update.get().init_id(), Some(amara));
         update
             .get()
-            .set_jscontact(common::card("uid-1", "Ada", "ada@x.org").as_str());
+            .set_jscontact(common::card("uid-1", "Amara", "amara@x.org").as_str());
         expect_problem(update.send().promise.await, CONFLICT);
 
         let mut is_ai = roles.is_ai_request();
-        write_uuid(is_ai.get().init_person(), Some(ada));
+        write_uuid(is_ai.get().init_person(), Some(amara));
         let answer = is_ai.send().promise.await.unwrap();
         assert!(answer.get().unwrap().get_ai());
     })

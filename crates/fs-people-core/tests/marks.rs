@@ -18,13 +18,13 @@ fn marked(name: &str, email: &str, categories: &[&str]) -> Card {
 async fn an_update_without_the_mark_keeps_it() {
     let r = repo().await;
     let a = r
-        .create(marked("Ada", "a@x.org", &["pd:HealthRecord"]))
+        .create(marked("Amara", "a@x.org", &["pd:HealthRecord"]))
         .await
         .unwrap()
         .envelope
         .id;
     r.create(person("A. K.", "a@x.org")).await.unwrap();
-    let mut bare = person("Ada", "a@x.org");
+    let mut bare = person("Amara", "a@x.org");
     bare.uid = r.get_card(a).await.unwrap().unwrap().uid;
     let stored = r.update(a, bare.clone()).await.unwrap();
     assert_eq!(stored.envelope.sensitive, ["pd:HealthRecord"]);
@@ -45,13 +45,13 @@ async fn an_update_without_the_mark_keeps_it() {
 #[tokio::test]
 async fn an_unclear_mark_stays_until_categories_replace_it() {
     let r = repo().await;
-    let text = json!({"@type": "Card", "version": "1.0", "uid": "u", "name": {"full": "Ada"},
+    let text = json!({"@type": "Card", "version": "1.0", "uid": "u", "name": {"full": "Amara"},
         SENSITIVE_KEY: true});
     let report = r.import_jscontact(&text.to_string()).await.unwrap();
     let id = report.created[0];
     assert_eq!(report.unclear.len(), 1);
 
-    let mut bare = Card::individual("Ada");
+    let mut bare = Card::individual("Amara");
     bare.uid = "u".into();
     let stored = r.update(id, bare.clone()).await.unwrap();
     assert_eq!(
@@ -74,7 +74,7 @@ async fn an_unclear_mark_stays_until_categories_replace_it() {
 async fn a_card_that_becomes_sensitive_loses_its_links() {
     let r = repo().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope

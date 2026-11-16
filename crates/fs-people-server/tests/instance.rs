@@ -28,7 +28,7 @@ async fn the_report_carries_the_id_of_the_store_and_the_log_does_not() {
         assert_eq!(instance_of(&root).await, Some(told));
 
         let persons = persons_of(&root).await;
-        create(&persons, "uid-1", "Ada", "ada@x.org").await;
+        create(&persons, "uid-1", "Amara", "amara@x.org").await;
         let log = store.activities(&ActivityFilter::default()).await.unwrap();
         assert_ne!(log, [] as [fs_objects::Activity; 0]);
         let written = format!("{log:?}");

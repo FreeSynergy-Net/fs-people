@@ -86,7 +86,7 @@ async fn a_new_entry_gets_the_chosen_kind_and_else_the_preselected_one() {
     let r = repo().await;
     for (field, selector, default, basic, value) in ROWS {
         let id = r
-            .create(person("Ada", "ada@example.org"))
+            .create(person("Amara", "amara@example.org"))
             .await
             .unwrap()
             .envelope
@@ -129,7 +129,7 @@ const ROWS_OTHER: [(&str, &str); 5] = [
 async fn an_entry_that_exists_keeps_its_kind() {
     let r = repo().await;
     let id = r
-        .create(person("Ada", "ada@example.org"))
+        .create(person("Amara", "amara@example.org"))
         .await
         .unwrap()
         .envelope
@@ -155,7 +155,7 @@ async fn an_entry_that_exists_keeps_its_kind() {
 async fn a_kind_that_is_not_allowed_is_refused_and_nothing_is_written() {
     let r = repo().await;
     let id = r
-        .create(person("Ada", "ada@example.org"))
+        .create(person("Amara", "amara@example.org"))
         .await
         .unwrap()
         .envelope
@@ -185,7 +185,7 @@ async fn a_kind_that_is_not_allowed_is_refused_and_nothing_is_written() {
 async fn a_kind_alone_changes_nothing() {
     let r = repo().await;
     let id = r
-        .create(person("Ada", "ada@example.org"))
+        .create(person("Amara", "amara@example.org"))
         .await
         .unwrap()
         .envelope
@@ -198,7 +198,7 @@ async fn a_kind_alone_changes_nothing() {
 #[tokio::test]
 async fn a_sound_on_the_card_is_not_the_image_forms_to_show_or_drop() {
     let r = repo().await;
-    let mut c = person("Ada", "ada@example.org");
+    let mut c = person("Amara", "amara@example.org");
     c.media.insert(
         "m1".into(),
         serde_json::from_value(

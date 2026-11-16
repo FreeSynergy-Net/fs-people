@@ -17,13 +17,13 @@ fn not_found<T: std::fmt::Debug>(r: &Result<T, Error>) -> bool {
 async fn removing_a_link_or_an_assignment_touches_nothing_else() {
     let r = repo().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
         .id;
     let b = r
-        .create(person("Ada K", "a@x.org"))
+        .create(person("Amara K", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -53,7 +53,7 @@ async fn removing_a_link_or_an_assignment_touches_nothing_else() {
 async fn a_uid_never_overwrites_the_object_with_that_id() {
     let (r, store) = setup().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -88,7 +88,7 @@ async fn a_uid_never_overwrites_the_object_with_that_id() {
 async fn a_scope_is_an_iri_and_details_belong_to_own_roles() {
     let r = repo().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope
@@ -124,7 +124,7 @@ async fn a_scope_is_an_iri_and_details_belong_to_own_roles() {
 async fn a_failed_ai_mark_leaves_the_card_alone() {
     let r = repo().await.with_roles(RoleRegistry::empty());
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope

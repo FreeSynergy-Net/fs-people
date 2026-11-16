@@ -9,7 +9,7 @@ use fs_people_core::{Error, ListFilter};
 async fn groups_hold_members() {
     let r = repo().await;
     let a = r
-        .create(person("Ada", "a@x.org"))
+        .create(person("Amara", "a@x.org"))
         .await
         .unwrap()
         .envelope

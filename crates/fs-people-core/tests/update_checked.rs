@@ -17,7 +17,7 @@ fn renamed(of: &Card, name: &str) -> Card {
 #[tokio::test(flavor = "current_thread")]
 async fn the_revision_read_writes_and_the_next_one_differs() {
     let r = common::repo().await;
-    let first = People::create(&r, person("Ada", "ada@x.org"))
+    let first = People::create(&r, person("Amara", "amara@x.org"))
         .await
         .unwrap();
     let card = card_of(&first).unwrap();
@@ -41,18 +41,18 @@ async fn the_revision_read_writes_and_the_next_one_differs() {
 #[tokio::test(flavor = "current_thread")]
 async fn a_wrong_revision_writes_nothing_and_does_not_name_the_right_one() {
     let (r, store) = common::setup().await;
-    let first = People::create(&r, person("Ada", "ada@x.org"))
+    let first = People::create(&r, person("Amara", "amara@x.org"))
         .await
         .unwrap();
     let card = card_of(&first).unwrap();
     let stale = Revision::of(&first);
-    let current = People::update(&r, first.envelope.id, renamed(&card, "Ada B"))
+    let current = People::update(&r, first.envelope.id, renamed(&card, "Amara B"))
         .await
         .unwrap();
     let log_before = store.count(&fs_objects::Query::new()).await.unwrap();
 
     let err = r
-        .update_checked(first.envelope.id, stale, renamed(&card, "Ada C"))
+        .update_checked(first.envelope.id, stale, renamed(&card, "Amara C"))
         .await
         .unwrap_err();
     assert!(
@@ -90,7 +90,7 @@ async fn an_unknown_person_is_not_found() {
 async fn of_two_writers_on_one_revision_exactly_one_wins() {
     for round in 0..20 {
         let r = yielding_repo().await;
-        let first = People::create(&*r, person("Ada", "ada@x.org"))
+        let first = People::create(&*r, person("Amara", "amara@x.org"))
             .await
             .unwrap();
         let id = first.envelope.id;
