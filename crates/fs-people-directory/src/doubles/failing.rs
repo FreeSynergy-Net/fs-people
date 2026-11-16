@@ -4,9 +4,10 @@
 
 use crate::fake::sample_ref;
 use crate::person_directory_v1::{
-    Candidate, Capabilities, ContactAddress, DirectoryChange, Error, Excerpt, ExcerptField,
-    NoExcerptReason, ObjectId, Page, PersonDirectory, PersonRef, PersonView, Place, Problem,
-    ProposeEntry, Reference, Resolved, Result, Suggest, Unreachable,
+    Candidate, Capabilities, Consent, ConsentEntry, ConsentQuery, ContactAddress, DirectoryChange,
+    Error, Excerpt, ExcerptRequest, NoExcerptReason, ObjectId, Page, PersonDirectory, PersonRef,
+    PersonView, Place, Problem, ProposeEntry, Reference, Resolved, Result, Suggest, Unreachable,
+    Withdrawal,
 };
 use async_trait::async_trait;
 
@@ -39,12 +40,14 @@ impl FailingDirectory {
                 reason: "out_of_range".to_owned(),
             }]),
             Error::BatchClosed(ObjectId([0; 16])),
+            Error::UnknownConsent(ObjectId([0; 16])),
         ];
         if let Some(person) = sample_ref(1) {
             for reason in [
                 NoExcerptReason::Deleted,
                 NoExcerptReason::NotShared,
                 NoExcerptReason::Unknown,
+                NoExcerptReason::NoConsent,
             ] {
                 errors.push(Error::NoExcerpt {
                     person: person.clone(),
@@ -97,7 +100,19 @@ impl PersonDirectory for FailingDirectory {
     async fn propose(&self, _: &ProposeEntry, _: Option<ObjectId>) -> Result<PersonRef> {
         self.fail()
     }
-    async fn excerpt(&self, _: &PersonRef, _: &[ExcerptField]) -> Result<Excerpt> {
+    async fn excerpt(&self, _: &PersonRef, _: &ExcerptRequest) -> Result<Excerpt> {
+        self.fail()
+    }
+    async fn consents_of(&self, _: &PersonRef) -> Result<Vec<Consent>> {
+        self.fail()
+    }
+    async fn check_consent(&self, _: &ConsentQuery) -> Result<Option<ObjectId>> {
+        self.fail()
+    }
+    async fn record_consent(&self, _: &ConsentEntry) -> Result<Consent> {
+        self.fail()
+    }
+    async fn withdraw_consent(&self, _: ObjectId, _: &Withdrawal) -> Result<Consent> {
         self.fail()
     }
 }

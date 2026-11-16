@@ -3,7 +3,7 @@
 //! Pattern: Strategy / Test fixture (the rules are written once; each provider says how to create a deleted,
 //! unshared or merged entry, so the same rules run against the fake and later against `PeopleRepo`).
 
-use crate::person_directory_v1::{PersonArt, PersonDirectory, PersonRef};
+use crate::person_directory_v1::{Birthday, PersonArt, PersonDirectory, PersonRef};
 use async_trait::async_trait;
 
 /// The provider under test plus the mutators behind it. A mutator that the provider cannot offer keeps its
@@ -51,6 +51,36 @@ pub trait ConformanceFixture: Send + Sync {
 
     /// A view of a foreign address book: reading works, `person.propose` is `Forbidden`.
     async fn foreign_book(&self) -> Option<Box<dyn PersonDirectory>> {
+        None
+    }
+
+    /// Create a confirmed entry with the AI mark (`PersonView::ai`); `display` carries the marker `Zzconf`.
+    async fn add_ai(&self, _display: &str) -> Option<PersonRef> {
+        None
+    }
+
+    /// Give an entry a birthday (with or without year) that `excerpt` hands out.
+    async fn set_birthday(&self, _person: &PersonRef, _birthday: Birthday) -> bool {
+        false
+    }
+
+    /// Link a profile to a person (`describes`); `None` cuts the link.
+    async fn describe(&self, _profile: &PersonRef, _person: Option<&PersonRef>) -> bool {
+        false
+    }
+
+    /// The same data asked by a signed-in administrator: all `consent.*` rights (read, check, write).
+    async fn admin_view(&self) -> Option<Box<dyn PersonDirectory>> {
+        None
+    }
+
+    /// The same data asked by `who` holding exactly the named rights of `consent.read`, `consent.check`,
+    /// `consent.write` (none: an ordinary member; an AI if `who` was made with `add_ai`).
+    async fn member_view(
+        &self,
+        _who: &PersonRef,
+        _rights: &[&str],
+    ) -> Option<Box<dyn PersonDirectory>> {
         None
     }
 }

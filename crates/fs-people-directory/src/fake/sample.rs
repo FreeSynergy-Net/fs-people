@@ -5,7 +5,7 @@
 //!
 //! | n | art | what |
 //! | --- | --- | --- |
-//! | 1 | Person | Amara Zolenko, confirmed, `mailto:amara@example.org`, the asker, full excerpt |
+//! | 1 | Person | Amara Zolenko, confirmed, `mailto:amara@example.org`, the asker, full excerpt incl. birthday 1988-04-15 |
 //! | 2 | Profile | "Amara Z.", linked to 1 (`describes`), same address as 1 |
 //! | 3 | Profile | "A. Zolenko", unlinked, same address as 1 (two profiles with one address) |
 //! | 4 | Person | "Assistent Sol", `ai` set |
@@ -19,8 +19,8 @@
 //! | 12 | Person | "Tariq Lindqvist", confirmed |
 
 use super::{Entry, FakeDirectory};
-use crate::person_directory_v1::{EntryState, ExcerptValue, PersonArt, PersonRef};
-use fs_types::{BasicValue, ContactAddress, EmailAddress, Name, Reference, Text};
+use crate::person_directory_v1::{Birthday, EntryState, ExcerptValue, PersonArt, PersonRef};
+use fs_types::{BasicValue, ContactAddress, Date, EmailAddress, Name, Reference, Text};
 
 /// The reference of entry `n` (1 to 12) of [`sample`], with the art of that entry; `None` for any other number.
 #[must_use]
@@ -56,6 +56,9 @@ fn amara() -> Option<Entry> {
     }
     if let Ok(mail) = EmailAddress::parse("amara@example.org") {
         e.excerpt.push(ExcerptValue::Email(mail));
+    }
+    if let Ok(day) = Date::parse("1988-04-15") {
+        e.excerpt.push(ExcerptValue::Birthday(Birthday::Date(day)));
     }
     Some(e)
 }

@@ -4,11 +4,20 @@
 
 use fs_people_directory::conformance::{run_conformance, run_fixture_conformance};
 use fs_people_directory::{
-    CompositeDirectory, EntryState, Error, ExcerptField, FailingDirectory, FakeDirectory,
-    FakeFixture, Gate, PersonArt, PersonDirectory, ProposeEntry, Resolved, SlowDirectory, Suggest,
-    sample, sample_ref,
+    CompositeDirectory, EntryState, Error, ExcerptField, ExcerptRequest, FailingDirectory,
+    FakeDirectory, FakeFixture, Gate, PersonArt, PersonDirectory, ProposeEntry, Purpose, Resolved,
+    SlowDirectory, Suggest, sample, sample_ref,
 };
 use std::time::Duration;
+
+fn ask(fields: &[ExcerptField]) -> ExcerptRequest {
+    ExcerptRequest {
+        fields: fields.to_vec(),
+        purpose: Purpose::OwnUse,
+        scope: None,
+        recipient: None,
+    }
+}
 
 fn r(n: u8) -> fs_people_directory::PersonRef {
     sample_ref(n).expect("a sample number")
@@ -69,11 +78,16 @@ async fn sample_covers_every_state() {
 #[tokio::test]
 async fn every_error_variant_is_reachable() {
     let all = FailingDirectory::each_variant();
-    assert_eq!(all.len(), 11);
+    assert_eq!(all.len(), 13);
     for f in all {
         assert!(f.resolve(&r(1)).await.is_err());
         assert!(f.asker().await.is_err());
-        assert!(f.excerpt(&r(1), &[ExcerptField::FullName]).await.is_err());
+        assert!(
+            f.excerpt(&r(1), &ask(&[ExcerptField::FullName]))
+                .await
+                .is_err()
+        );
+        assert!(f.consents_of(&r(1)).await.is_err());
         let e = ProposeEntry {
             display_hint: "x".into(),
             address: None,
@@ -167,7 +181,7 @@ async fn fake_merge_bumps_rev_and_excerpt_follows() {
         other => panic!("{other:?}"),
     }
     let x = d
-        .excerpt(&r(12), &[ExcerptField::FullName])
+        .excerpt(&r(12), &ask(&[ExcerptField::FullName]))
         .await
         .expect("follows the merge");
     assert_eq!(x.person.id, r(1).id);

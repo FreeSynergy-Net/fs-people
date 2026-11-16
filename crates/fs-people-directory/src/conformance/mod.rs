@@ -6,6 +6,11 @@
 //! works on an empty or a filled directory (all seeds carry the marker `Zzconf`). A provider without
 //! `person.propose` runs `run_unsupported` instead.
 
+mod ai_rules;
+mod ai_views;
+mod consent_match;
+mod consent_rights;
+mod consent_rules;
 mod extra;
 mod fixture;
 mod fixture_rules;
@@ -15,4 +20,4 @@ mod write;
 
 pub use fixture::ConformanceFixture;
 pub use run::{Report, run_conformance, run_fixture_conformance, run_unsupported};
-pub(crate) use run::{Seeds, address, entry};
+pub(crate) use run::{Seeds, address, entry, purposed, request};

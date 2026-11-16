@@ -4,9 +4,9 @@
 //! Pattern: Decorator over `PersonDirectory` (delays, then delegates) with a hand-made latch.
 
 use crate::person_directory_v1::{
-    Candidate, Capabilities, ContactAddress, DirectoryChange, Excerpt, ExcerptField, ObjectId,
-    Page, PersonDirectory, PersonRef, PersonView, Place, ProposeEntry, Reference, Resolved, Result,
-    Suggest,
+    Candidate, Capabilities, Consent, ConsentEntry, ConsentQuery, ContactAddress, DirectoryChange,
+    Excerpt, ExcerptRequest, ObjectId, Page, PersonDirectory, PersonRef, PersonView, Place,
+    ProposeEntry, Reference, Resolved, Result, Suggest, Withdrawal,
 };
 use async_trait::async_trait;
 use std::future::Future;
@@ -129,8 +129,24 @@ impl<D: PersonDirectory> PersonDirectory for SlowDirectory<D> {
         self.hold().await;
         self.inner.propose(entry, batch).await
     }
-    async fn excerpt(&self, person: &PersonRef, fields: &[ExcerptField]) -> Result<Excerpt> {
+    async fn excerpt(&self, person: &PersonRef, request: &ExcerptRequest) -> Result<Excerpt> {
         self.hold().await;
-        self.inner.excerpt(person, fields).await
+        self.inner.excerpt(person, request).await
+    }
+    async fn consents_of(&self, person: &PersonRef) -> Result<Vec<Consent>> {
+        self.hold().await;
+        self.inner.consents_of(person).await
+    }
+    async fn check_consent(&self, query: &ConsentQuery) -> Result<Option<ObjectId>> {
+        self.hold().await;
+        self.inner.check_consent(query).await
+    }
+    async fn record_consent(&self, entry: &ConsentEntry) -> Result<Consent> {
+        self.hold().await;
+        self.inner.record_consent(entry).await
+    }
+    async fn withdraw_consent(&self, id: ObjectId, withdrawal: &Withdrawal) -> Result<Consent> {
+        self.hold().await;
+        self.inner.withdraw_consent(id, withdrawal).await
     }
 }

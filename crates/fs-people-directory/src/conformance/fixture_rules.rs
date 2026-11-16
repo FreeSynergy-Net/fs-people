@@ -2,7 +2,7 @@
 //!
 //! Pattern: Template method (rules as plain checks; the states come from the `ConformanceFixture`).
 
-use super::{ConformanceFixture, Report, Seeds};
+use super::{ConformanceFixture, Report, Seeds, request};
 use crate::person_directory_v1::{
     ChangeKind, Error, ExcerptField, NoExcerptReason, PersonArt, PersonDirectory, PersonRef, Place,
     Resolved, Suggest,
@@ -46,6 +46,9 @@ pub(super) async fn rules(fx: &dyn ConformanceFixture, s: &Seeds, r: &mut Report
     order_rules(fx, s, r).await;
     arten_rules(fx, r).await;
     forbidden_rules(fx, r).await;
+    super::consent_rules::rules(fx, r).await;
+    super::consent_match::rules(fx, r).await;
+    super::ai_rules::rules(fx, r).await;
 }
 
 /// `Deleted` or `NotShared`, then `Restored`.
@@ -85,7 +88,7 @@ async fn gone_rules(fx: &dyn ConformanceFixture, which: &str, from: &Place, r: &
         state_ok,
         &format!("resolve: {which} is {which}, not Unknown"),
     );
-    let excerpt = dir.excerpt(&p, &[ExcerptField::FullName]).await;
+    let excerpt = dir.excerpt(&p, &request(&[ExcerptField::FullName])).await;
     r.is_err(
         &excerpt,
         &format!("excerpt: {which} is NoExcerpt with the reason {which}"),
@@ -177,7 +180,9 @@ async fn merge_rules(fx: &dyn ConformanceFixture, from: &Place, r: &mut Report) 
         "resolve: after Merged the old reference is Found with person == into",
     );
     r.ensure(
-        dir.excerpt(&old, &[ExcerptField::FullName]).await.is_ok(),
+        dir.excerpt(&old, &request(&[ExcerptField::FullName]))
+            .await
+            .is_ok(),
         "excerpt: after Merged the old reference gives the excerpt of the target",
     );
     if fx.rename(&new, "Zzconf Merge Renamed").await {

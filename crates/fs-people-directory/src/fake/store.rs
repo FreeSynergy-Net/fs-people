@@ -22,6 +22,8 @@ pub enum Status {
 pub struct Entry {
     pub person: PersonRef,
     pub display: String,
+    /// The display text is only the address (no name: the last stage of ADR 0032); an AI sees no name then.
+    pub from_address: bool,
     pub sort_key: String,
     pub address: Option<ContactAddress>,
     pub state: EntryState,
@@ -44,6 +46,7 @@ impl Entry {
         Self {
             person,
             display: display.to_owned(),
+            from_address: false,
             sort_key: display.to_lowercase(),
             address: None,
             state: EntryState::Confirmed,
@@ -58,18 +61,44 @@ impl Entry {
         }
     }
 
-    /// The view of this row (`abzug` is always `None`).
+    /// The view of this row for a human asker (`abzug` is always `None`).
     #[must_use]
     pub fn view(&self) -> PersonView {
+        self.view_for(false)
+    }
+
+    /// The view for an asker that is an AI or not: an AI gets no address and no address stage in `display` and
+    /// `sort_key` (empty then; the display shows a translated placeholder).
+    #[must_use]
+    pub fn view_for(&self, ai_asker: bool) -> PersonView {
+        self.view_with(ai_asker, ai_asker)
+    }
+
+    /// The view with the address and the address-only display hidden separately (for the mutation tests).
+    #[must_use]
+    pub fn view_with(&self, hide_address: bool, hide_name: bool) -> PersonView {
+        let hide = hide_name && self.from_address;
         PersonView {
             person: PersonRef {
                 id: self.person.id.clone(),
                 art: self.person.art,
                 abzug: None,
             },
-            display: self.display.clone(),
-            sort_key: self.sort_key.clone(),
-            address: self.address.clone(),
+            display: if hide {
+                String::new()
+            } else {
+                self.display.clone()
+            },
+            sort_key: if hide {
+                String::new()
+            } else {
+                self.sort_key.clone()
+            },
+            address: if hide_address {
+                None
+            } else {
+                self.address.clone()
+            },
             state: self.state,
             ai: self.ai,
             describes: self.describes.clone(),
@@ -125,22 +154,28 @@ pub fn find_order(a: &(usize, &Entry), b: &(usize, &Entry)) -> Ordering {
 
 /// Rank of a suggestion for the typed text: exact, prefix, name part, address (lower is better).
 #[must_use]
-pub fn suggest_rank(entry: &Entry, text: &str) -> Option<(u8, bool)> {
+/// An AI asker never matches on addresses, nor on a display that is only the address.
+pub fn suggest_rank(entry: &Entry, text: &str, ai_asker: bool) -> Option<(u8, bool)> {
     if text.is_empty() {
         return Some((0, true));
     }
     let needle = text.to_lowercase();
-    let name = entry.display.to_lowercase();
+    let name = if ai_asker && entry.from_address {
+        String::new()
+    } else {
+        entry.display.to_lowercase()
+    };
     if name == needle {
         Some((0, true))
     } else if name.starts_with(&needle) {
         Some((1, true))
     } else if name.contains(&needle) {
         Some((2, true))
-    } else if entry
-        .address
-        .as_ref()
-        .is_some_and(|a| a.canonical().to_lowercase().contains(&needle))
+    } else if !ai_asker
+        && entry
+            .address
+            .as_ref()
+            .is_some_and(|a| a.canonical().to_lowercase().contains(&needle))
     {
         Some((3, false))
     } else {

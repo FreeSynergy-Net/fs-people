@@ -7,10 +7,19 @@ use common::ReadOnly;
 use fs_people_directory::conformance::{run_conformance, run_unsupported};
 use fs_people_directory::{
     ChangeKind, CompositeDirectory, ContactAddress, Entry, EntryState, Error, Excerpt,
-    ExcerptField, ExcerptValue, FailingDirectory, FakeDirectory, NoExcerptReason, PersonArt,
-    PersonDirectory, PersonRef, Place, Resolved, Result, Suggest, Unreachable,
+    ExcerptField, ExcerptRequest, ExcerptValue, FailingDirectory, FakeDirectory, NoExcerptReason,
+    PersonArt, PersonDirectory, PersonRef, Place, Purpose, Resolved, Result, Suggest, Unreachable,
 };
 use fs_types::{BasicValue, Name, Reference, Text};
+
+fn ask(fields: &[ExcerptField]) -> ExcerptRequest {
+    ExcerptRequest {
+        fields: fields.to_vec(),
+        purpose: Purpose::OwnUse,
+        scope: None,
+        recipient: None,
+    }
+}
 
 fn down() -> FailingDirectory {
     FailingDirectory::new(Error::Unavailable(Unreachable::Timeout))
@@ -88,7 +97,7 @@ async fn trash_states_and_restored() {
         d.resolve(&amara).await,
         Ok(Resolved::Deleted { .. })
     ));
-    let gone = d.excerpt(&amara, &[ExcerptField::FullName]).await;
+    let gone = d.excerpt(&amara, &ask(&[ExcerptField::FullName])).await;
     assert!(matches!(
         gone,
         Err(Error::NoExcerpt {
@@ -105,7 +114,7 @@ async fn trash_states_and_restored() {
     );
     assert!(d.unshare(&team));
     assert!(matches!(d.resolve(&team).await, Ok(Resolved::NotShared)));
-    let hidden = d.excerpt(&team, &[ExcerptField::FullName]).await;
+    let hidden = d.excerpt(&team, &ask(&[ExcerptField::FullName])).await;
     assert!(matches!(
         hidden,
         Err(Error::NoExcerpt {
@@ -143,7 +152,7 @@ async fn excerpt_lists_missing_and_asker_works() {
     let d = seeded();
     let amara = person(1, PersonArt::Person);
     let x = d
-        .excerpt(&amara, &[ExcerptField::FullName, ExcerptField::Phone])
+        .excerpt(&amara, &ask(&[ExcerptField::FullName, ExcerptField::Phone]))
         .await
         .expect("excerpt");
     assert_eq!(x.values.len(), 1);
@@ -178,7 +187,10 @@ async fn optional_methods_are_unsupported() {
     let failures = run_unsupported(&ReadOnly).await;
     assert!(failures.is_empty(), "{failures:?}");
     let x = ReadOnly
-        .excerpt(&person(1, PersonArt::Person), &[ExcerptField::FullName])
+        .excerpt(
+            &person(1, PersonArt::Person),
+            &ask(&[ExcerptField::FullName]),
+        )
         .await;
     assert!(matches!(x, Err(Error::Unsupported { .. })));
 }
@@ -208,12 +220,15 @@ async fn composite_chain_rules() {
     ));
     assert!(
         chain
-            .excerpt(&amara, &[ExcerptField::FullName])
+            .excerpt(&amara, &ask(&[ExcerptField::FullName]))
             .await
             .is_ok()
     );
     let nobody = up
-        .excerpt(&person(99, PersonArt::Person), &[ExcerptField::FullName])
+        .excerpt(
+            &person(99, PersonArt::Person),
+            &ask(&[ExcerptField::FullName]),
+        )
         .await;
     assert!(matches!(
         nobody,
@@ -262,7 +277,10 @@ async fn composite_deleted_is_final_and_all_down_is_unavailable() {
         Err(Error::Unavailable(_))
     ));
     let x: Result<Excerpt> = down
-        .excerpt(&person(1, PersonArt::Person), &[ExcerptField::FullName])
+        .excerpt(
+            &person(1, PersonArt::Person),
+            &ask(&[ExcerptField::FullName]),
+        )
         .await;
     assert!(matches!(x, Err(Error::Unavailable(_))));
 }

@@ -2,9 +2,49 @@
 //!
 //! Pattern: Fake (in-memory state behind one lock; mutators feed the change log).
 
+use super::Defect;
 use super::store::{Entry, Status};
-use crate::person_directory_v1::{ChangeKind, DirectoryChange, ObjectId, PersonRef, Utc};
-use std::sync::{Mutex, MutexGuard, PoisonError};
+use crate::person_directory_v1::{ChangeKind, Consent, DirectoryChange, ObjectId, PersonRef, Utc};
+use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
+
+/// Which `consent.*` rights the asker holds (the fake has no fs-access; the asker's own records never need one).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Rights {
+    /// `consent.read`: read the records of others.
+    pub read: bool,
+    /// `consent.check`: ask `check_consent` (a program account's right).
+    pub check: bool,
+    /// `consent.write`: record and withdraw for others.
+    pub write: bool,
+}
+
+impl Rights {
+    /// All three rights (the default of the fake: an administrator).
+    #[must_use]
+    pub fn all() -> Self {
+        Self {
+            read: true,
+            check: true,
+            write: true,
+        }
+    }
+
+    /// No right: an ordinary member, who may only handle their own records.
+    #[must_use]
+    pub fn none() -> Self {
+        Self {
+            read: false,
+            check: false,
+            write: false,
+        }
+    }
+}
+
+impl Default for Rights {
+    fn default() -> Self {
+        Self::all()
+    }
+}
 
 /// Mutable state, behind one lock.
 #[derive(Default)]
@@ -14,6 +54,10 @@ pub(crate) struct Inner {
     /// Batches and whether they are still open.
     pub(crate) batches: Vec<(ObjectId, bool)>,
     pub(crate) tick: u64,
+    /// Consent records in the order they were recorded (oldest first).
+    pub(crate) consents: Vec<Consent>,
+    /// A deliberate rule break (mutation test of the conformance rules).
+    pub(crate) defect: Option<Defect>,
 }
 
 /// In-memory provider; `asker` is a property of the provider (the "I" card).
@@ -22,9 +66,14 @@ pub struct FakeDirectory {
     /// A foreign address book: reading works, `person.propose` is `Forbidden`.
     pub(crate) foreign: bool,
     pub(crate) asker: Option<PersonRef>,
-    pub(crate) inner: Mutex<Inner>,
+    pub(crate) rights: Rights,
+    /// Shared with the views made by [`FakeDirectory::view_as`].
+    pub(crate) inner: Arc<Mutex<Inner>>,
 }
 
+// The mutators report whether the row existed; a caller may ignore that (the state is shared behind an `Arc`, so the
+// lint does not see the interior mutability).
+#[allow(clippy::must_use_candidate)]
 impl FakeDirectory {
     /// An empty directory with no asker.
     #[must_use]
@@ -44,6 +93,32 @@ impl FakeDirectory {
     pub fn with_asker(mut self, asker: Option<PersonRef>) -> Self {
         self.asker = asker;
         self
+    }
+
+    /// Break one rule on purpose (see [`Defect`]); the views of this fake share it.
+    #[must_use]
+    pub fn with_defect(self, defect: Defect) -> Self {
+        self.lock().defect = Some(defect);
+        self
+    }
+
+    /// Set the `consent.*` rights of the asker (default: all three).
+    #[must_use]
+    pub fn with_rights(mut self, rights: Rights) -> Self {
+        self.rights = rights;
+        self
+    }
+
+    /// The same data asked by someone else, with their own rights: a second door to the shared state. An asker
+    /// whose entry has `ai` set is an AI (the AI rules apply).
+    #[must_use]
+    pub fn view_as(&self, asker: Option<PersonRef>, rights: Rights) -> Self {
+        Self {
+            foreign: self.foreign,
+            asker,
+            rights,
+            inner: Arc::clone(&self.inner),
+        }
     }
 
     pub(crate) fn lock(&self) -> MutexGuard<'_, Inner> {
@@ -70,7 +145,23 @@ impl FakeDirectory {
     pub fn delete(&self, person: &PersonRef) -> bool {
         let mut g = self.lock();
         let at = g.now();
-        g.set_status(person, Status::Deleted(at), ChangeKind::Deleted)
+        let done = g.set_status(person, Status::Deleted(at), ChangeKind::Deleted);
+        if done && !g.bad(Defect::EraseKeepsActive) {
+            g.erase_consents(person);
+        }
+        done
+    }
+
+    /// Link a profile to a person (`describes`), or cut the link with `None`; logs `Changed`.
+    pub fn set_describes(&self, profile: &PersonRef, person: Option<PersonRef>) -> bool {
+        let mut g = self.lock();
+        let Some(e) = g.find_mut(profile) else {
+            return false;
+        };
+        e.describes = person;
+        e.rev += 1;
+        g.record(profile.clone(), ChangeKind::Changed);
+        true
     }
 
     /// Withdraw the sharing of a row.
@@ -121,6 +212,11 @@ impl FakeDirectory {
 }
 
 impl Inner {
+    /// Is this deliberate defect switched on?
+    pub(crate) fn bad(&self, defect: Defect) -> bool {
+        self.defect == Some(defect)
+    }
+
     pub(crate) fn now(&mut self) -> Utc {
         self.tick += 1;
         Utc::from_millis(1_700_000_000_000 + i64::try_from(self.tick).unwrap_or(0) * 1000)

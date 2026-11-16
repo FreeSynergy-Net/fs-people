@@ -4,23 +4,23 @@
 
 use super::ids::{uuid7, uuid7_urn};
 use super::store::{find_order, same_address, suggest_rank};
-use super::{Entry, FakeDirectory, Inner, Status};
+use super::{Defect, Entry, FakeDirectory, Inner, Status};
 use crate::person_directory_v1::{
-    CAPABILITIES, Candidate, Capabilities, ChangeKind, ContactAddress, DirectoryChange, EntryState,
-    Error, Excerpt, ExcerptField, Matched, NoExcerptReason, ObjectId, Page, PersonArt,
-    PersonDirectory, PersonRef, PersonView, Place, Problem, ProposeEntry, Reference, Resolved,
-    Result, Suggest,
+    CAPABILITIES, Candidate, Capabilities, ChangeKind, Consent, ConsentEntry, ConsentQuery,
+    ContactAddress, DirectoryChange, EntryState, Error, Excerpt, ExcerptRequest, Matched, ObjectId,
+    Page, PersonArt, PersonDirectory, PersonRef, PersonView, Place, Problem, ProposeEntry,
+    Reference, Resolved, Result, Suggest, Withdrawal,
 };
 use async_trait::async_trait;
 use fs_types::BasicValue;
 
-fn forbidden<T>() -> Result<T> {
+fn forbidden<T>(capability: &str) -> Result<T> {
     Err(Error::Forbidden {
-        capability: "person.propose".to_owned(),
+        capability: capability.to_owned(),
     })
 }
 
-fn invalid<T>(field: &str, reason: &str) -> Result<T> {
+pub(super) fn invalid<T>(field: &str, reason: &str) -> Result<T> {
     Err(Error::Invalid(vec![Problem {
         field: field.to_owned(),
         reason: reason.to_owned(),
@@ -29,7 +29,7 @@ fn invalid<T>(field: &str, reason: &str) -> Result<T> {
 
 impl Inner {
     /// The row a reference ends at; a merge chain is followed, with a bound against cycles.
-    fn target(&self, person: &PersonRef) -> Option<&Entry> {
+    pub(super) fn target(&self, person: &PersonRef) -> Option<&Entry> {
         let mut current = person.id.clone();
         for _ in 0..8 {
             let e = self.entries.iter().find(|e| e.person.id == current)?;
@@ -41,16 +41,24 @@ impl Inner {
         None
     }
 
-    fn resolve(&self, person: &PersonRef) -> Resolved {
+    /// The view for the asker; the mutation tests may let an AI see more.
+    fn view_of(&self, e: &Entry, ai: bool) -> PersonView {
+        e.view_with(
+            ai && !self.bad(Defect::AiSeesAddress),
+            ai && !self.bad(Defect::AiSeesAddressDisplay),
+        )
+    }
+
+    pub(super) fn resolve(&self, person: &PersonRef, ai: bool) -> Resolved {
         match self.target(person).map(|e| (e, e.status)) {
             None => Resolved::Unknown,
-            Some((e, Status::Active)) => Resolved::Found(e.view()),
+            Some((e, Status::Active)) => Resolved::Found(self.view_of(e, ai)),
             Some((_, Status::Deleted(since))) => Resolved::Deleted { since },
             Some((_, Status::NotShared)) => Resolved::NotShared,
         }
     }
 
-    fn matching(&self, address: &ContactAddress) -> Vec<PersonView> {
+    fn matching(&self, address: &ContactAddress, ai: bool) -> Vec<PersonView> {
         let mut hits: Vec<(usize, &Entry)> = self
             .entries
             .iter()
@@ -62,7 +70,7 @@ impl Inner {
             })
             .collect();
         hits.sort_by(find_order);
-        hits.into_iter().map(|(_, e)| e.view()).collect()
+        hits.into_iter().map(|(_, e)| e.view_for(ai)).collect()
     }
 }
 
@@ -78,7 +86,8 @@ impl PersonDirectory for FakeDirectory {
     }
 
     async fn resolve(&self, person: &PersonRef) -> Result<Resolved> {
-        Ok(self.lock().resolve(person))
+        let g = self.lock();
+        Ok(g.resolve(person, self.asker_is_ai(&g)))
     }
 
     async fn asker(&self) -> Result<Option<PersonRef>> {
@@ -87,7 +96,8 @@ impl PersonDirectory for FakeDirectory {
 
     async fn resolve_many(&self, people: &[PersonRef]) -> Result<Vec<Resolved>> {
         let g = self.lock();
-        Ok(people.iter().map(|p| g.resolve(p)).collect())
+        let ai = self.asker_is_ai(&g);
+        Ok(people.iter().map(|p| g.resolve(p, ai)).collect())
     }
 
     async fn changes(&self, since: Option<&Place>, size: usize) -> Result<Page<DirectoryChange>> {
@@ -108,7 +118,11 @@ impl PersonDirectory for FakeDirectory {
     }
 
     async fn find_by_address(&self, address: &ContactAddress) -> Result<Vec<PersonView>> {
-        Ok(self.lock().matching(address))
+        let g = self.lock();
+        if self.asker_is_ai(&g) && !g.bad(Defect::AiMayFind) {
+            return forbidden("person.find");
+        }
+        Ok(g.matching(address, false))
     }
 
     async fn suggest(&self, query: &Suggest) -> Result<Vec<Candidate>> {
@@ -116,20 +130,24 @@ impl PersonDirectory for FakeDirectory {
             return invalid("limit", "out_of_range");
         }
         let g = self.lock();
+        let ai = self.asker_is_ai(&g);
         let mut hits: Vec<(u8, &Entry, bool)> = g
             .entries
             .iter()
             .filter(|e| e.status == Status::Active && e.merged_into.is_none())
             .filter(|e| query.arten.is_empty() || query.arten.contains(&e.person.art))
             .filter(|e| query.include_proposed || e.state == EntryState::Confirmed)
-            .filter_map(|e| suggest_rank(e, query.text.trim()).map(|(r, name)| (r, e, name)))
+            .filter_map(|e| {
+                suggest_rank(e, query.text.trim(), ai && !g.bad(Defect::AiSuggestAddress))
+                    .map(|(r, name)| (r, e, name))
+            })
             .collect();
         hits.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| a.1.sort_key.cmp(&b.1.sort_key)));
         Ok(hits
             .into_iter()
             .take(usize::from(query.limit))
             .map(|(_, e, by_name)| Candidate {
-                view: e.view(),
+                view: g.view_of(e, ai),
                 matched: if !by_name {
                     Matched::Address
                 } else if e.person.art == PersonArt::Organization {
@@ -143,7 +161,7 @@ impl PersonDirectory for FakeDirectory {
 
     async fn open_batch(&self, _origin: &Reference) -> Result<ObjectId> {
         if self.foreign {
-            return forbidden();
+            return forbidden("person.propose");
         }
         let mut g = self.lock();
         let ms = g.now().millis();
@@ -154,20 +172,23 @@ impl PersonDirectory for FakeDirectory {
 
     async fn propose(&self, entry: &ProposeEntry, batch: Option<ObjectId>) -> Result<PersonRef> {
         if self.foreign {
-            return forbidden();
+            return forbidden("person.propose");
         }
         let hint = entry.display_hint.trim();
         if hint.is_empty() && entry.address.is_none() {
             return invalid("display_hint", "empty");
         }
         let mut g = self.lock();
+        if entry.address.is_some() && self.asker_is_ai(&g) && !g.bad(Defect::AiProposeAddress) {
+            return forbidden("person.propose");
+        }
         if let Some(b) = batch
             && !g.batches.iter().any(|(id, open)| *id == b && *open)
         {
             return Err(Error::BatchClosed(b));
         }
         if let Some(address) = &entry.address
-            && let Some(first) = g.matching(address).into_iter().next()
+            && let Some(first) = g.matching(address, false).into_iter().next()
         {
             return Ok(first.person);
         }
@@ -188,6 +209,7 @@ impl PersonDirectory for FakeDirectory {
             hint.to_owned()
         };
         let mut row = Entry::new(person.clone(), &shown);
+        row.from_address = hint.is_empty();
         row.state = EntryState::Proposed;
         row.address.clone_from(&entry.address);
         row.created = g.now();
@@ -196,43 +218,23 @@ impl PersonDirectory for FakeDirectory {
         Ok(person)
     }
 
-    async fn excerpt(&self, person: &PersonRef, fields: &[ExcerptField]) -> Result<Excerpt> {
-        if fields.is_empty() {
-            return invalid("fields", "empty");
-        }
-        let mut g = self.lock();
-        let captured = g.now();
-        let refuse = |reason| {
-            Err(Error::NoExcerpt {
-                person: person.clone(),
-                reason,
-            })
-        };
-        let Some(e) = g.target(person) else {
-            return refuse(NoExcerptReason::Unknown);
-        };
-        match e.status {
-            Status::Deleted(_) => return refuse(NoExcerptReason::Deleted),
-            Status::NotShared => return refuse(NoExcerptReason::NotShared),
-            Status::Active => {}
-        }
-        let mut values = Vec::new();
-        let mut missing = Vec::new();
-        for f in fields {
-            if values.iter().any(|v: &crate::ExcerptValue| v.field() == *f) || missing.contains(f) {
-                continue;
-            }
-            match e.excerpt.iter().find(|v| v.field() == *f) {
-                Some(v) => values.push(v.clone()),
-                None => missing.push(*f),
-            }
-        }
-        Ok(Excerpt {
-            person: e.view().person,
-            source: e.person.id.clone(),
-            captured,
-            values,
-            missing,
-        })
+    async fn excerpt(&self, person: &PersonRef, request: &ExcerptRequest) -> Result<Excerpt> {
+        self.do_excerpt(person, request)
+    }
+
+    async fn consents_of(&self, person: &PersonRef) -> Result<Vec<Consent>> {
+        self.do_consents_of(person)
+    }
+
+    async fn check_consent(&self, query: &ConsentQuery) -> Result<Option<ObjectId>> {
+        self.do_check(query)
+    }
+
+    async fn record_consent(&self, entry: &ConsentEntry) -> Result<Consent> {
+        self.do_record(entry)
+    }
+
+    async fn withdraw_consent(&self, id: ObjectId, withdrawal: &Withdrawal) -> Result<Consent> {
+        self.do_withdraw(id, withdrawal)
     }
 }

@@ -1,12 +1,14 @@
 //! `CompositeDirectory`: asks its members in order; the first answer that is not "unknown" counts.
 //!
 //! Pattern: Composite (a chain of `PersonDirectory` members is itself a `PersonDirectory`) with Chain of
-//! Responsibility for reading; writing (`open_batch`, `propose`) goes to the first member with `person.propose`.
+//! Responsibility for reading; writing (`open_batch`, `propose`) goes to the first member with `person.propose`, and
+//! each `consent.*` method to the first member that offers its capability.
 
 use crate::person_directory_v1::{
-    Candidate, Capabilities, ContactAddress, DirectoryChange, Error, Excerpt, ExcerptField,
-    NoExcerptReason, ObjectId, Page, PersonDirectory, PersonRef, PersonView, Place, Problem,
-    ProposeEntry, Reference, Resolved, Result, Suggest, Unreachable, not_possible,
+    Candidate, Capabilities, Consent, ConsentEntry, ConsentQuery, ContactAddress, DirectoryChange,
+    Error, Excerpt, ExcerptRequest, NoExcerptReason, ObjectId, Page, PersonDirectory, PersonRef,
+    PersonView, Place, Problem, ProposeEntry, Reference, Resolved, Result, Suggest, Unreachable,
+    Withdrawal, not_possible,
 };
 use async_trait::async_trait;
 use std::collections::HashMap;
@@ -29,13 +31,18 @@ impl CompositeDirectory {
         }
     }
 
-    fn proposer(&self) -> Option<usize> {
+    /// The first member that offers `capability`.
+    fn first_with(&self, capability: &str) -> Option<usize> {
         self.members.iter().position(|m| {
             m.capabilities()
                 .0
                 .iter()
-                .any(|(c, on)| c == "person.propose" && *on)
+                .any(|(c, on)| c == capability && *on)
         })
+    }
+
+    fn proposer(&self) -> Option<usize> {
+        self.first_with("person.propose")
     }
 }
 
@@ -228,10 +235,11 @@ impl PersonDirectory for CompositeDirectory {
         self.members[target].propose(entry, batch).await
     }
 
-    async fn excerpt(&self, person: &PersonRef, fields: &[ExcerptField]) -> Result<Excerpt> {
+    /// Only `Unknown` (and a member that cannot) passes the question on; `NoConsent` is final.
+    async fn excerpt(&self, person: &PersonRef, request: &ExcerptRequest) -> Result<Excerpt> {
         let mut seen = None;
         for m in &self.members {
-            match m.excerpt(person, fields).await {
+            match m.excerpt(person, request).await {
                 Err(
                     Error::NoExcerpt {
                         reason: NoExcerptReason::Unknown,
@@ -249,6 +257,34 @@ impl PersonDirectory for CompositeDirectory {
                 person: person.clone(),
                 reason: NoExcerptReason::Unknown,
             }),
+        }
+    }
+
+    async fn consents_of(&self, person: &PersonRef) -> Result<Vec<Consent>> {
+        match self.first_with("consent.read") {
+            Some(i) => self.members[i].consents_of(person).await,
+            None => not_possible("consent.read"),
+        }
+    }
+
+    async fn check_consent(&self, query: &ConsentQuery) -> Result<Option<ObjectId>> {
+        match self.first_with("consent.check") {
+            Some(i) => self.members[i].check_consent(query).await,
+            None => not_possible("consent.check"),
+        }
+    }
+
+    async fn record_consent(&self, entry: &ConsentEntry) -> Result<Consent> {
+        match self.first_with("consent.write") {
+            Some(i) => self.members[i].record_consent(entry).await,
+            None => not_possible("consent.write"),
+        }
+    }
+
+    async fn withdraw_consent(&self, id: ObjectId, withdrawal: &Withdrawal) -> Result<Consent> {
+        match self.first_with("consent.write") {
+            Some(i) => self.members[i].withdraw_consent(id, withdrawal).await,
+            None => not_possible("consent.write"),
         }
     }
 }

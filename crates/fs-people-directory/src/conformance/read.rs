@@ -2,10 +2,10 @@
 //!
 //! Pattern: Template method (rules as plain checks collected in a `Report`).
 
-use super::{Report, Seeds, address};
+use super::{Report, Seeds, address, purposed, request};
 use crate::person_directory_v1::{
     EntryState, Error, ExcerptField, Matched, NoExcerptReason, PersonArt, PersonDirectory,
-    PersonRef, Resolved, Suggest,
+    PersonRef, Purpose, Resolved, Suggest,
 };
 use fs_types::{BasicValue, Reference};
 
@@ -177,11 +177,13 @@ pub(super) async fn find_rules(dir: &dyn PersonDirectory, s: &Seeds, r: &mut Rep
 
 pub(super) async fn excerpt_rules(dir: &dyn PersonDirectory, s: &Seeds, r: &mut Report) {
     let Some(nobody) = unknown() else { return };
-    let empty = dir.excerpt(&s.a, &[]).await;
+    let empty = dir.excerpt(&s.a, &request(&[])).await;
     r.is_err(&empty, "excerpt: an empty field list is Invalid", |e| {
         matches!(e, Error::Invalid(_))
     });
-    let unknown_ref = dir.excerpt(&nobody, &[ExcerptField::FullName]).await;
+    let unknown_ref = dir
+        .excerpt(&nobody, &request(&[ExcerptField::FullName]))
+        .await;
     r.is_err(
         &unknown_ref,
         "excerpt: an unknown reference is NoExcerpt Unknown",
@@ -200,9 +202,13 @@ pub(super) async fn excerpt_rules(dir: &dyn PersonDirectory, s: &Seeds, r: &mut 
         ExcerptField::Phone,
         ExcerptField::Phone,
     ];
-    match dir.excerpt(&s.a, &fields).await {
+    match dir.excerpt(&s.a, &request(&fields)).await {
         Ok(x) => {
             r.ensure(x.person.abzug.is_none(), "excerpt: abzug is None");
+            r.ensure(
+                x.purpose == Purpose::OwnUse && x.consent.is_none(),
+                "excerpt: the answer names the purpose; no consent needed for OwnUse",
+            );
             r.ensure(
                 x.values.iter().all(|v| fields.contains(&v.field())),
                 "excerpt: only the asked fields",
@@ -213,5 +219,40 @@ pub(super) async fn excerpt_rules(dir: &dyn PersonDirectory, s: &Seeds, r: &mut 
             );
         }
         Err(_) => r.ensure(false, "excerpt: answers for a known entry"),
+    }
+}
+
+/// Purpose binding without any setup: no consent exists for the seeds, so purposes that need one are refused.
+pub(super) async fn purpose_rules(dir: &dyn PersonDirectory, s: &Seeds, r: &mut Report) {
+    let no_consent = |e: &Error| {
+        matches!(
+            e,
+            Error::NoExcerpt {
+                reason: NoExcerptReason::NoConsent,
+                ..
+            }
+        )
+    };
+    let fields = [ExcerptField::FullName];
+    for purpose in [
+        Purpose::Photo,
+        Purpose::Publication,
+        Purpose::Newsletter,
+        Purpose::AiAssistance,
+        Purpose::DisclosureToThirdParty,
+    ] {
+        let x = dir.excerpt(&s.a, &purposed(&fields, purpose.clone())).await;
+        r.is_err(
+            &x,
+            &format!("excerpt: {purpose:?} without a consent is NoConsent"),
+            no_consent,
+        );
+    }
+    for purpose in [Purpose::Contract, Purpose::LegalObligation, Purpose::OwnUse] {
+        let x = dir.excerpt(&s.a, &purposed(&fields, purpose.clone())).await;
+        r.ensure(
+            x.is_ok_and(|x| x.consent.is_none() && x.purpose == purpose),
+            &format!("excerpt: {purpose:?} needs no consent"),
+        );
     }
 }
