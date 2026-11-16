@@ -169,7 +169,7 @@ So a client no longer needs `split_once(": ")`, `strip_prefix("stored data: ")`,
   own `Arc<dyn Store>` for undo / log / count calls (the old tests did `r.store().undo(..)`).
 * `vcard::ImportedCard` moved to `format::ImportedCard` (re-exported at the crate root); `original` is now `Option<Blob>`.
 * `Card`, `PeopleRepo::new/with_instance/create/get/update/delete/list/search/...`, `ListFilter`, `ImportReport`, `MatchKind`,
-  `MatchReason`, `SameAsProposal`, `validate::*`, `vcard::*` keep their paths and signatures; fs-hub compiles unchanged.
+  `MatchReason`, `SameAsProposal`, `validate::*`, `vcard::*` keep their paths and signatures; fs-registry compiles unchanged.
 * New: `People`, `Importer`, `Exporter`, `MatchStrategy`, `PeopleRepo::{with_backend, with_match_strategy, import, export}`.
   If you import `People` next to `PeopleRepo`'s inherent methods nothing is ambiguous (inherent methods win).
 
@@ -267,7 +267,7 @@ Still wanted:
 
 ## Merge lock for consumers of the AI role (strategy, 2026-11-07)
 
-`roles-skos` is **already on `main`** (since v0.4.0): `RoleAssignment.role` and `RoleDefinition.id` are full IRIs (`https://freesynergy.net/ns/roles/ai`), short ids are still accepted in queries. Every consumer that decides "is this member an AI" (ADR 0054: consent, agents are never admin) must use `fs_people_core::is_ai_role()` and must never compare the short id `ai`. Read from the code on 2026-11-07, not tested end to end: `fs-groups` takes the decision through the injected trait `AiMarking` (no string compare of its own in `main`), `fs-messenger-guard` lists `ai` only among its test inputs for unknown values. Whether the host that implements `AiMarking` and the guard compare the short id is **not checked**: switch and check them in the next plan.
+`roles-skos` is **already on `main`** (since v0.4.0): `RoleAssignment.role` and `RoleDefinition.id` are full IRIs (`https://freesynergy.net/ns/roles/ai`), short ids are still accepted in queries. Every consumer that decides "is this member an AI" (ADR 0054: consent, agents are never admin) must use `fs_people_core::is_ai_role()` and must never compare the short id `ai`. Read from the code on 2026-11-07, not tested end to end: `fs-groups` takes the decision through the injected trait `AiMarking` (no string compare of its own in `main`), `fs-messages-guard` lists `ai` only among its test inputs for unknown values. Whether the host that implements `AiMarking` and the guard compare the short id is **not checked**: switch and check them in the next plan.
 
 
 ## RFC 9553 against the window (2026-11-08, Thread G)

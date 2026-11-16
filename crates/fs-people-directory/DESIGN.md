@@ -31,10 +31,10 @@ snapshot. No Blinc, no app, no store.
 
 ## Who expects what (calendar adapter, not in this crate)
 
-The adapter `appointments_v1::PersonDirectory` to `person_directory_v1::PersonDirectory` is ONE file in fs-calendar
+The adapter `appointments_v1::PersonDirectory` to `person_directory_v1::PersonDirectory` is ONE file in fs-calendars
 (plan step C1, O3): it converts `PersonRef`, `ContactAddress` and `Utc` between the two shapes and holds a
-`Box<dyn person_directory_v1::PersonDirectory>`. fs-calendar tests it against `FakeDirectory` from this crate;
-this crate never depends on fs-calendar. Tasks (`assignee`) and groups (members, `PersonArt::Group` via
+`Box<dyn person_directory_v1::PersonDirectory>`. fs-calendars tests it against `FakeDirectory` from this crate;
+this crate never depends on fs-calendars. Tasks (`assignee`) and groups (members, `PersonArt::Group` via
 `GroupsDirectory`) depend on this crate the same way. People itself provides the real `PeopleDirectory`.
 
 ## Planned (not in P0)

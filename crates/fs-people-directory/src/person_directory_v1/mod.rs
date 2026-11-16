@@ -23,7 +23,7 @@
 //! Id, Name, Adresse), `GroupsDirectory` (fs-groups: Gruppen als `PersonArt::Group` für `resolve`/`suggest`),
 //! `CompositeDirectory` (fragt
 //! der Reihe nach, erste Antwort ungleich `Unknown` gilt), `FakeDirectory` (Testdaten). Der Kalender behält seinen
-//! gesperrten Verbraucher-Trait (`appointments_v1/exchange.rs`); ein Adapter in fs-calendar (eine Datei) bildet ihn
+//! gesperrten Verbraucher-Trait (`appointments_v1/exchange.rs`); ein Adapter in fs-calendars (eine Datei) bildet ihn
 //! auf diesen Trait ab. Die Abhängigkeit zeigt immer vom Verbraucher auf People, nie umgekehrt.
 //!
 //! Pattern: Repository (interface) + Null Object (ADR 0043/0045) wie `appointments_v1`: Lesemethoden sind Pflicht,
