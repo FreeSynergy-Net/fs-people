@@ -40,7 +40,14 @@ pub fn serve(args: impl IntoIterator<Item = OsString>) -> Result<(), ServeError>
         data,
         actor,
         instance,
+        facet,
     } = options;
+    // People has no facets of its own to choose: a named one is refused, as v0.0.14 refused the unknown flag.
+    if let Some(facet) = facet {
+        return Err(ServeError::Usage(format!(
+            "people shows no facet (got `--facet {facet}`)"
+        )));
+    }
     run_until_signal(&socket, || async move {
         // The watcher ends this process by SIGTERM, so it starts only here, where the stop signal is already registered
         // (`run_until_signal` registers it before it binds): a look that finds nobody early can no longer kill the
