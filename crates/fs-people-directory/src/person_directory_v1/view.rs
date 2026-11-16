@@ -23,9 +23,12 @@ pub struct PersonView {
     /// Gültiger Verweis: `art` aus dem Ziel; bei zusammengelegten Profilen das Ziel der Zusammenlegung. Weicht er vom
     /// gefragten ab, zieht der Verbraucher nach und meldet (ADR 0085 §3). `abzug` ist hier immer `None`.
     pub person: PersonRef,
-    /// Anzeigename nach ADR 0032 (voller Name, sonst Bestandteile, Spitzname, Organisation, Adresse).
+    /// Anzeigename nach ADR 0032 (voller Name, sonst Bestandteile, Spitzname, Organisation, Adresse). Fragt eine KI,
+    /// entfällt die Stufe Adresse: ohne Namen und Organisation ist `display` leer, und die Anzeige zeigt den
+    /// übersetzten Platzhalter „ohne Namen“ (ADR 0057); nie die Adresse.
     pub display: String,
-    /// Sortierschlüssel ("Nachname, Vorname"), Kleinschreibung, NFC.
+    /// Sortierschlüssel ("Nachname, Vorname"), Kleinschreibung, NFC; für eine KI ohne Adress-Stufe wie `display`
+    /// (leer sortiert zuletzt).
     pub sort_key: String,
     /// Bevorzugte Adresse (kleinster `pref`, sonst erste), wenn es eine gibt und sie gezeigt werden darf; fragt eine
     /// KI, immer `None` (KI-Regel wie `ExcerptField::sensitive`).
@@ -61,6 +64,7 @@ pub enum Resolved {
 }
 
 /// Worauf ein Auswahl-Vorschlag passt (für die Hervorhebung im Personenwähler). `non_exhaustive`: Erweiterung additiv.
+/// Fragt eine KI, sucht `suggest` nie in Adressen, und `Address` kommt nie vor (KI-Regel, kein Adress-Orakel).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Matched {

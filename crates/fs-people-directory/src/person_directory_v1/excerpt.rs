@@ -23,18 +23,22 @@ pub enum ExcerptField {
     Postal,
     Email,
     Phone,
-    /// Geburtstag (`JSContact` `anniversaries` mit `kind: birth`), z. B. für die Geburtstags-Facette des Kalenders.
+    /// Geburtstag (`JSContact` `anniversaries` mit `kind: birth`), mit Jahr, wenn bekannt.
     Birthday,
+    /// Geburtstag OHNE Jahr (immer `MonthDay`, auch wenn das Jahr bekannt ist; Datensparsamkeit): z. B. für die
+    /// Geburtstags-Facette des Kalenders, die kein Alter braucht.
+    BirthMonthDay,
 }
 
 impl ExcerptField {
-    /// Sensibel im Sinn der KI-Regel (Nutzer 16.11., Antwort 29): Anschrift, E-Mail, Telefon, Geburtstag. Fragt
-    /// eine KI (`asker` mit KI-Markierung), stehen diese Felder immer in `Excerpt::missing`, spurlos wie fehlend.
+    /// Sensibel im Sinn der KI-Regel (Nutzer 16.11., Antwort 29): Anschrift, E-Mail, Telefon, Geburtstag (mit und
+    /// ohne Jahr). Fragt eine KI (`asker` mit KI-Markierung), stehen diese Felder immer in `Excerpt::missing`, spurlos
+    /// wie fehlend. Auch E-Mail (Strategie 16.11.): die KI schreibt den Text, versenden tut das Programm.
     #[must_use]
     pub fn sensitive(self) -> bool {
         matches!(
             self,
-            Self::Postal | Self::Email | Self::Phone | Self::Birthday
+            Self::Postal | Self::Email | Self::Phone | Self::Birthday | Self::BirthMonthDay
         )
     }
 }
@@ -95,6 +99,7 @@ pub enum ExcerptValue {
     Email(EmailAddress),
     Phone(PhoneNumber),
     Birthday(Birthday),
+    BirthMonthDay(MonthDay),
 }
 
 impl ExcerptValue {
@@ -110,6 +115,7 @@ impl ExcerptValue {
             Self::Email(_) => ExcerptField::Email,
             Self::Phone(_) => ExcerptField::Phone,
             Self::Birthday(_) => ExcerptField::Birthday,
+            Self::BirthMonthDay(_) => ExcerptField::BirthMonthDay,
         }
     }
 }

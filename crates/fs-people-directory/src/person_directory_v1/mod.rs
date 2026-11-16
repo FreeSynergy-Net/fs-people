@@ -38,7 +38,10 @@
 //! gehen an das erste Glied mit `person.propose`, die Einwilligungs-Methoden an das erste mit `consent.*`.
 //! KI-Regel (Antwort 29, ADR 0054/0076): eine KI ist eine `Person` mit KI-Markierung, keine eigene Art. Fragt eine
 //! KI, fehlen sensible Felder (`ExcerptField::sensitive`) spurlos in jedem Auszug, `PersonView.address` ist `None`,
-//! und jede Einwilligungs-Methode ist `Forbidden`.
+//! `display`/`sort_key` haben keine Adress-Stufe, `suggest` sucht nie in Adressen; `Forbidden` sind jede
+//! Einwilligungs-Methode, `find_by_address`, `propose` mit Adresse und `excerpt` mit einem Zweck außer `AiAssistance`.
+//! Einwilligungen: `given_by` nennt Eltern oder Betreuung (Art. 8); die Passregel (`ConsentQuery`) trifft Profile über
+//! `describes` und zusammengelegte Verweise über ihr Ziel.
 //! Erweiterung: `#[non_exhaustive]` steht an allen Ausgabe-Enums (nie an Structs; Lehre `groups_v1`), damit
 //! Verbraucher schon heute einen Rest-Arm haben. Vor dem ersten Release ändert sich v1 selbst (Entscheidung 21);
 //! danach ändert jede Erweiterung den Ordner-Hash und kommt nur mit neuer Version (v2).

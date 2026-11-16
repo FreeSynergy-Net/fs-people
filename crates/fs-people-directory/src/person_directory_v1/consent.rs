@@ -10,6 +10,8 @@
 //! bleibt). Wird die Person gelöscht, gelten ihre aktiven Einwilligungen als widerrufen (`ConsentOrigin::Erasure`).
 //! `retain_until` setzt der Anbieter beim Widerruf aus einer Einstellung von People; danach löscht er die
 //! Aufzeichnung wirklich, auch aus dem Verlauf.
+//! Befristung: in v1 gibt es kein Ablaufdatum; eine Einwilligung gilt bis zum Widerruf, eine enge Geltung (ein
+//! Ereignis, ein Raum, ein Verteiler) drückt `scope` aus.
 
 use super::{Date, ObjectId, PersonRef, Reference, Revision, Utc};
 
@@ -75,8 +77,13 @@ pub enum ConsentOrigin {
 /// Eingabe für `record_consent`: was die Person erlaubt hat. Wer erfasst, ist der Anbieter (`asker`), kein Feld.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ConsentEntry {
-    /// Wer zustimmt (die betroffene Person; Art `Person` oder `Profile`).
+    /// Die betroffene Person (Art `Person` oder `Profile`).
     pub person: PersonRef,
+    /// Wer die Einwilligung erteilt hat: `None` = die Person selbst; sonst Eltern oder Sorgeberechtigte eines Kindes
+    /// (DSGVO Art. 8) oder eine rechtliche Betreuung. Die Altersgrenze (Voreinstellung des Programms: 16 Jahre,
+    /// einstellbar; Mitgliedstaaten dürfen bis 13 senken) ist eine Einstellung von People, keine Rechtsberatung.
+    /// Die Passregel (`ConsentQuery`) sieht nur `person`, nicht `given_by`.
+    pub given_by: Option<PersonRef>,
     pub purpose: Purpose,
     /// Wo die Einwilligung gilt: Raum, Unterhaltung, Dokument, Verteiler; `None` = allgemein für den Zweck. Bei
     /// `AiAssistance` Pflicht (Zustimmung je Raum, ADR 0054 Pkt 4/5; sonst `Invalid`).
@@ -122,7 +129,14 @@ pub struct Consent {
 }
 
 /// Abfrage für `check_consent`: deckt eine aktive Einwilligung diesen Zweck hier und für diesen Empfänger? Eine
-/// Einwilligung passt, wenn der Zweck gleich ist und ihr `scope`/`recipient` `None` oder gleich der Abfrage ist.
+/// Einwilligung passt, wenn der Zweck gleich ist, ihr `scope`/`recipient` `None` oder gleich der Abfrage ist und ihr
+/// `person` die gefragte Person trifft. Treffen (ADR 0058, 0085 §3; Verweise werden nie umgeschrieben):
+/// - Ein zusammengelegter Verweis gilt als sein Ziel. Beim Zusammenlegen ziehen die Einwilligungen mit: sie bleiben
+///   mit ihrem alten Verweis gespeichert und zählen für das Ziel (auch in `consents_of` des Ziels).
+/// - Fragt man nach einem Profil, passen Einwilligungen am Profil und an der Person, die es beschreibt
+///   (`PersonView::describes`); die Einwilligung einer Person deckt alle ihre Profile.
+/// - Eine Einwilligung an einem Profil deckt nur dieses Profil, nie die Person oder ihre anderen Profile.
+/// - Wird die Verknüpfung (`describes`) gelöst, deckt die Einwilligung der Person das Profil nicht mehr.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ConsentQuery {
     pub person: PersonRef,

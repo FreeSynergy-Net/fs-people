@@ -44,8 +44,9 @@ pub enum NoExcerptReason {
 pub enum Error {
     /// Der Anbieter kann es ausdrücklich nicht (ADR 0045), mit Fähigkeitskennung.
     Unsupported { capability: String, reason: String },
-    /// Die fragende Person darf es nicht (Vorschlag in einem fremden Adressbuch; Einwilligungen ohne Recht; jede
-    /// Einwilligungs-Methode, wenn eine KI fragt, unabhängig vom Ziel), mit Fähigkeitskennung.
+    /// Die fragende Person darf es nicht (Vorschlag in einem fremden Adressbuch; Einwilligungen ohne Recht), mit
+    /// Fähigkeitskennung. Fragt eine KI, unabhängig vom Ziel: jede Einwilligungs-Methode, `find_by_address`,
+    /// `propose` mit Adresse und `excerpt` mit einem anderen Zweck als `AiAssistance`.
     Forbidden { capability: String },
     /// Eingabe ungültig (leerer Vorschlag, `limit` außerhalb 1 bis 50, Feldliste leer, Einwilligung für einen
     /// Verweis, der nicht `Found` ist, `AiAssistance` ohne `scope`); nichts geschrieben.

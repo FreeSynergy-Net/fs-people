@@ -24,7 +24,9 @@ pub fn not_possible<T>(capability: &str) -> Result<T> {
 /// Fähigkeitskennungen dieses Teils (Wortlaut für `capabilities`, Manifest, `access.toml` und `people.capnp`).
 /// `person.read`, `person.find` gibt es schon (people.capnp); neu: `person.pick`, `person.propose`, `person.excerpt`,
 /// `consent.read`, `consent.check`, `consent.write`. Mitglieder von Gruppen gibt es hier nicht (nur fs-groups,
-/// `GroupMembers::members_of`), also auch kein `cardgroup.read`.
+/// `GroupMembers::members_of`), also auch kein `cardgroup.read`. `consent.check` ist ein eigenes kleines Recht NUR für
+/// Programm-Konten (fs-messages, Newsletter), keine Voreinstellung für Rollen von Menschen; `consent.read` bleibt bei
+/// Verwaltung und Datenschutz (Strategie 16.11.).
 pub const CAPABILITIES: &[&str] = &[
     "person.read",
     "person.find",
@@ -63,9 +65,11 @@ pub trait PersonDirectory: Send + Sync {
     async fn changes(&self, since: Option<&Place>, size: usize) -> Result<Page<DirectoryChange>>;
     /// `person.find`: Einträge mit genau dieser Adresse (Vergleich nach der Regel in `ContactAddress`); mehrere möglich
     /// (Profile derselben Person, ADR 0058). Reihenfolge: `Confirmed` vor `Proposed`, dann `Person` vor `Profile`,
-    /// dann ältester zuerst. Gelöschte und nicht freigegebene Einträge fehlen.
+    /// dann ältester zuerst. Gelöschte und nicht freigegebene Einträge fehlen. KI: `Forbidden{person.find}`
+    /// (kein Adress-Orakel).
     async fn find_by_address(&self, address: &ContactAddress) -> Result<Vec<PersonView>>;
     /// `person.pick`: Vorschläge für den Personenwähler; Reihenfolge = Rang. `limit == 0` oder über 50 ist `Invalid`.
+    /// KI: sucht nie in Adressen, `Matched::Address` kommt nie vor.
     async fn suggest(&self, query: &Suggest) -> Result<Vec<Candidate>>;
 
     /// `person.propose`: Stapel für einen Sammelvorschlag öffnen; im `CompositeDirectory` geht das an das erste
@@ -75,14 +79,18 @@ pub trait PersonDirectory: Send + Sync {
     async fn open_batch(&self, origin: &Reference) -> Result<ObjectId>;
     /// `person.propose`: Eintrag im Zustand `Proposed` anlegen, optional in einem offenen Stapel. Ist die Adresse
     /// schon bekannt, kommt der vorhandene Verweis zurück (erster aus `find_by_address`) und nichts wird angelegt.
-    /// Nie wird etwas ohne Rückfrage mit einer bestehenden Person verknüpft.
+    /// Nie wird etwas ohne Rückfrage mit einer bestehenden Person verknüpft. KI mit `address`:
+    /// `Forbidden{person.propose}` (die Antwort würde die Adresse einer Person zuordnen).
     async fn propose(&self, entry: &ProposeEntry, batch: Option<ObjectId>) -> Result<PersonRef>;
     /// `person.excerpt`: Auszug der erbetenen Felder jetzt, für den genannten Zweck (ADR 0085 §3, Datensparsamkeit
     /// §4, Zweckbindung). Leere Feldliste: `Invalid`; gelöscht, nicht freigegeben oder unbekannt: `Error::NoExcerpt`
     /// mit Grund (bei `Unknown` fragt ein `CompositeDirectory` weiter). Braucht der Zweck eine Einwilligung
     /// (`Purpose::needs_consent`) und ist das Ziel `Person` oder `Profile`, muss `check_consent` mit Zweck, `scope`
     /// und `recipient` der Anfrage eine liefern, sonst `NoExcerpt{reason: NoConsent}`; ihre Id steht in
-    /// `Excerpt::consent`. Fragt eine KI, fehlen sensible Felder spurlos (`missing`).
+    /// `Excerpt::consent`. Die Einwilligung passt nach der Regel in `ConsentQuery` (Profil über `describes`,
+    /// zusammengelegte Verweise über ihr Ziel). Fragt eine KI, fehlen sensible Felder spurlos (`missing`); fragt sie
+    /// mit einem anderen Zweck als `AiAssistance`, ist die Antwort vor jeder anderen Prüfung
+    /// `Forbidden{person.excerpt}` (kein Leck über `NoConsent`).
     async fn excerpt(&self, person: &PersonRef, request: &ExcerptRequest) -> Result<Excerpt>;
 
     /// `consent.read`: alle Einwilligungen einer Person, auch widerrufene und aufbewahrte, älteste zuerst (Nachweis
@@ -92,17 +100,20 @@ pub trait PersonDirectory: Send + Sync {
     async fn consents_of(&self, person: &PersonRef) -> Result<Vec<Consent>>;
     /// `consent.check`: Id einer aktiven Einwilligung, die die Abfrage deckt (Regel in `ConsentQuery`; mehrere: die
     /// älteste), sonst `None`. Verrät nichts über andere Zwecke (Datensparsamkeit). Zweck: das Zuschalten einer KI
-    /// (`AiAssistance`, `scope` = Raum, je anwesender Person, ADR 0054) und `excerpt`. KI: `Forbidden`.
+    /// (`AiAssistance`, `scope` = Raum, je anwesender Person, ADR 0054) und `excerpt`. Das Recht halten
+    /// Programm-Konten (siehe [`CAPABILITIES`]). KI: `Forbidden`.
     async fn check_consent(&self, query: &ConsentQuery) -> Result<Option<ObjectId>>;
     /// `consent.write`: Einwilligung festhalten; `recorded_by` ist die fragende Person (ohne Anmeldung `Forbidden`).
     /// Die Person selbst darf für sich erfassen (`ByPerson`); für andere braucht es das Recht `consent.write`.
-    /// Ziel muss `Found` sein, `AiAssistance` braucht `scope`, sonst `Invalid`. Gibt es schon eine aktive mit gleicher
-    /// Eingabe außer `given`/`evidence`, kommt sie zurück und nichts wird angelegt. Ohne `expected` (Anlegen).
-    /// KI: `Forbidden`.
+    /// Ziel muss `Found` sein, `AiAssistance` braucht `scope`, sonst `Invalid`. Jeder Aufruf legt einen eigenen
+    /// Eintrag an, auch wenn schon eine aktive passt: ein neuer Nachweis (Formular, Zeitpunkt, Fassung) wird nie still
+    /// verworfen; `check_consent` nennt weiter die älteste. Ohne `expected` (Anlegen). KI: `Forbidden`.
     async fn record_consent(&self, entry: &ConsentEntry) -> Result<Consent>;
     /// `consent.write`: Einwilligung widerrufen (Art. 7 Abs. 3: so einfach wie erteilt). Die Person selbst darf ihre
     /// immer widerrufen, andere brauchen `consent.write`. Löscht nie; setzt `withdrawn` und `retain_until`.
     /// Ausdrücklich ohne `expected`: ein Eintrag ändert sich nur hierdurch, ein zweiter Widerruf liefert den ersten
-    /// unverändert. Unbekannte Id: `UnknownConsent`. KI: `Forbidden`.
+    /// unverändert. Rangfolge (kein Orakel, wie `NotFound` vor `Forbidden` in `groups_v1`): fragt eine KI,
+    /// `Forbidden` ohne Blick auf die Id; sonst ist eine unbekannte oder für die fragende Person nicht sichtbare Id
+    /// (nicht die eigene und ohne `consent.read`) `UnknownConsent`, erst eine sichtbare ohne Recht `Forbidden`.
     async fn withdraw_consent(&self, id: ObjectId, withdrawal: &Withdrawal) -> Result<Consent>;
 }
