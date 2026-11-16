@@ -141,7 +141,11 @@ impl FakeDirectory {
 
     pub(super) fn do_record(&self, entry: &ConsentEntry) -> Result<Consent> {
         let mut g = self.lock();
-        let Some(by) = self.asker.clone().filter(|_| !self.blocks_ai(&g)) else {
+        let login = self.asker.clone().or_else(|| {
+            g.bad(Defect::RecordWithoutLogin)
+                .then(|| entry.person.clone())
+        });
+        let Some(by) = login.filter(|_| !self.blocks_ai(&g)) else {
             return forbidden("consent.write");
         };
         if !(self.is_self(&g, &entry.person)
@@ -242,8 +246,9 @@ impl FakeDirectory {
         self.asker.as_ref().is_some_and(|a| {
             let end = g.target_id(a);
             let merged = !g.bad(Defect::AiFlagNoMergeTarget);
+            let own = !g.bad(Defect::AiFlagOnlyMergeTarget);
             g.entries.iter().any(|e| {
-                e.ai && (e.person.id == a.id || (merged && e.person.id == end))
+                e.ai && ((own && e.person.id == a.id) || (merged && e.person.id == end))
                     && !(g.bad(Defect::AiFlagNeedsShared) && e.status == Status::NotShared)
             })
         })

@@ -7,7 +7,7 @@ use fs_people_directory::conformance::run_fixture_conformance;
 use fs_people_directory::{Defect, FakeDirectory, FakeFixture};
 
 /// Each defect with a part of the name of the rule that must fail.
-const EXPECTED: [(Defect, &str); 24] = [
+const EXPECTED: [(Defect, &str); 26] = [
     (Defect::IgnoreScope, "another scope does not match"),
     (Defect::ProfileCoversPerson, "never covers the person"),
     (Defect::NoMergeFollow, "consents move with a merge"),
@@ -44,6 +44,14 @@ const EXPECTED: [(Defect, &str); 24] = [
     (Defect::AiMayConsent, "check_consent is Forbidden"),
     (Defect::AiFlagNeedsShared, "stays Forbidden after unshare"),
     (Defect::AiFlagNoMergeTarget, "stays Forbidden after merge"),
+    (
+        Defect::AiFlagOnlyMergeTarget,
+        "stays Forbidden after merge into a person",
+    ),
+    (
+        Defect::RecordWithoutLogin,
+        "record_consent: without a login is Forbidden",
+    ),
     (Defect::RetainFromRecorded, "not after the record"),
     (Defect::PurgeKeeps, "deleted for good"),
     (Defect::ErasedByPerson, "recorded by the one who deletes"),

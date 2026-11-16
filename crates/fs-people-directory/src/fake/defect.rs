@@ -50,6 +50,10 @@ pub enum Defect {
     AiFlagNeedsShared,
     /// The AI mark is not looked up at the merge target of the asker.
     AiFlagNoMergeTarget,
+    /// The AI mark is only looked up at the end of the merge chain, not at the asker's own id.
+    AiFlagOnlyMergeTarget,
+    /// `record_consent` without a login is recorded for the person themselves.
+    RecordWithoutLogin,
     /// `retain_until` counts from the day the withdrawal was recorded, not from the withdrawal.
     RetainFromRecorded,
     /// Expired records are never purged.
@@ -60,7 +64,7 @@ pub enum Defect {
 
 impl Defect {
     /// Every defect, for the mutation test.
-    pub const ALL: [Self; 24] = [
+    pub const ALL: [Self; 26] = [
         Self::IgnoreScope,
         Self::ProfileCoversPerson,
         Self::NoMergeFollow,
@@ -82,6 +86,8 @@ impl Defect {
         Self::AiMayConsent,
         Self::AiFlagNeedsShared,
         Self::AiFlagNoMergeTarget,
+        Self::AiFlagOnlyMergeTarget,
+        Self::RecordWithoutLogin,
         Self::RetainFromRecorded,
         Self::PurgeKeeps,
         Self::ErasedByPerson,

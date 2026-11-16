@@ -44,6 +44,7 @@ snapshot. No Blinc, no app, no store.
   a purpose other than `AiAssistance` are `Forbidden` (the purpose check comes first).
 - The AI mark sticks to the entry whatever its state (shared, unshared, deleted) and is looked up at the asker's id and
   at the end of its merge chain: an AI stays an AI after unshare, delete and merge.
+- Etappe 2 note (retention setting): the contract says `retain_until` comes "from a setting of People", but the rule fixes three years (consent_gaps.rs, answer 40: three years from the end of the year, adjustable). The People fixture needs this setting, or `PeopleRepo` gets the default of three years from the year end.
 - Retention: `retain_until` is the end of the third year after the WITHDRAWAL (`withdrawal.at`), not after the record;
   after it the provider deletes the record for good (fake: `purge_expired`, fixture: `purge_expired(today)`). The one who
   deletes a person records the `Erasure` withdrawals (`recorded_by`); the person only if nobody asks.

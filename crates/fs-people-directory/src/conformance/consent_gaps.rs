@@ -24,15 +24,27 @@ pub(super) async fn rules(fx: &dyn ConformanceFixture, r: &mut Report) {
     retention(fx, &*admin, r).await;
 }
 
-/// The AI mark does not depend on the state of the entry and follows the merge target.
+/// The AI mark does not depend on the state of the entry; it follows the merge target (a profile merged into an AI)
+/// and it stays with the AI itself (an AI merged into a person).
 async fn ai_sticks(fx: &dyn ConformanceFixture, r: &mut Report) {
-    for label in ["unshare", "delete", "merge"] {
+    for label in ["unshare", "delete", "merge", "merge into a person"] {
         let Some(ai) = fx.add_ai("Zzconf Sticky Robot").await else {
+            r.skip("AI: fixture cannot add an AI");
             return;
         };
         let (asker, done) = match label {
             "unshare" => (Some(ai.clone()), fx.unshare(&ai).await),
             "delete" => (Some(ai.clone()), fx.delete(&ai).await),
+            "merge into a person" => {
+                let human = fx
+                    .add_confirmed(PersonArt::Person, "Zzconf Sticky Human", None)
+                    .await;
+                let done = match &human {
+                    Some(h) => fx.merge(&ai, h).await,
+                    None => false,
+                };
+                (Some(ai.clone()), done)
+            }
             _ => {
                 let alias = fx
                     .add_confirmed(PersonArt::Profile, "Zzconf Sticky Alias", None)
@@ -107,6 +119,7 @@ async fn anonymous(fx: &dyn ConformanceFixture, admin: &dyn PersonDirectory, r: 
     let Ok(c) = admin.record_consent(&entry(&p, Purpose::Newsletter)).await else {
         return;
     };
+    // The anonymous view holds consent.write, so Forbidden can only come from the missing login.
     r.is_err(
         &anon.record_consent(&entry(&p, Purpose::Photo)).await,
         "record_consent: without a login is Forbidden",

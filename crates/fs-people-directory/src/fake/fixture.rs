@@ -131,7 +131,7 @@ impl ConformanceFixture for FakeFixture {
     }
 
     async fn anonymous_view(&self) -> Option<Box<dyn PersonDirectory>> {
-        Some(Box::new(self.directory.view_as(None, Rights::none())))
+        Some(Box::new(self.directory.view_as(None, Rights::all())))
     }
 
     async fn delete_by(&self, person: &PersonRef, by: &PersonRef) -> bool {
