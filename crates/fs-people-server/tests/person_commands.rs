@@ -54,12 +54,12 @@ async fn patch_changes_what_it_names_and_a_bad_patch_is_a_problem() {
         write_uuid(patch.get().init_id(), Some(id));
         patch
             .get()
-            .set_patch(r#"{"name/full":"Ada King","emails/e1/label":"main"}"#);
+            .set_patch(r#"{"name/full":"Amara Brandt","emails/e1/label":"main"}"#);
         let done = patch.send().promise.await.unwrap();
         let person = done.get().unwrap().get_person().unwrap();
         assert_eq!(id_of(person), id);
         let content = json_of(person);
-        assert_eq!(content["name"]["full"], "Ada King");
+        assert_eq!(content["name"]["full"], "Amara Brandt");
         assert_eq!(content["emails"]["e1"]["label"], "main");
         assert_eq!(content["emails"]["e1"]["address"], "ada@x.org");
 

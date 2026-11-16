@@ -5,18 +5,18 @@
 //!
 //! | n | art | what |
 //! | --- | --- | --- |
-//! | 1 | Person | Ada Lovelace, confirmed, `mailto:ada@example.org`, the asker, full excerpt |
-//! | 2 | Profile | "Ada L.", linked to 1 (`describes`), same address as 1 |
-//! | 3 | Profile | "A. Lovelace", unlinked, same address as 1 (two profiles with one address) |
-//! | 4 | Person | "Claude", `ai` set |
-//! | 5 | Group | "Analytical Engine Team" (members live in fs-groups) |
-//! | 6 | Organization | "Babbage Works Ltd" |
+//! | 1 | Person | Amara Zolenko, confirmed, `mailto:amara@example.org`, the asker, full excerpt |
+//! | 2 | Profile | "Amara Z.", linked to 1 (`describes`), same address as 1 |
+//! | 3 | Profile | "A. Zolenko", unlinked, same address as 1 (two profiles with one address) |
+//! | 4 | Person | "Assistent Sol", `ai` set |
+//! | 5 | Group | "Quillon Team" (members live in fs-groups) |
+//! | 6 | Organization | "Tamarind Works Ltd" |
 //! | 7 | Person | "Charles Deleted", deleted (tombstone) |
 //! | 8 | Person | "Hedy Hidden", no longer shared |
-//! | 9 | Profile | "Grace H.", merged into 10 |
-//! | 10 | Person | "Grace Hopper", `tel:+49301234567` |
-//! | 11 | Profile | "Import Alan", `Proposed`, `mailto:alan@example.org` |
-//! | 12 | Person | "Alan Turing", confirmed |
+//! | 9 | Profile | "Soo-jin M.", merged into 10 |
+//! | 10 | Person | "Soo-jin Marchetti", `tel:+49305550123` |
+//! | 11 | Profile | "Import Tariq", `Proposed`, `mailto:tariq@example.org` |
+//! | 12 | Person | "Tariq Lindqvist", confirmed |
 
 use super::{Entry, FakeDirectory};
 use crate::person_directory_v1::{EntryState, ExcerptValue, PersonArt, PersonRef};
@@ -47,14 +47,14 @@ fn row(n: u8, display: &str, address: Option<&str>) -> Option<Entry> {
 }
 
 fn ada() -> Option<Entry> {
-    let mut e = row(1, "Ada Lovelace", Some("mailto:ada@example.org"))?;
-    if let Ok(name) = Name::new("Ada Lovelace", &[]) {
+    let mut e = row(1, "Amara Zolenko", Some("mailto:amara@example.org"))?;
+    if let Ok(name) = Name::new("Amara Zolenko", &[]) {
         e.excerpt.push(ExcerptValue::FullName(name));
     }
-    if let Ok(t) = Text::parse("Lovelace") {
+    if let Ok(t) = Text::parse("Zolenko") {
         e.excerpt.push(ExcerptValue::Surname(t));
     }
-    if let Ok(mail) = EmailAddress::parse("ada@example.org") {
+    if let Ok(mail) = EmailAddress::parse("amara@example.org") {
         e.excerpt.push(ExcerptValue::Email(mail));
     }
     Some(e)
@@ -65,31 +65,31 @@ fn ada() -> Option<Entry> {
 #[must_use]
 pub fn sample() -> FakeDirectory {
     let d = FakeDirectory::new().with_asker(sample_ref(1));
-    let linked = row(2, "Ada L.", Some("mailto:ada@example.org")).map(|mut e| {
+    let linked = row(2, "Amara Z.", Some("mailto:amara@example.org")).map(|mut e| {
         e.describes = sample_ref(1);
         e
     });
-    let ai = row(4, "Claude", None).map(|mut e| {
+    let ai = row(4, "Assistent Sol", None).map(|mut e| {
         e.ai = true;
         e
     });
-    let proposed = row(11, "Import Alan", Some("mailto:alan@example.org")).map(|mut e| {
+    let proposed = row(11, "Import Tariq", Some("mailto:tariq@example.org")).map(|mut e| {
         e.state = EntryState::Proposed;
         e
     });
     let rows = [
         ada(),
         linked,
-        row(3, "A. Lovelace", Some("mailto:ada@example.org")),
+        row(3, "A. Zolenko", Some("mailto:amara@example.org")),
         ai,
-        row(5, "Analytical Engine Team", None),
-        row(6, "Babbage Works Ltd", None),
+        row(5, "Quillon Team", None),
+        row(6, "Tamarind Works Ltd", None),
         row(7, "Charles Deleted", None),
         row(8, "Hedy Hidden", None),
-        row(9, "Grace H.", None),
-        row(10, "Grace Hopper", Some("tel:+49301234567")),
+        row(9, "Soo-jin M.", None),
+        row(10, "Soo-jin Marchetti", Some("tel:+49305550123")),
         proposed,
-        row(12, "Alan Turing", None),
+        row(12, "Tariq Lindqvist", None),
     ];
     for e in rows.into_iter().flatten() {
         d.add(e);

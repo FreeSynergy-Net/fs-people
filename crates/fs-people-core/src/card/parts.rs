@@ -12,7 +12,7 @@ use std::collections::BTreeMap;
 use super::sub_object::sub_object;
 
 /// `Name.sortAs`: RFC 9553 section 2.2.1.1 makes it a map from component kind to sort string
-/// (`{"surname": "Lovelace"}`). Cards written before carry a single string; both are read and written
+/// (`{"surname": "Zolenko"}`). Cards written before carry a single string; both are read and written
 /// back as they came, so no stored card becomes unreadable.
 #[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]

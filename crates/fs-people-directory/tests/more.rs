@@ -48,7 +48,7 @@ async fn sample_covers_every_state() {
     assert!(
         matches!(d.resolve(&r(11)).await, Ok(Resolved::Found(v)) if v.state == EntryState::Proposed)
     );
-    let ada = fs_types::ContactAddress::parse("mailto:ada@example.org").expect("address");
+    let ada = fs_types::ContactAddress::parse("mailto:amara@example.org").expect("address");
     let ids: Vec<_> = d
         .find_by_address(&ada)
         .await
@@ -137,7 +137,7 @@ async fn composite_bad_limit_is_invalid_even_when_all_are_down() {
 async fn composite_suggest_merges_by_position_and_changes_skip_unsupported() {
     let a = FakeDirectory::new();
     let q = Suggest {
-        text: "Ada".into(),
+        text: "Amara".into(),
         arten: vec![],
         limit: 10,
         include_proposed: true,
@@ -161,7 +161,7 @@ async fn fake_merge_bumps_rev_and_excerpt_follows() {
         other => panic!("{other:?}"),
     };
     assert!(d.merge(&r(12), &r(1)));
-    assert!(d.rename(&r(10), "Grace M. Hopper"));
+    assert!(d.rename(&r(10), "Soo-jin K. Marchetti"));
     match d.resolve(&r(10)).await {
         Ok(Resolved::Found(v)) => assert!(v.rev > before),
         other => panic!("{other:?}"),

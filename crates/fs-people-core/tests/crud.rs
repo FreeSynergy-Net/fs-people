@@ -10,12 +10,12 @@ use serde_json::json;
 #[tokio::test]
 async fn create_get_update_delete_with_envelope() {
     let (r, store) = setup().await;
-    let mut card = person("Ada Lovelace", " Ada@Example.ORG ");
+    let mut card = person("Amara Zolenko", " Amara@Example.ORG ");
     card.add_phone("+49 (30) 1234-567");
-    card.add_organization("Analytical Engines");
+    card.add_organization("Quillon Works");
     let o = r.create(card.clone()).await.unwrap();
     assert_eq!(o.envelope.object_type, "Profile");
-    assert_eq!(o.envelope.name, "Ada Lovelace");
+    assert_eq!(o.envelope.name, "Amara Zolenko");
     assert_eq!(o.content_type, "application/jscontact+json");
     assert_eq!(o.envelope.context.as_deref(), Some("people"));
     assert!(
@@ -25,9 +25,9 @@ async fn create_get_update_delete_with_envelope() {
             .unwrap()
             .starts_with("https://local.invalid/people/")
     );
-    assert_eq!(o.index["email"], ["ada@example.org"]);
+    assert_eq!(o.index["email"], ["amara@example.org"]);
     assert_eq!(o.index["phone"], ["+49301234567"]);
-    assert_eq!(o.index["org"], ["analytical engines"]);
+    assert_eq!(o.index["org"], ["quillon works"]);
     assert_eq!(o.index["kind"], ["individual"]);
     // duplicate uid refused
     assert!(matches!(r.create(card.clone()).await, Err(ref e) if e.is_conflict()));
@@ -38,12 +38,12 @@ async fn create_get_update_delete_with_envelope() {
 
     let id = o.envelope.id;
     let mut c = r.get_card(id).await.unwrap().unwrap();
-    c.name.as_mut().unwrap().full = Some("Ada King".into());
+    c.name.as_mut().unwrap().full = Some("Amara Brandt".into());
     c.emails.clear();
-    c.add_email("ada@king.example");
+    c.add_email("amara@brandt.example");
     let o2 = r.update(id, c.clone()).await.unwrap();
-    assert_eq!(o2.envelope.name, "Ada King");
-    assert_eq!(o2.index["email"], ["ada@king.example"]);
+    assert_eq!(o2.envelope.name, "Amara Brandt");
+    assert_eq!(o2.index["email"], ["amara@brandt.example"]);
     assert_eq!(o2.envelope.published, o.envelope.published);
     // uid is immutable
     c.uid = "urn:uuid:other".into();
@@ -74,21 +74,21 @@ async fn name_is_derived_even_without_full() {
         components: vec![
             card::NameComponent {
                 kind: "given".into(),
-                value: "Grace".into(),
+                value: "Soo-jin".into(),
                 ..Default::default()
             },
             card::NameComponent {
                 kind: "surname".into(),
-                value: "Hopper".into(),
+                value: "Marchetti".into(),
                 ..Default::default()
             },
         ],
         ..Default::default()
     });
-    assert_eq!(c.display_name(), "Grace Hopper");
+    assert_eq!(c.display_name(), "Soo-jin Marchetti");
     let o = repo().await.create(c).await.unwrap();
-    assert_eq!(o.envelope.name, "Grace Hopper");
-    assert_eq!(o.index["name_sort"], ["hopper, grace"]);
+    assert_eq!(o.envelope.name, "Soo-jin Marchetti");
+    assert_eq!(o.index["name_sort"], ["marchetti, soo-jin"]);
     let mut anon = Card::individual("x");
     anon.name = None;
     anon.add_email("only@mail.example");
@@ -98,7 +98,7 @@ async fn name_is_derived_even_without_full() {
 #[tokio::test]
 async fn describes_is_an_envelope_field() {
     let r = repo().await;
-    let mut c = person("Ada", "ada@example.org");
+    let mut c = person("Ada", "amara@example.org");
     c.set_vendor("freesynergy.net:describes", json!("did:example:ada"));
     let o = r.create(c).await.unwrap();
     assert_eq!(o.envelope.describes.as_deref(), Some("did:example:ada"));

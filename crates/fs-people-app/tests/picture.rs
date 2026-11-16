@@ -41,12 +41,12 @@ fn read_and_clear(path: &PathBuf) -> Vec<u8> {
 
 fn world() -> World {
     let w = World::in_memory();
-    let mut ada = person("Ada Lovelace", "ada@x.org");
+    let mut ada = person("Amara Zolenko", "amara@x.org");
     ada.add_phone("+44 20 1234");
-    ada.add_organization("Analytical Engines Ltd");
+    ada.add_organization("Quillon Works Ltd");
     ada.add_email("home@x.org");
     w.add(ada);
-    w.add(person("Grace Hopper", "grace@x.org"));
+    w.add(person("Soo-jin Marchetti", "soojin@x.org"));
     let bot = w.add(person("Helper", "bot@x.org"));
     w.runtime
         .block_on(w.repo.mark_ai(bot.parse().unwrap()))

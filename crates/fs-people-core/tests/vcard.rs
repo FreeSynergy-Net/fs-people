@@ -8,7 +8,7 @@ use fs_people_core::vcard;
 #[tokio::test]
 async fn vcard_import_keeps_original_and_exports() {
     let r = repo().await;
-    let vcf = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1aaef-ba80-7f7a-8dff-000000000001\r\nFN:Ada Lovelace\r\nN:Lovelace;Ada;;;\r\nEMAIL;TYPE=work:Ada@Example.org\r\nTEL;VALUE=uri:tel:+49-30-1234567\r\nORG:Analytical Engines\r\nURL:https://example.org/ada\r\nNOTE:First programmer\r\nKIND:individual\r\nADR;TYPE=home:;;1 Main St;Berlin;;10115;Germany\r\nX-CUSTOM:keep me\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:3.0\r\nFN:Bob Old\r\nEMAIL:bob@old.example\r\nEND:VCARD\r\n";
+    let vcf = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1aaef-ba80-7f7a-8dff-000000000001\r\nFN:Amara Zolenko\r\nN:Zolenko;Amara;;;\r\nEMAIL;TYPE=work:Amara@Example.org\r\nTEL;VALUE=uri:tel:+49-30-5550123\r\nORG:Quillon Works\r\nURL:https://example.org/amara\r\nNOTE:First customer\r\nKIND:individual\r\nADR;TYPE=home:;;1 Main St;Berlin;;10115;Germany\r\nX-CUSTOM:keep me\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:3.0\r\nFN:Bob Old\r\nEMAIL:bob@old.example\r\nEND:VCARD\r\n";
     let rep = r.import_vcard(vcf).await.unwrap();
     assert_eq!(rep.created.len(), 2, "{rep:?}");
     let ada = r.get(rep.created[0]).await.unwrap().unwrap();
@@ -26,14 +26,14 @@ async fn vcard_import_keeps_original_and_exports() {
             .ends_with("END:VCARD\r\n")
     );
     assert!(!std::str::from_utf8(&orig.bytes).unwrap().contains("Bob"));
-    assert_eq!(ada.envelope.name, "Ada Lovelace");
+    assert_eq!(ada.envelope.name, "Amara Zolenko");
     assert_eq!(
         ada.envelope.id.to_string(),
         "01a1aaef-ba80-7f7a-8dff-000000000001"
     );
-    assert_eq!(ada.index["email"], ["ada@example.org"]);
-    assert_eq!(ada.index["phone"], ["+49301234567"]);
-    assert_eq!(ada.index["org"], ["analytical engines"]);
+    assert_eq!(ada.index["email"], ["amara@example.org"]);
+    assert_eq!(ada.index["phone"], ["+49305550123"]);
+    assert_eq!(ada.index["org"], ["quillon works"]);
     // v3 card without UID got one
     let bob = r.get_card(rep.created[1]).await.unwrap().unwrap();
     assert!(bob.uid.starts_with("urn:uuid:"));
@@ -45,8 +45,8 @@ async fn vcard_import_keeps_original_and_exports() {
     for needle in [
         "BEGIN:VCARD",
         "VERSION:4.0",
-        "FN:Ada Lovelace",
-        "ada@example.org".to_lowercase().as_str(),
+        "FN:Amara Zolenko",
+        "amara@example.org".to_lowercase().as_str(),
         "UID:urn:uuid:01a1aaef",
         "END:VCARD",
     ] {

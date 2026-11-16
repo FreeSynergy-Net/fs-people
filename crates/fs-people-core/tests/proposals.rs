@@ -13,9 +13,9 @@ use serde_json::json;
 #[tokio::test]
 async fn same_person_proposals_and_confirmation() {
     let (r, store) = setup().await;
-    let mut a = person("Ada L.", "ada@example.org");
+    let mut a = person("Amara Z.", "amara@example.org");
     a.add_phone("+49 30 1234567");
-    let mut b = person("Ada Lovelace", "ADA@example.org");
+    let mut b = person("Amara Zolenko", "AMARA@example.org");
     b.add_phone("030 1234567"); // different national format: no match
     let mut c = person("Countess", "other@example.org");
     c.add_phone("0049 30 1234567"); // matches a by phone
@@ -39,7 +39,7 @@ async fn same_person_proposals_and_confirmation() {
         ab.reasons,
         [MatchReason {
             kind: MatchKind::Email,
-            value: "ada@example.org".into()
+            value: "amara@example.org".into()
         }]
     );
     // proposing writes nothing

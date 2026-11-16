@@ -51,7 +51,7 @@ async fn a_stored_old_card_is_read_as_it_is_and_rewritten_on_the_next_save() {
 #[tokio::test]
 async fn a_map_is_kept_as_it_is() {
     let r = repo().await;
-    let map = json!({"surname": "Lovelace", "given": "Ada"});
+    let map = json!({"surname": "Zolenko", "given": "Amara"});
     let stored = r.create(with_sort_as(&map)).await.unwrap();
     assert_eq!(stored.content["name"]["sortAs"], map);
 }

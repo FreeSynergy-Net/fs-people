@@ -29,7 +29,7 @@ async fn a_shown_value_that_is_older_than_the_rules_sent_back_is_not_a_change() 
         "kind": "example.com:robot",
         "keywords": {"Rust": true},
         "name": {"isOrdered": true, "sortAs": {"surname": "L"}, "components": [
-            {"kind": "surname", "value": "Lovelace"}, {"kind": "separator", "value": ", "}, {"kind": "given", "value": "Ada"}]}
+            {"kind": "surname", "value": "Zolenko"}, {"kind": "separator", "value": ", "}, {"kind": "given", "value": "Amara"}]}
     }))
     .unwrap();
     let id = stored(&r, card).await;

@@ -12,26 +12,26 @@
     "@type": "Name",
     "components": [
       {"@type": "NameComponent", "kind": "title", "value": "Dr."},
-      {"@type": "NameComponent", "kind": "given", "value": "Ada", "phonetic": "AY-duh"},
-      {"@type": "NameComponent", "kind": "surname", "value": "Lovelace"}
+      {"@type": "NameComponent", "kind": "given", "value": "Amara", "phonetic": "ah-MAR-ah"},
+      {"@type": "NameComponent", "kind": "surname", "value": "Zolenko"}
     ],
     "isOrdered": true,
     "defaultSeparator": " ",
-    "full": "Dr. Ada Lovelace",
-    "sortAs": {"surname": "Lovelace", "given": "Ada"},
+    "full": "Dr. Amara Zolenko",
+    "sortAs": {"surname": "Zolenko", "given": "Amara"},
     "phoneticScript": "Latn",
     "phoneticSystem": "ipa"
   },
   "nicknames": {"n1": {"@type": "Nickname", "name": "Countess", "contexts": {"private": true}, "pref": 1}},
-  "organizations": {"o1": {"@type": "Organization", "name": "Analytical Engines Ltd", "units": [{"@type": "OrgUnit", "name": "Notes", "sortAs": "notes"}], "sortAs": "analytical", "contexts": {"work": true}}},
+  "organizations": {"o1": {"@type": "Organization", "name": "Quillon Works Ltd", "units": [{"@type": "OrgUnit", "name": "Notes", "sortAs": "notes"}], "sortAs": "quillon", "contexts": {"work": true}}},
   "speakAs": {"@type": "SpeakToAs", "grammaticalGender": "feminine", "pronouns": {"p1": {"@type": "Pronouns", "pronouns": "she/her", "contexts": {"private": true}, "pref": 1}}},
   "titles": {"t1": {"@type": "Title", "name": "Mathematician", "kind": "title", "organizationId": "o1"}},
-  "emails": {"e1": {"@type": "EmailAddress", "address": "ada@example.org", "contexts": {"work": true}, "pref": 1, "label": "main"}},
+  "emails": {"e1": {"@type": "EmailAddress", "address": "amara@example.org", "contexts": {"work": true}, "pref": 1, "label": "main"}},
   "onlineServices": {"s1": {"@type": "OnlineService", "service": "Mastodon", "uri": "https://social.example/@ada", "user": "ada", "contexts": {"private": true}, "pref": 2, "label": "fediverse"}},
   "phones": {"p1": {"@type": "Phone", "number": "+441234567890", "features": {"voice": true, "text": true}, "contexts": {"work": true}, "pref": 1, "label": "desk"}},
   "preferredLanguages": {"l1": {"@type": "LanguagePref", "language": "en", "contexts": {"work": true}, "pref": 1}},
   "calendars": {"c1": {"@type": "Calendar", "kind": "calendar", "uri": "https://cal.example/ada", "mediaType": "text/calendar", "contexts": {"work": true}, "pref": 1, "label": "work"}},
-  "schedulingAddresses": {"a1": {"@type": "SchedulingAddress", "uri": "mailto:ada@example.org", "contexts": {"work": true}, "pref": 1, "label": "invites"}},
+  "schedulingAddresses": {"a1": {"@type": "SchedulingAddress", "uri": "mailto:amara@example.org", "contexts": {"work": true}, "pref": 1, "label": "invites"}},
   "addresses": {"ad1": {"@type": "Address", "components": [
       {"@type": "AddressComponent", "kind": "number", "value": "12"},
       {"@type": "AddressComponent", "kind": "name", "value": "St James's Square", "phonetic": "x"},
@@ -48,7 +48,7 @@
     "d": {"@type": "Anniversary", "kind": "death", "date": {"@type": "Timestamp", "utc": "1852-11-27T00:00:00Z"}}
   },
   "keywords": {"math": true},
-  "notes": {"n1": {"@type": "Note", "created": "2026-01-02T03:04:05Z", "author": {"@type": "Author", "name": "Charles", "uri": "https://example.org/charles"}, "note": "Wrote the first program."}},
+  "notes": {"n1": {"@type": "Note", "created": "2026-01-02T03:04:05Z", "author": {"@type": "Author", "name": "Charles", "uri": "https://example.org/charles"}, "note": "Wrote the first draft."}},
   "personalInfo": {"i1": {"@type": "PersonalInfo", "kind": "expertise", "value": "mathematics", "level": "high", "listAs": 1, "label": "field"}},
   "freesynergy.net:sensitive": ["dpv:Health"]
 }

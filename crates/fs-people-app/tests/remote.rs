@@ -52,31 +52,31 @@ fn create_list_search_read_edit_delete_over_the_socket() {
     let adapter = PeopleAdapter::new(remote.clone(), Arc::new(NoRoles), runtime.handle().clone());
 
     let ada = runtime
-        .block_on(remote.create(person("Ada Lovelace", "ada@example.org")))
+        .block_on(remote.create(person("Amara Zolenko", "amara@example.org")))
         .unwrap();
     runtime
-        .block_on(remote.create(person("Grace Hopper", "grace@example.org")))
+        .block_on(remote.create(person("Soo-jin Marchetti", "soojin@example.org")))
         .unwrap();
     let key = ada.envelope.id.to_string();
 
     assert_eq!(adapter.rows("", 0, 100).unwrap().len(), 2);
-    let found = adapter.rows("lovelace", 0, 100).unwrap();
+    let found = adapter.rows("zolenko", 0, 100).unwrap();
     assert_eq!(found.len(), 1);
     assert_eq!(found[0].key, key);
     assert_eq!(adapter.rows("", 1, 100).unwrap().len(), 1, "offset");
     assert_eq!(adapter.rows("", 0, 1).unwrap().len(), 1, "limit");
 
     let sheet = adapter.read(&key).unwrap();
-    assert_eq!(sheet.title, "Ada Lovelace");
+    assert_eq!(sheet.title, "Amara Zolenko");
 
     let mut edit = adapter.draft(&key).unwrap();
     let email = edit
         .groups
         .iter_mut()
         .flat_map(|g| g.fields.iter_mut())
-        .find(|f| f.value == "ada@example.org")
+        .find(|f| f.value == "amara@example.org")
         .unwrap();
-    email.value = "ada@new.example".into();
+    email.value = "amara@new.example".into();
     adapter.save(&key, &edit).unwrap();
     let shown: String = adapter
         .read(&key)
@@ -85,7 +85,7 @@ fn create_list_search_read_edit_delete_over_the_socket() {
         .iter()
         .flat_map(|s| s.fields.iter().map(|f| f.value.clone()))
         .collect();
-    assert!(shown.contains("ada@new.example"), "{shown}");
+    assert!(shown.contains("amara@new.example"), "{shown}");
 
     adapter.delete(&key).unwrap();
     assert_eq!(adapter.rows("", 0, 100).unwrap().len(), 1);
@@ -116,7 +116,7 @@ fn two_windows_on_one_server_a_stale_save_is_a_conflict_and_writes_nothing() {
     );
     let b = PeopleAdapter::new(b_remote, Arc::new(NoRoles), runtime.handle().clone());
     let ada = runtime
-        .block_on(a_remote.create(person("Ada Lovelace", "ada@example.org")))
+        .block_on(a_remote.create(person("Amara Zolenko", "amara@example.org")))
         .unwrap();
     let key = ada.envelope.id.to_string();
 
@@ -127,7 +127,7 @@ fn two_windows_on_one_server_a_stale_save_is_a_conflict_and_writes_nothing() {
             .groups
             .iter_mut()
             .flat_map(|g| g.fields.iter_mut())
-            .find(|f| f.value == "ada@example.org")
+            .find(|f| f.value == "amara@example.org")
             .unwrap();
         field.value = to.into();
     };
@@ -158,7 +158,7 @@ fn the_roles_of_a_person_are_read_over_the_socket_with_their_names() {
     let runtime = tokio::runtime::Runtime::new().unwrap();
     let adapter = PeopleAdapter::new(remote.clone(), remote.clone(), runtime.handle().clone());
     let ada = runtime
-        .block_on(remote.create(person("Ada Lovelace", "ada@example.org")))
+        .block_on(remote.create(person("Amara Zolenko", "amara@example.org")))
         .unwrap();
     runtime
         .block_on(repo.assign_role(

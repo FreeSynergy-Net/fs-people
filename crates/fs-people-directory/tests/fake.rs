@@ -39,16 +39,16 @@ fn query(text: &str, limit: u16) -> Suggest {
 }
 
 fn seeded() -> FakeDirectory {
-    let mut ada = Entry::new(person(1, PersonArt::Person), "Ada Lovelace");
-    ada.address = Some(addr("mailto:ada@example.org"));
+    let mut ada = Entry::new(person(1, PersonArt::Person), "Amara Zolenko");
+    ada.address = Some(addr("mailto:amara@example.org"));
     ada.excerpt = vec![
-        ExcerptValue::FullName(Name::new("Ada Lovelace", &[]).expect("name")),
-        ExcerptValue::Surname(Text::parse("Lovelace").expect("text")),
+        ExcerptValue::FullName(Name::new("Amara Zolenko", &[]).expect("name")),
+        ExcerptValue::Surname(Text::parse("Zolenko").expect("text")),
     ];
-    let mut profile = Entry::new(person(2, PersonArt::Profile), "Ada L.");
-    profile.address = Some(addr("mailto:ada@example.org"));
+    let mut profile = Entry::new(person(2, PersonArt::Profile), "Amara Z.");
+    profile.address = Some(addr("mailto:amara@example.org"));
     profile.state = EntryState::Proposed;
-    let team = Entry::new(person(3, PersonArt::Group), "Analytical Engine Team");
+    let team = Entry::new(person(3, PersonArt::Group), "Quillon Team");
     FakeDirectory::new()
         .with_asker(Some(person(1, PersonArt::Person)))
         .with_entry(profile)
@@ -69,7 +69,7 @@ async fn fake_is_conformant() {
 async fn find_by_address_orders_person_before_profile() {
     let d = seeded();
     let found = d
-        .find_by_address(&addr("mailto:ada@EXAMPLE.org"))
+        .find_by_address(&addr("mailto:amara@EXAMPLE.org"))
         .await
         .expect("find");
     // Confirmed before Proposed: the person (Confirmed) comes before the profile (Proposed, added first).
@@ -97,7 +97,7 @@ async fn trash_states_and_restored() {
         })
     ));
     assert!(
-        d.find_by_address(&addr("mailto:ada@example.org"))
+        d.find_by_address(&addr("mailto:amara@example.org"))
             .await
             .expect("find")
             .iter()
@@ -113,7 +113,7 @@ async fn trash_states_and_restored() {
             ..
         })
     ));
-    let hidden_team = d.suggest(&query("Analytical", 5)).await.expect("suggest");
+    let hidden_team = d.suggest(&query("Quillon", 5)).await.expect("suggest");
     assert_eq!(hidden_team.len(), 0);
     assert!(d.restore(&ada));
     assert!(matches!(d.resolve(&ada).await, Ok(Resolved::Found(_))));

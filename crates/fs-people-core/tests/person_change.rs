@@ -96,14 +96,14 @@ async fn single_fields_name_kind_gender_keywords() {
     let r = repo().await;
     let id = stored(&r, person("Ada", "ada@example.org")).await;
     let edit = Edit::new()
-        .set(&["name"], BasicType::Name, &["Ada King"])
+        .set(&["name"], BasicType::Name, &["Amara Brandt"])
         .set(&["grammaticalGender"], BasicType::Choice, &["feminine"])
         .set(&["keywords"], BasicType::Keywords, &["math, Engines"]);
     let card: Card =
         serde_json::from_value(People::change(&r, id, &edit).await.unwrap().content).unwrap();
     assert_eq!(
         card.name.as_ref().unwrap().full.as_deref(),
-        Some("Ada King")
+        Some("Amara Brandt")
     );
     assert_eq!(
         card.speak_as

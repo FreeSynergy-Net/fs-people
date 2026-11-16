@@ -37,11 +37,11 @@ async fn create_get_update_delete() {
         write_uuid(update.get().init_id(), Some(id));
         update
             .get()
-            .set_jscontact(card("uid-1", "Ada King", "ada@x.org").as_str());
+            .set_jscontact(card("uid-1", "Amara Brandt", "ada@x.org").as_str());
         let updated = update.send().promise.await.unwrap();
         assert_eq!(
             name_of(updated.get().unwrap().get_person().unwrap()),
-            "Ada King"
+            "Amara Brandt"
         );
 
         let mut delete = persons.delete_request();

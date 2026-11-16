@@ -19,8 +19,8 @@ fn rich() -> Card {
         "name": {
             "@type": "Name",
             "components": [
-                {"@type": "NameComponent", "kind": "given", "value": "Ada"},
-                {"@type": "NameComponent", "kind": "surname", "value": "Lovelace"}
+                {"@type": "NameComponent", "kind": "given", "value": "Amara"},
+                {"@type": "NameComponent", "kind": "surname", "value": "Zolenko"}
             ],
             "isOrdered": true,
             "example.org:phonetic": "ay-da"
@@ -28,7 +28,7 @@ fn rich() -> Card {
         "nicknames": {"n1": {"@type": "Nickname", "name": "Countess"}},
         "titles": {"t1": {"@type": "Title", "name": "Analyst", "organizationId": "o1"}},
         "emails": {
-            "e1": {"@type": "EmailAddress", "address": "ada@x.org", "contexts": {"work": true},
+            "e1": {"@type": "EmailAddress", "address": "amara@x.org", "contexts": {"work": true},
                    "pref": 1, "label": "desk", "example.org:verified": true},
             "e2": {"@type": "EmailAddress", "address": "home@x.org", "contexts": {"private": true}}
         },
@@ -40,7 +40,7 @@ fn rich() -> Card {
         },
         "addresses": {"a1": {"@type": "Address", "full": "12 St James", "countryCode": "GB"}},
         "links": {"l1": {"@type": "Link", "uri": "https://x.org"}},
-        "notes": {"no1": {"@type": "Note", "note": "first programmer"}},
+        "notes": {"no1": {"@type": "Note", "note": "first customer"}},
         "keywords": {"maths": true},
         "relatedTo": {"urn:uuid:other": {"relation": {"friend": true}}},
         "personalInfo": {"pi1": {"@type": "PersonalInfo", "kind": "expertise", "value": "maths"}},
@@ -141,7 +141,7 @@ fn a_new_name_replaces_the_parts_and_sorting_and_search_follow_and_the_rest_stay
         .unwrap()
         .value
         .clone();
-    assert_eq!(shown, "Ada Lovelace", "the parts are shown as the name");
+    assert_eq!(shown, "Amara Zolenko", "the parts are shown as the name");
     s.set_field("name/full", "Augusta King");
     s.save();
     let card = w.card(&key);
@@ -153,7 +153,7 @@ fn a_new_name_replaces_the_parts_and_sorting_and_search_follow_and_the_rest_stay
         card.extra["example.org:anything"]["deep"][2]["three"],
         json!(true)
     );
-    s.search("Lovelace");
+    s.search("Zolenko");
     assert!(s.rows().is_empty(), "the old name no longer finds her");
     s.search("King");
     assert_eq!(s.rows().len(), 1);
@@ -196,12 +196,12 @@ fn an_organisation_with_units_only_loses_its_name_when_emptied() {
 fn the_imported_original_survives_an_edit() {
     let w = World::in_memory();
     let vcard =
-        "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Grace Hopper\r\nEMAIL:grace@x.org\r\nEND:VCARD\r\n";
+        "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Soo-jin Marchetti\r\nEMAIL:soojin@x.org\r\nEND:VCARD\r\n";
     w.runtime.block_on(w.repo.import_vcard(vcard)).unwrap();
     let mut s = w.state();
     let key = s.selected().unwrap().to_string();
     s.begin_edit();
-    s.set_field("name/full", "Rear Admiral Hopper");
+    s.set_field("name/full", "Captain Marchetti");
     s.save();
     let id = key.parse().unwrap();
     let stored = w.runtime.block_on(w.repo.get(id)).unwrap().unwrap();

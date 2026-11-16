@@ -8,9 +8,12 @@ use fs_objects::ObjectId;
 use fs_people_core::{Adoption, Card, Error, ProposalState};
 
 async fn two_with_one_address(r: &fs_people_core::PeopleRepo) -> (ObjectId, ObjectId) {
-    let a = r.create(person("Ada", "ada@example.org")).await.unwrap();
+    let a = r
+        .create(person("Amara", "amara@example.org"))
+        .await
+        .unwrap();
     let b = r
-        .create(person("A. Lovelace", "ADA@example.org"))
+        .create(person("A. Zolenko", "amara@example.org"))
         .await
         .unwrap();
     let (a, b) = (a.envelope.id, b.envelope.id);
@@ -109,12 +112,12 @@ async fn a_hand_made_link_needs_no_proposal() {
 #[tokio::test]
 async fn name_at_the_same_organisation_is_a_proposal_a_name_alone_is_not() {
     let r = repo().await;
-    let mut x = Card::individual("Ada Lovelace");
-    x.add_organization("Analytical Engines");
-    let mut y = Card::individual("ada lovelace");
-    y.add_organization("ANALYTICAL ENGINES");
-    let z = Card::individual("Ada Lovelace");
-    let mut w = Card::individual("Ada Lovelace");
+    let mut x = Card::individual("Amara Zolenko");
+    x.add_organization("Quillon Works");
+    let mut y = Card::individual("amara zolenko");
+    y.add_organization("QUILLON WORKS");
+    let z = Card::individual("Amara Zolenko");
+    let mut w = Card::individual("Amara Zolenko");
     w.add_organization("Elsewhere Ltd");
     let ids: Vec<_> = {
         let mut v = vec![];

@@ -86,14 +86,14 @@ fn the_typed_members_hold_the_values() {
         name.sort_as,
         Some(fs_people_core::card::SortAs::ByKind(
             [
-                ("surname".to_owned(), "Lovelace".to_owned()),
-                ("given".to_owned(), "Ada".to_owned())
+                ("surname".to_owned(), "Zolenko".to_owned()),
+                ("given".to_owned(), "Amara".to_owned())
             ]
             .into()
         ))
     );
     assert_eq!(name.phonetic_system.as_deref(), Some("ipa"));
-    assert_eq!(name.components[1].phonetic.as_deref(), Some("AY-duh"));
+    assert_eq!(name.components[1].phonetic.as_deref(), Some("ah-MAR-ah"));
     assert_eq!(
         card.speak_as
             .as_ref()
@@ -110,7 +110,7 @@ fn the_typed_members_hold_the_values() {
     assert_eq!(card.calendars["c1"].uri, "https://cal.example/ada");
     assert_eq!(
         card.scheduling_addresses["a1"].uri,
-        "mailto:ada@example.org"
+        "mailto:amara@example.org"
     );
     assert_eq!(card.addresses["ad1"].pref, Some(1));
     assert_eq!(card.addresses["ad1"].is_ordered, Some(true));
@@ -158,7 +158,7 @@ fn a_card_of_an_older_version_keeps_every_property() {
         "@type": "Card", "version": "1.0", "uid": "u",
         "onlineServices": {"s": {"service": "X", "someday:new": 1}},
         "personalInfo": {"i": {"kind": "hobby", "value": "chess"}},
-        "name": {"full": "A", "sortAs": {"surname": "Lovelace"}},
+        "name": {"full": "A", "sortAs": {"surname": "Zolenko"}},
         "someday:card": {"a": [1, 2]}
     });
     let card: Card = serde_json::from_value(older.clone()).unwrap();
@@ -167,7 +167,10 @@ fn a_card_of_an_older_version_keeps_every_property() {
 
 #[test]
 fn a_name_sorts_by_a_map_of_kinds_and_an_older_card_by_one_string() {
-    for sort_as in [json!({"surname": "Lovelace", "given": "Ada"}), json!("ADA")] {
+    for sort_as in [
+        json!({"surname": "Zolenko", "given": "Amara"}),
+        json!("AMARA"),
+    ] {
         let card = json!({"@type": "Card", "version": "1.0", "uid": "u", "name": {"full": "Ada", "sortAs": sort_as}});
         let parsed: Card = serde_json::from_value(card.clone()).unwrap();
         assert_eq!(serde_json::to_value(&parsed).unwrap(), card);

@@ -25,10 +25,10 @@ async fn the_revision_read_writes_and_the_next_one_differs() {
     assert_eq!(Revision::of(&first), seen, "reading again changes nothing");
 
     let second = r
-        .update_checked(first.envelope.id, seen, renamed(&card, "Ada King"))
+        .update_checked(first.envelope.id, seen, renamed(&card, "Amara Brandt"))
         .await
         .unwrap();
-    assert_eq!(second.envelope.name, "Ada King");
+    assert_eq!(second.envelope.name, "Amara Brandt");
     assert_ne!(
         Revision::of(&second),
         seen,

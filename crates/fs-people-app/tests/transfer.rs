@@ -116,7 +116,7 @@ fn people_marked_sensitive_are_left_out_of_an_export_and_named() {
 fn an_export_after_an_edit_says_the_new_name_not_the_imported_one() {
     let (w, dir) = (World::in_memory(), Scratch::new());
     let source = dir.file("in.vcf");
-    let vcard = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Ada Lovelace\r\nN:Lovelace;Ada;;;\r\nEMAIL:ada@x.org\r\nEND:VCARD\r\n";
+    let vcard = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Amara Zolenko\r\nN:Zolenko;Amara;;;\r\nEMAIL:amara@x.org\r\nEND:VCARD\r\n";
     std::fs::write(&source, vcard).unwrap();
     import_file(w.repo.as_ref(), w.runtime.handle(), &source).unwrap();
     let mut s = w.state();
@@ -143,7 +143,7 @@ fn an_export_after_an_edit_says_the_new_name_not_the_imported_one() {
     let text = std::fs::read_to_string(&out).unwrap();
     assert!(text.contains("Augusta King"), "{text}");
     assert!(text.contains("augusta@x.org"), "{text}");
-    assert!(!text.contains("Lovelace"), "the old name lives on: {text}");
+    assert!(!text.contains("Zolenko"), "the old name lives on: {text}");
     assert!(
         !text.contains("ada@x.org"),
         "the old address lives on: {text}"
