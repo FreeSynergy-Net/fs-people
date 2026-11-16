@@ -1554,7 +1554,7 @@ dependencies = [
  "capnp",
  "capnp-rpc",
  "chrono",
- "fs-objects",
+ "fs-objects 0.0.1",
  "futures",
  "idna",
  "rustix 1.1.6",
@@ -1583,12 +1583,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "fs-objects"
+version = "0.0.3"
+source = "git+https://github.com/FreeSynergy/fs-objects?tag=v0.0.3#86eab3a1deb0b742fe76b9469cd3d2b999c5dfd6"
+dependencies = [
+ "async-trait",
+ "base64",
+ "chrono",
+ "fs-types",
+ "getrandom 0.3.4",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.21",
+ "tokio",
+ "turso",
+ "unicode-normalization",
+ "uuid",
+]
+
+[[package]]
 name = "fs-people"
 version = "0.0.13"
 dependencies = [
  "capnp",
  "fs-interfaces 0.0.22",
- "fs-objects",
+ "fs-objects 0.0.1",
  "fs-people-app",
  "fs-people-cli",
  "fs-people-core",
@@ -1608,7 +1628,7 @@ dependencies = [
  "fs-components-render",
  "fs-components-workbenches",
  "fs-interfaces 0.0.22",
- "fs-objects",
+ "fs-objects 0.0.1",
  "fs-people-core",
  "fs-people-server",
  "serde_json",
@@ -1622,7 +1642,7 @@ version = "0.0.13"
 dependencies = [
  "capnp",
  "fs-interfaces 0.0.22",
- "fs-objects",
+ "fs-objects 0.0.1",
  "fs-people-core",
  "fs-people-server",
  "serde_json",
@@ -1638,7 +1658,9 @@ dependencies = [
  "calcard",
  "chrono",
  "fs-interfaces 0.0.22",
- "fs-objects",
+ "fs-objects 0.0.1",
+ "fs-objects 0.0.3",
+ "fs-people-directory",
  "fs-types",
  "proptest",
  "serde",
@@ -1665,7 +1687,7 @@ dependencies = [
  "capnp",
  "capnp-rpc",
  "fs-interfaces 0.0.22",
- "fs-objects",
+ "fs-objects 0.0.1",
  "fs-people-core",
  "fs-types",
  "rustix 1.1.6",

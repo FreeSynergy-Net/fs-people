@@ -7,6 +7,7 @@ use std::sync::Arc;
 use fs_objects::{Store, TursoStore};
 use fs_people_core::{Card, PeopleRepo};
 
+pub mod dir;
 pub mod yielding;
 
 pub const ME: &str = "https://local.invalid/users/owner";

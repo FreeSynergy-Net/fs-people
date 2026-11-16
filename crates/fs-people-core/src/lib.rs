@@ -20,6 +20,7 @@
 mod adoption;
 pub mod card;
 mod clock;
+pub mod directory_store;
 mod error;
 pub mod feed;
 pub mod format;

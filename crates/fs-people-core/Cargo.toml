@@ -8,6 +8,12 @@ rust-version.workspace = true
 
 [dependencies]
 fs-objects = { git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.1" }
+# The typed v5 tables (directory_store). A second pin on purpose: fs-interfaces v0.0.22/v0.0.23 (rpc) is built on
+# fs-objects v0.0.1, so its envelope and id types cannot meet the v0.0.3 ones in server, app and cli. This alias goes
+# away (one pin, v0.0.3 or later) as soon as fs-interfaces follows.
+fs-objects-v5 = { package = "fs-objects", git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.3", features = ["v5"] }
+# The locked trait person_directory_v1 and its value types: the typed tables store exactly these.
+fs-people-directory = { path = "../fs-people-directory" }
 # Last MIT/Apache version before Stalwart moved later releases to AGPL: pinned exactly (see DESIGN.md).
 calcard = "=0.3.14"
 # The contract and the provider rule (ADR 0045).
