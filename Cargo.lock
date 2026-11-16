@@ -1553,6 +1553,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "fs-interfaces"
+version = "0.0.22"
+source = "git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.22#7743056396ffa80bc77d3af9d1946229dd1f6155"
+dependencies = [
+ "capnp",
+ "idna",
+]
+
+[[package]]
 name = "fs-objects"
 version = "0.0.1"
 source = "git+https://github.com/FreeSynergy/fs-objects?tag=v0.0.1#7cf0f05e3a9835b582aa2ac22014f2a1f1bff200"
@@ -1627,12 +1636,21 @@ dependencies = [
  "chrono",
  "fs-interfaces 0.0.1 (git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.14)",
  "fs-objects",
- "fs-types",
+ "fs-types 0.0.1",
  "proptest",
  "serde",
  "serde_json",
  "tempfile",
  "thiserror 2.0.21",
+ "tokio",
+]
+
+[[package]]
+name = "fs-people-directory"
+version = "0.0.12"
+dependencies = [
+ "async-trait",
+ "fs-types 0.0.22",
  "tokio",
 ]
 
@@ -1646,7 +1664,7 @@ dependencies = [
  "fs-interfaces 0.0.1 (git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.14)",
  "fs-objects",
  "fs-people-core",
- "fs-types",
+ "fs-types 0.0.1",
  "rustix 1.1.6",
  "serde_json",
  "tempfile",
@@ -1663,6 +1681,20 @@ dependencies = [
  "capnp-rpc",
  "chrono",
  "fs-interfaces 0.0.1 (git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.14)",
+ "geo-uri",
+ "iri-string",
+ "oxilangtag",
+ "unicode-normalization",
+]
+
+[[package]]
+name = "fs-types"
+version = "0.0.22"
+source = "git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.22#7743056396ffa80bc77d3af9d1946229dd1f6155"
+dependencies = [
+ "capnp",
+ "chrono",
+ "fs-interfaces 0.0.22",
  "geo-uri",
  "iri-string",
  "oxilangtag",
