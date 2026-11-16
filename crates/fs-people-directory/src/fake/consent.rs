@@ -5,11 +5,11 @@
 use super::ids::uuid7;
 use super::ops::invalid;
 use super::{Defect, FakeDirectory, Inner, Status};
+use crate::ConsentRetention;
 use crate::person_directory_v1::{
     Consent, ConsentEntry, ConsentOrigin, ConsentQuery, Date, Error, ObjectId, PersonRef, Purpose,
     Resolved, Result, Revision, When, Withdrawal, Withdrawn,
 };
-use fs_types::BasicValue;
 
 fn forbidden<T>(capability: &str) -> Result<T> {
     Err(Error::Forbidden {
@@ -17,17 +17,9 @@ fn forbidden<T>(capability: &str) -> Result<T> {
     })
 }
 
-/// The year a withdrawal happened in (`When::On` is a day, `When::At` an instant in UTC).
-fn year_of(when: &When) -> Option<i32> {
-    match when {
-        When::On(day) => Some(day.year()),
-        When::At(at) => at.to_rfc3339()?.get(..4)?.parse().ok(),
-    }
-}
-
-/// Keep the proof three years from the end of the year of the withdrawal (the setting of People; a default here).
+/// Keep the proof for the default of the setting of People (3 years from the end of the year; the fake stays at it).
 fn retain_until(when: &When) -> Option<Date> {
-    Date::parse(&format!("{:04}-12-31", year_of(when)? + 3)).ok()
+    ConsentRetention::default().after(when)
 }
 
 fn open_or_same<T: PartialEq>(have: Option<&T>, want: Option<&T>) -> bool {

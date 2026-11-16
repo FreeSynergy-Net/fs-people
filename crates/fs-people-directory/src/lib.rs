@@ -15,6 +15,7 @@ pub mod composite;
 pub mod conformance;
 pub mod doubles;
 pub mod fake;
+pub mod retention;
 
 pub use composite::CompositeDirectory;
 pub use doubles::{FailingDirectory, Gate, SlowDirectory};
@@ -22,3 +23,4 @@ pub use doubles::{FailingDirectory, Gate, SlowDirectory};
 pub use fake::Defect;
 pub use fake::{Entry, FakeDirectory, FakeFixture, Rights, Status, sample, sample_ref};
 pub use person_directory_v1::*;
+pub use retention::ConsentRetention;
