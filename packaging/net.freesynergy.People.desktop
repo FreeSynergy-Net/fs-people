@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=FreeSynergy.People
+Comment=Manage people and contacts
+Exec=fs-people
+Icon=net.freesynergy.People
+Terminal=false
+Categories=Office;ContactManagement;
