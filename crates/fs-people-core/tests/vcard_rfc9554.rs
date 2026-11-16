@@ -22,25 +22,25 @@ const NOT_BACK: &[&str] = &[
 
 /// Paths present in `a` and different or missing in `b`; `@type` of nested objects does not count
 /// (RFC 9553 section 1.4.5: implied by the place, so a vCard does not carry it).
-fn lost(a: &Value, b: &Value, at: &str, out: &mut Vec<String>) {
-    match (a, b) {
-        (Value::Object(x), Value::Object(y)) => {
-            for (k, v) in x {
-                if k == "@type" && !at.is_empty() {
+fn lost(left: &Value, right: &Value, at: &str, out: &mut Vec<String>) {
+    match (left, right) {
+        (Value::Object(oa), Value::Object(ob)) => {
+            for (key, lv) in oa {
+                if key == "@type" && !at.is_empty() {
                     continue;
                 }
-                match y.get(k) {
-                    Some(w) => lost(v, w, &format!("{at}/{k}"), out),
-                    None => out.push(format!("{at}/{k}")),
+                match ob.get(key) {
+                    Some(rv) => lost(lv, rv, &format!("{at}/{key}"), out),
+                    None => out.push(format!("{at}/{key}")),
                 }
             }
         }
-        (Value::Array(x), Value::Array(y)) if x.len() == y.len() => {
-            for (i, (v, w)) in x.iter().zip(y).enumerate() {
-                lost(v, w, &format!("{at}/{i}"), out);
+        (Value::Array(xs), Value::Array(ys)) if xs.len() == ys.len() => {
+            for (idx, (lv, rv)) in xs.iter().zip(ys).enumerate() {
+                lost(lv, rv, &format!("{at}/{idx}"), out);
             }
         }
-        _ if a != b => out.push(at.to_owned()),
+        _ if left != right => out.push(at.to_owned()),
         _ => {}
     }
 }
