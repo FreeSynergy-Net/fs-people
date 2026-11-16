@@ -10,7 +10,7 @@ use fs_people_core::{Card, PeopleRepo};
 pub mod yielding;
 
 pub const ME: &str = "https://local.invalid/users/owner";
-/// The demo cards: a copy of the documentation tree's `temp/demo-data/contacts.json`, kept here so the tests need nothing outside the repository.
+/// The demo cards: a copy of the documentation tree's `data/samples/contacts.json` (invented sample data), kept here so the tests need nothing outside the repository.
 pub const DEMO: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/contacts.json");
 
 /// A repository over a fresh in-memory store.

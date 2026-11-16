@@ -40,29 +40,36 @@ async fn import_demo_list_and_search() {
         5
     );
 
-    let by_name = r.search("nlnet").await.unwrap();
+    let by_name = r.search("beispielstiftung").await.unwrap();
     assert!(
         by_name
             .iter()
-            .any(|o| o.envelope.name == "NLnet Foundation")
+            .any(|o| o.envelope.name == "Beispielstiftung Offenes Netz")
     );
-    let by_mail = r.search("WEBCONTACT@nlnet").await.unwrap();
+    let by_mail = r.search("INFO@offenes-netz").await.unwrap();
     assert_eq!(by_mail.len(), 1);
-    let by_phone = r.search("20 888 4252").await.unwrap_or_default();
+    let by_phone = r.search("30 555 0100").await.unwrap_or_default();
     assert!(by_phone.is_empty() || by_phone.len() == 1); // formatting-insensitive but contiguous digits
-    let by_phone = r.search("+31208884252").await.unwrap();
+    let by_phone = r.search("+49305550100").await.unwrap();
     assert_eq!(by_phone.len(), 1);
     let by_org = r.search("stichting").await.unwrap();
-    assert!(by_org.iter().any(|o| o.envelope.name == "NLnet Foundation"));
+    assert!(
+        by_org
+            .iter()
+            .any(|o| o.envelope.name == "Beispielstiftung Offenes Netz")
+    );
     assert_eq!(
         r.search("zzzz-nobody").await.unwrap(),
         [] as [fs_objects::StoredObject; 0]
     );
     assert_eq!(
-        r.find_by_email("WebContact@NLnet.nl").await.unwrap().len(),
+        r.find_by_email("Info@Offenes-Netz.Example.org")
+            .await
+            .unwrap()
+            .len(),
         1
     );
-    assert_eq!(r.find_by_phone("0031 20 888 4252").await.unwrap().len(), 1);
+    assert_eq!(r.find_by_phone("0049 30 555 0100").await.unwrap().len(), 1);
 }
 
 #[tokio::test]

@@ -15,7 +15,7 @@ fn demo_cards_roundtrip_losslessly_and_validate() {
         let card: Card = serde_json::from_value(item.clone()).unwrap();
         validate::validate(&card).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(card.to_value(), item, "lossless: {}", card.uid);
-        assert!(card.vendor("freesynergy.net:source").is_some());
+        assert!(card.vendor("freesynergy.net:sample").is_some());
     }
 }
 

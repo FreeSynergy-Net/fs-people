@@ -8,12 +8,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "NLnet Foundation"
+      "full": "Beispielstiftung Offenes Netz"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Stichting NLnet"
+        "name": "Beispielstiftung Offenes Netz Stichting (foundation, NL)"
       }
     },
     "addresses": {
@@ -23,30 +23,30 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Science Park"
+            "value": "Musterstraße"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "400"
+            "value": "1"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "1098 XH"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Amsterdam"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
             "kind": "country",
-            "value": "The Netherlands"
+            "value": "Germany"
           }
         ],
-        "countryCode": "NL",
+        "countryCode": "DE",
         "contexts": {
           "work": true
         }
@@ -55,7 +55,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "webcontact@nlnet.nl",
+        "address": "info@offenes-netz.example.org",
         "contexts": {
           "work": true
         }
@@ -64,7 +64,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+31 20 8884252",
+        "number": "+49 30 555 0100",
         "features": {
           "voice": true
         },
@@ -76,20 +76,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://nlnet.nl"
+        "uri": "https://www.offenes-netz.example.org"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Funds open internet technology through NGI Zero grants and is the most natural first funder for FreeSynergy's privacy-respecting, standards-based components."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "Stichting (foundation, NL)",
-    "freesynergy.net:source": {
-      "url": "https://nlnet.nl/contact/address.html",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -100,12 +97,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Sovereign Tech Agency"
+      "full": "Agentur für Offene Infrastruktur"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Sovereign Tech Agency GmbH"
+        "name": "Agentur für Offene Infrastruktur GmbH"
       }
     },
     "addresses": {
@@ -115,22 +112,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Gartenstr."
+            "value": "Beispielweg"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "7"
+            "value": "2"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10115"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -147,7 +144,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@sovereign.tech",
+        "address": "info@offene-infrastruktur.example.com",
         "contexts": {
           "work": true
         }
@@ -156,20 +153,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.sovereign.tech"
+        "uri": "https://www.offene-infrastruktur.example.com"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "German federal agency investing in open digital infrastructure, a fit for FreeSynergy's reusable Rust building blocks."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "GmbH",
-    "freesynergy.net:source": {
-      "url": "https://www.sovereign.tech/imprint",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -180,12 +174,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Prototype Fund (Open Knowledge Foundation Deutschland)"
+      "full": "Werkstatt für Freie Software"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Open Knowledge Foundation Deutschland e. V."
+        "name": "Werkstatt für Freie Software e. V. (registered association)"
       }
     },
     "addresses": {
@@ -195,22 +189,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Singerstr."
+            "value": "Probeallee"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "109"
+            "value": "3"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10179"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -227,7 +221,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@okfn.de",
+        "address": "info@freie-software.example.net",
         "contexts": {
           "work": true
         }
@@ -236,7 +230,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 30 97894230",
+        "number": "+49 30 555 0102",
         "features": {
           "voice": true
         },
@@ -248,20 +242,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.prototypefund.de"
+        "uri": "https://www.freie-software.example.net"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Operates the Prototype Fund, which supports individual public-interest open-source developers in Germany like the FreeSynergy project owner."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "e. V. (registered association)",
-    "freesynergy.net:source": {
-      "url": "https://okfn.de/impressum/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -272,12 +263,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Free Software Foundation Europe"
+      "full": "Verband Freie Software Europa"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Free Software Foundation Europe e.V."
+        "name": "Verband Freie Software Europa e.V. (registered charitable association)"
       }
     },
     "addresses": {
@@ -287,12 +278,12 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Revaler Straße"
+            "value": "Testgasse"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "19"
+            "value": "4"
           },
           {
             "@type": "AddressComponent",
@@ -302,12 +293,12 @@
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10245"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -324,7 +315,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "contact@fsfe.org",
+        "address": "info@freie-software-europa.example.org",
         "contexts": {
           "work": true
         }
@@ -333,20 +324,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://fsfe.org"
+        "uri": "https://www.freie-software-europa.example.org"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Europe's leading Free Software advocacy organisation, aligned with FreeSynergy's forever-free licensing and user-freedom goals."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "e.V. (registered charitable association)",
-    "freesynergy.net:source": {
-      "url": "https://fsfe.org/contact/contact.en.html",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -357,12 +345,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Open Source Business Alliance"
+      "full": "Bündnis Digitale Selbstbestimmung"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Open Source Business Alliance – Bundesverband für digitale Souveränität e.V."
+        "name": "Bündnis Digitale Selbstbestimmung e.V. (registered association)"
       }
     },
     "addresses": {
@@ -372,22 +360,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Pariser Platz"
+            "value": "Musterstraße"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "6a"
+            "value": "5"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10117"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -404,7 +392,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@osb-alliance.com",
+        "address": "info@digitale-souveraenitaet.example.com",
         "contexts": {
           "work": true
         }
@@ -413,7 +401,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 30 300 149 3377",
+        "number": "+49 30 555 0104",
         "features": {
           "voice": true
         },
@@ -425,20 +413,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.osb-alliance.com"
+        "uri": "https://www.digitale-souveraenitaet.example.com"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "German open-source business association focused on digital sovereignty, offering access to public-sector and SME adopters."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "e.V. (registered association)",
-    "freesynergy.net:source": {
-      "url": "https://osb-alliance.de/impressum",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -449,12 +434,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "KDE e.V."
+      "full": "Verein Arbeitsplatz-Werkzeuge"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "KDE e.V."
+        "name": "Verein Arbeitsplatz-Werkzeuge e.V. (registered association)"
       }
     },
     "addresses": {
@@ -464,22 +449,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Prinzenstraße"
+            "value": "Beispielweg"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "85 F"
+            "value": "6"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10969"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -496,7 +481,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "kde-ev-board@kde.org",
+        "address": "info@arbeitsplatz-werkzeuge.example.net",
         "contexts": {
           "work": true
         }
@@ -505,7 +490,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 30 2023 7305-0",
+        "number": "+49 30 555 0105",
         "features": {
           "voice": true
         },
@@ -517,20 +502,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://ev.kde.org"
+        "uri": "https://www.arbeitsplatz-werkzeuge.example.net"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Represents the KDE community, whose PIM stack (contacts, calendar, mail) overlaps with FreeSynergy's domain."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "e.V. (registered association)",
-    "freesynergy.net:source": {
-      "url": "https://ev.kde.org/contact/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -541,12 +523,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "GNOME Foundation"
+      "full": "Stiftung Desktop-Gemeinschaft"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "GNOME Foundation"
+        "name": "Stiftung Desktop-Gemeinschaft"
       }
     },
     "addresses": {
@@ -556,12 +538,12 @@
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "1875"
+            "value": "7"
           },
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Mission St"
+            "value": "Probeallee"
           },
           {
             "@type": "AddressComponent",
@@ -571,7 +553,7 @@
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "San Francisco"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -581,15 +563,15 @@
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "94103"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "country",
-            "value": "USA"
+            "value": "Germany"
           }
         ],
-        "countryCode": "US",
+        "countryCode": "DE",
         "contexts": {
           "work": true
         }
@@ -598,7 +580,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@gnome.org",
+        "address": "info@desktop-gemeinschaft.example.org",
         "contexts": {
           "work": true
         }
@@ -607,7 +589,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+1 707 435 3731",
+        "number": "+49 30 555 0106",
         "features": {
           "voice": true
         },
@@ -619,19 +601,16 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://foundation.gnome.org"
+        "uri": "https://www.desktop-gemeinschaft.example.org"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Stewards the GNOME desktop and its contacts/calendar apps, a potential integration partner for FreeSynergy's open data formats."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
-    "freesynergy.net:source": {
-      "url": "https://foundation.gnome.org/contact/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -642,12 +621,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Codeberg e.V."
+      "full": "Verein Gemeinschaftlicher Code-Hort"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Codeberg e.V."
+        "name": "Verein Gemeinschaftlicher Code-Hort e.V. (non-profit registered association)"
       }
     },
     "addresses": {
@@ -657,22 +636,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Arminiusstraße"
+            "value": "Testgasse"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "2 - 4"
+            "value": "8"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10551"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -689,7 +668,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "contact@codeberg.org",
+        "address": "info@code-hort.example.com",
         "contexts": {
           "work": true
         }
@@ -698,20 +677,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://codeberg.org"
+        "uri": "https://www.code-hort.example.com"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Non-profit, Forgejo-based code hosting in Germany, a candidate home for FreeSynergy's repositories and community."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "e.V. (non-profit registered association)",
-    "freesynergy.net:source": {
-      "url": "https://codeberg.org/codeberg/org/src/branch/main/Imprint.md",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -722,12 +698,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Nextcloud GmbH"
+      "full": "Wolkenwerk"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Nextcloud GmbH"
+        "name": "Wolkenwerk GmbH"
       }
     },
     "addresses": {
@@ -737,22 +713,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Hauptmannsreute"
+            "value": "Musterstraße"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "44a"
+            "value": "9"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "70192"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Stuttgart"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -769,7 +745,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "contact@nextcloud.com",
+        "address": "info@wolkenwerk.example.net",
         "contexts": {
           "work": true
         }
@@ -778,7 +754,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 711 25 24 28 90",
+        "number": "+49 30 555 0108",
         "features": {
           "voice": true
         },
@@ -790,20 +766,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://nextcloud.com"
+        "uri": "https://www.wolkenwerk.example.net"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Leading German self-hosted collaboration suite (files, contacts, calendar, talk), a key interoperability peer for FreeSynergy."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "GmbH",
-    "freesynergy.net:source": {
-      "url": "https://nextcloud.com/impressum/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -814,12 +787,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Collabora Productivity"
+      "full": "Büroschmiede"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Collabora Productivity Ltd"
+        "name": "Büroschmiede Ltd"
       }
     },
     "addresses": {
@@ -829,30 +802,30 @@
           {
             "@type": "AddressComponent",
             "kind": "building",
-            "value": "St John's Innovation Centre"
+            "value": "Haus Lindenpark"
           },
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Cowley Road"
+            "value": "Beispielweg"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Cambridge"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "CB4 0WS"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "country",
-            "value": "United Kingdom"
+            "value": "Germany"
           }
         ],
-        "countryCode": "GB",
+        "countryCode": "DE",
         "contexts": {
           "work": true
         }
@@ -861,7 +834,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+44 1223 362967",
+        "number": "+49 30 555 0109",
         "features": {
           "voice": true
         },
@@ -873,25 +846,22 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.collaboraonline.com"
+        "uri": "https://www.bueroschmiede.example.org"
       },
       "l2": {
         "@type": "Link",
         "kind": "contact",
-        "uri": "https://www.collaboraonline.com/contact-us/"
+        "uri": "https://www.bueroschmiede.example.org/contact"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Builds Collabora Online (LibreOffice-based), a natural document-editing companion to FreeSynergy's wiki and collaboration tools."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "Ltd",
-    "freesynergy.net:source": {
-      "url": "https://www.collaboraonline.com/contact-us/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -902,12 +872,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "OpenProject GmbH"
+      "full": "Projektwerk"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "OpenProject GmbH"
+        "name": "Projektwerk GmbH"
       }
     },
     "addresses": {
@@ -917,22 +887,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Krausenstraße"
+            "value": "Probeallee"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "9"
+            "value": "11"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10117"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -949,7 +919,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@openproject.com",
+        "address": "info@projektwerk.example.com",
         "contexts": {
           "work": true
         }
@@ -958,7 +928,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 30 288 777 07",
+        "number": "+49 30 555 0110",
         "features": {
           "voice": true
         },
@@ -970,20 +940,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.openproject.org"
+        "uri": "https://www.projektwerk.example.com"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Berlin-based open-source project management vendor and openDesk component, relevant for calendar and task interoperability."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "GmbH",
-    "freesynergy.net:source": {
-      "url": "https://www.openproject.org/legal/imprint/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -994,12 +961,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Element (Element Software GmbH)"
+      "full": "Nachrichtenwerk"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Element Software GmbH"
+        "name": "Nachrichtenwerk GmbH"
       }
     },
     "addresses": {
@@ -1009,7 +976,7 @@
           {
             "@type": "AddressComponent",
             "kind": "building",
-            "value": "c/o tradeo legal GmbH & Co. KG"
+            "value": "c/o Kanzlei Hellwig & Muster PartG"
           },
           {
             "@type": "AddressComponent",
@@ -1019,22 +986,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Kaiserswerther Straße"
+            "value": "Testgasse"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "135"
+            "value": "12"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "40474"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Düsseldorf"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -1051,25 +1018,22 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://element.io"
+        "uri": "https://www.nachrichtenwerk.example.net"
       },
       "l2": {
         "@type": "Link",
         "kind": "contact",
-        "uri": "https://element.io/legal/company-information"
+        "uri": "https://www.nachrichtenwerk.example.net/contact"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Main commercial Matrix vendor; FreeSynergy's messenger builds on Matrix via tuwunel, so Element is a key ecosystem partner."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "GmbH",
-    "freesynergy.net:source": {
-      "url": "https://element.io/legal/company-information",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -1080,18 +1044,18 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "The Matrix.org Foundation"
+      "full": "Stiftung Offenes Nachrichtenprotokoll"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "The Matrix.org Foundation C.I.C."
+        "name": "Stiftung Offenes Nachrichtenprotokoll C.I.C. (UK Community Interest Company)"
       }
     },
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "support@matrix.org",
+        "address": "info@offenes-protokoll.example.org",
         "contexts": {
           "work": true
         }
@@ -1100,20 +1064,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://matrix.org"
+        "uri": "https://www.offenes-protokoll.example.org"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Neutral custodian of the Matrix standard that FreeSynergy's messenger implements, so spec alignment and visibility matter."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "C.I.C. (UK Community Interest Company)",
-    "freesynergy.net:source": {
-      "url": "https://matrix.org/contact/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -1124,18 +1085,18 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Thunderbird (MZLA Technologies Corporation)"
+      "full": "Postfach-Werkstatt"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "MZLA Technologies Corporation"
+        "name": "Postfach-Werkstatt Corporation (subsidiary of the Beispiel Gemeinnutz Foundation)"
       }
     },
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "partnerships@thunderbird.net",
+        "address": "info@postfach-werkstatt.example.com",
         "contexts": {
           "work": true
         }
@@ -1144,20 +1105,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.thunderbird.net"
+        "uri": "https://www.postfach-werkstatt.example.com"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Thunderbird is the leading free mail/contacts/calendar client and a prime interoperability target for JSContact/JSCalendar data."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
-    "freesynergy.net:legalForm": "Corporation (subsidiary of the Mozilla Foundation)",
-    "freesynergy.net:source": {
-      "url": "https://www.thunderbird.net/en-US/contact/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:legalForm": "Corporation (subsidiary of the Beispiel Gemeinnutz Foundation)",
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -1168,12 +1126,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "FOSSGIS e.V."
+      "full": "Verein Freie Kartendaten"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "FOSSGIS e.V."
+        "name": "Verein Freie Kartendaten e.V. (registered association)"
       }
     },
     "addresses": {
@@ -1183,22 +1141,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Bundesallee"
+            "value": "Probeallee"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "23"
+            "value": "15"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10717"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -1215,7 +1173,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@fossgis.de",
+        "address": "info@freie-karten.example.net",
         "contexts": {
           "work": true
         }
@@ -1224,7 +1182,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 30 62932037",
+        "number": "+49 30 555 0114",
         "features": {
           "voice": true
         },
@@ -1236,20 +1194,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.fossgis.de"
+        "uri": "https://www.freie-karten.example.net"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "German association for free GIS and OpenStreetMap (local OSM chapter), relevant to FreeSynergy's maps module."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "e.V. (registered association)",
-    "freesynergy.net:source": {
-      "url": "https://www.fossgis.de/impressum/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -1260,12 +1215,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "ZenDiS"
+      "full": "Zentrum für Offene Verwaltung"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH"
+        "name": "Zentrum für Offene Verwaltung GmbH"
       }
     },
     "addresses": {
@@ -1275,22 +1230,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Suttner-Nobel-Allee"
+            "value": "Testgasse"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "4"
+            "value": "16"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "44803"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Bochum"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -1307,7 +1262,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "hallo@zendis.de",
+        "address": "info@offene-verwaltung.example.org",
         "contexts": {
           "work": true
         }
@@ -1316,7 +1271,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 234 3671503-0",
+        "number": "+49 30 555 0115",
         "features": {
           "voice": true
         },
@@ -1328,20 +1283,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.zendis.de"
+        "uri": "https://www.offene-verwaltung.example.org"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Federal centre for digital sovereignty behind openDesk, a potential public-sector adopter of open, standards-based collaboration software."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "GmbH",
-    "freesynergy.net:source": {
-      "url": "https://www.zendis.de/impressum",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -1352,12 +1304,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Wikimedia Deutschland"
+      "full": "Verein Freies Wissen"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Wikimedia Deutschland – Gesellschaft zur Förderung Freien Wissens e. V."
+        "name": "Verein Freies Wissen e. V. (registered association)"
       }
     },
     "addresses": {
@@ -1367,22 +1319,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Tempelhofer Ufer"
+            "value": "Musterstraße"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "23/24"
+            "value": "17"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10963"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -1399,7 +1351,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@wikimedia.de",
+        "address": "info@freies-wissen.example.com",
         "contexts": {
           "work": true
         }
@@ -1408,7 +1360,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 30 577 11 62-0",
+        "number": "+49 30 555 0116",
         "features": {
           "voice": true
         },
@@ -1420,20 +1372,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.wikimedia.de"
+        "uri": "https://www.freies-wissen.example.com"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Promotes free knowledge and wiki software in Germany, relevant to FreeSynergy's wiki and open-data approach."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "e. V. (registered association)",
-    "freesynergy.net:source": {
-      "url": "https://www.wikimedia.de/impressum/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -1444,12 +1393,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "The Document Foundation"
+      "full": "Stiftung Offene Dokumente"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "The Document Foundation"
+        "name": "Stiftung Offene Dokumente Stiftung des bürgerlichen Rechts (charitable foundation under German law)"
       }
     },
     "addresses": {
@@ -1459,22 +1408,22 @@
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "Winterfeldtstraße"
+            "value": "Beispielweg"
           },
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "52"
+            "value": "18"
           },
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "10781"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Berlin"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -1491,7 +1440,7 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@documentfoundation.org",
+        "address": "info@offene-dokumente.example.net",
         "contexts": {
           "work": true
         }
@@ -1500,7 +1449,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 30 55579920",
+        "number": "+49 30 555 0117",
         "features": {
           "voice": true
         },
@@ -1512,20 +1461,17 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.documentfoundation.org"
+        "uri": "https://www.offene-dokumente.example.net"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "Home of LibreOffice and ODF advocacy, sharing FreeSynergy's open-standards-first philosophy."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "Stiftung des bürgerlichen Rechts (charitable foundation under German law)",
-    "freesynergy.net:source": {
-      "url": "https://www.documentfoundation.org/imprint/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   },
   {
     "@type": "Card",
@@ -1536,12 +1482,12 @@
     "updated": "2026-11-05T09:00:00Z",
     "name": {
       "@type": "Name",
-      "full": "Rust Foundation"
+      "full": "Stiftung Sichere Programmiersprache"
     },
     "organizations": {
       "o1": {
         "@type": "Organization",
-        "name": "Rust Foundation"
+        "name": "Stiftung Sichere Programmiersprache"
       }
     },
     "addresses": {
@@ -1551,12 +1497,12 @@
           {
             "@type": "AddressComponent",
             "kind": "number",
-            "value": "8"
+            "value": "19"
           },
           {
             "@type": "AddressComponent",
             "kind": "name",
-            "value": "The Green"
+            "value": "Probeallee"
           },
           {
             "@type": "AddressComponent",
@@ -1566,7 +1512,7 @@
           {
             "@type": "AddressComponent",
             "kind": "locality",
-            "value": "Dover"
+            "value": "Musterstadt"
           },
           {
             "@type": "AddressComponent",
@@ -1576,86 +1522,7 @@
           {
             "@type": "AddressComponent",
             "kind": "postcode",
-            "value": "19901"
-          },
-          {
-            "@type": "AddressComponent",
-            "kind": "country",
-            "value": "USA"
-          }
-        ],
-        "countryCode": "US",
-        "contexts": {
-          "work": true
-        }
-      }
-    },
-    "emails": {
-      "e1": {
-        "@type": "EmailAddress",
-        "address": "contact@rustfoundation.org",
-        "contexts": {
-          "work": true
-        }
-      }
-    },
-    "links": {
-      "l1": {
-        "@type": "Link",
-        "uri": "https://foundation.rust-lang.org"
-      }
-    },
-    "notes": {
-      "n1": {
-        "@type": "Note",
-        "note": "Supports the Rust language that the entire FreeSynergy suite is written in, a good fit for showcase and community visibility."
-      }
-    },
-    "freesynergy.net:source": {
-      "url": "https://foundation.rust-lang.org/contact/",
-      "retrieved": "2026-11-05"
-    }
-  },
-  {
-    "@type": "Card",
-    "version": "1.0",
-    "uid": "urn:uuid:01a1aaf0-04b8-7992-ab1a-966de952cf0f",
-    "kind": "org",
-    "created": "2026-11-05T09:00:00Z",
-    "updated": "2026-11-05T09:00:00Z",
-    "name": {
-      "@type": "Name",
-      "full": "Univention GmbH"
-    },
-    "organizations": {
-      "o1": {
-        "@type": "Organization",
-        "name": "Univention GmbH"
-      }
-    },
-    "addresses": {
-      "a1": {
-        "@type": "Address",
-        "components": [
-          {
-            "@type": "AddressComponent",
-            "kind": "name",
-            "value": "Mary-Somerville-Straße"
-          },
-          {
-            "@type": "AddressComponent",
-            "kind": "number",
-            "value": "1"
-          },
-          {
-            "@type": "AddressComponent",
-            "kind": "postcode",
-            "value": "28359"
-          },
-          {
-            "@type": "AddressComponent",
-            "kind": "locality",
-            "value": "Bremen"
+            "value": "12345"
           },
           {
             "@type": "AddressComponent",
@@ -1672,7 +1539,83 @@
     "emails": {
       "e1": {
         "@type": "EmailAddress",
-        "address": "info@univention.de",
+        "address": "info@sichere-sprache.example.org",
+        "contexts": {
+          "work": true
+        }
+      }
+    },
+    "links": {
+      "l1": {
+        "@type": "Link",
+        "uri": "https://www.sichere-sprache.example.org"
+      }
+    },
+    "notes": {
+      "n1": {
+        "@type": "Note",
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
+      }
+    },
+    "freesynergy.net:sample": true
+  },
+  {
+    "@type": "Card",
+    "version": "1.0",
+    "uid": "urn:uuid:01a1aaf0-04b8-7992-ab1a-966de952cf0f",
+    "kind": "org",
+    "created": "2026-11-05T09:00:00Z",
+    "updated": "2026-11-05T09:00:00Z",
+    "name": {
+      "@type": "Name",
+      "full": "Identitätswerk"
+    },
+    "organizations": {
+      "o1": {
+        "@type": "Organization",
+        "name": "Identitätswerk GmbH"
+      }
+    },
+    "addresses": {
+      "a1": {
+        "@type": "Address",
+        "components": [
+          {
+            "@type": "AddressComponent",
+            "kind": "name",
+            "value": "Testgasse"
+          },
+          {
+            "@type": "AddressComponent",
+            "kind": "number",
+            "value": "20"
+          },
+          {
+            "@type": "AddressComponent",
+            "kind": "postcode",
+            "value": "12345"
+          },
+          {
+            "@type": "AddressComponent",
+            "kind": "locality",
+            "value": "Musterstadt"
+          },
+          {
+            "@type": "AddressComponent",
+            "kind": "country",
+            "value": "Germany"
+          }
+        ],
+        "countryCode": "DE",
+        "contexts": {
+          "work": true
+        }
+      }
+    },
+    "emails": {
+      "e1": {
+        "@type": "EmailAddress",
+        "address": "info@identitaetswerk.example.com",
         "contexts": {
           "work": true
         }
@@ -1681,7 +1624,7 @@
     "phones": {
       "p1": {
         "@type": "Phone",
-        "number": "+49 421 22232-0",
+        "number": "+49 30 555 0119",
         "features": {
           "voice": true
         },
@@ -1693,19 +1636,16 @@
     "links": {
       "l1": {
         "@type": "Link",
-        "uri": "https://www.univention.de"
+        "uri": "https://www.identitaetswerk.example.com"
       }
     },
     "notes": {
       "n1": {
         "@type": "Note",
-        "note": "German open-source identity and access management vendor (Nubus, openDesk IAM), relevant to FreeSynergy's Kanidm-based identity layer."
+        "note": "Fictional sample organisation for demos and tests; all data is invented."
       }
     },
     "freesynergy.net:legalForm": "GmbH",
-    "freesynergy.net:source": {
-      "url": "https://www.univention.de/impressum/",
-      "retrieved": "2026-11-05"
-    }
+    "freesynergy.net:sample": true
   }
 ]
