@@ -96,6 +96,7 @@ impl FakeDirectory {
     }
 
     /// Break one rule on purpose (see [`Defect`]); the views of this fake share it.
+    #[doc(hidden)]
     #[must_use]
     pub fn with_defect(self, defect: Defect) -> Self {
         self.lock().defect = Some(defect);
@@ -147,9 +148,28 @@ impl FakeDirectory {
         let at = g.now();
         let done = g.set_status(person, Status::Deleted(at), ChangeKind::Deleted);
         if done && !g.bad(Defect::EraseKeepsActive) {
-            g.erase_consents(person);
+            // The contract: the one who deletes records the withdrawal (the person only if nobody asks).
+            let by = self
+                .asker
+                .clone()
+                .filter(|_| !g.bad(Defect::ErasedByPerson))
+                .unwrap_or_else(|| person.clone());
+            g.erase_consents(person, &by);
         }
         done
+    }
+
+    /// The retention time is over: delete the withdrawn records whose `retain_until` is before `today`, for good.
+    /// The consents are the only history the fake keeps, so they are gone from `consents_of` afterwards.
+    pub fn purge_expired(&self, today: crate::person_directory_v1::Date) -> usize {
+        let mut g = self.lock();
+        if g.bad(Defect::PurgeKeeps) {
+            return 0;
+        }
+        let before = g.consents.len();
+        g.consents
+            .retain(|c| c.retain_until.is_none_or(|d| d >= today));
+        before - g.consents.len()
     }
 
     /// Link a profile to a person (`describes`), or cut the link with `None`; logs `Changed`.

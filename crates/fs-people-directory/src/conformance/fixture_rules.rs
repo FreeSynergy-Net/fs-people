@@ -49,6 +49,7 @@ pub(super) async fn rules(fx: &dyn ConformanceFixture, s: &Seeds, r: &mut Report
     super::consent_rules::rules(fx, r).await;
     super::consent_match::rules(fx, r).await;
     super::ai_rules::rules(fx, r).await;
+    super::consent_gaps::rules(fx, r).await;
 }
 
 /// `Deleted` or `NotShared`, then `Restored`.

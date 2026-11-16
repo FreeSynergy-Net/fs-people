@@ -1,9 +1,11 @@
 //! `Defect`: one deliberate rule break of the fake, to prove that the conformance rules catch it (mutation test of
-//! the tests). A fake with a defect is never used as test data; `FakeDirectory::with_defect` is the only door.
+//! the tests). A fake with a defect is never used as test data; `FakeDirectory::with_defect` is the only door. Both
+//! are `#[doc(hidden)]`: they are test machinery of this crate (and of other fakes that copy the idea), not API.
 //!
 //! Pattern: Fault injection (a closed list of mutants; `tests/mutants.rs` runs every one and demands a failure).
 
 /// A rule the fake breaks on purpose.
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Defect {
     /// The matching rule ignores `scope`.
@@ -44,11 +46,21 @@ pub enum Defect {
     AiSuggestAddress,
     /// An AI may use the consent methods.
     AiMayConsent,
+    /// The AI mark only counts while the entry is shared.
+    AiFlagNeedsShared,
+    /// The AI mark is not looked up at the merge target of the asker.
+    AiFlagNoMergeTarget,
+    /// `retain_until` counts from the day the withdrawal was recorded, not from the withdrawal.
+    RetainFromRecorded,
+    /// Expired records are never purged.
+    PurgeKeeps,
+    /// A deleted person's consents are withdrawn by that person, not by the one who deletes.
+    ErasedByPerson,
 }
 
 impl Defect {
     /// Every defect, for the mutation test.
-    pub const ALL: [Self; 19] = [
+    pub const ALL: [Self; 24] = [
         Self::IgnoreScope,
         Self::ProfileCoversPerson,
         Self::NoMergeFollow,
@@ -68,5 +80,10 @@ impl Defect {
         Self::AiSeesAddressDisplay,
         Self::AiSuggestAddress,
         Self::AiMayConsent,
+        Self::AiFlagNeedsShared,
+        Self::AiFlagNoMergeTarget,
+        Self::RetainFromRecorded,
+        Self::PurgeKeeps,
+        Self::ErasedByPerson,
     ];
 }

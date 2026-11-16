@@ -144,3 +144,27 @@ async fn the_composite_of_fakes_is_conformant_with_rights_default_all() {
     let d = FakeDirectory::new().with_rights(Rights::all());
     assert_eq!(run_conformance(&d).await, Vec::<String>::new());
 }
+
+#[tokio::test]
+async fn the_ai_of_the_sample_stays_an_ai_after_unshare() {
+    let d = sample();
+    let ai = sample_ref(4).expect("sample");
+    let bot = d.view_as(Some(ai.clone()), Rights::all());
+    let addr = fs_types::ContactAddress::parse("mailto:amara@example.org").expect("address");
+    assert!(
+        bot.find_by_address(&addr)
+            .await
+            .is_err_and(|e| matches!(e, Error::Forbidden { .. }))
+    );
+    assert!(d.unshare(&ai));
+    assert!(
+        bot.find_by_address(&addr)
+            .await
+            .is_err_and(|e| matches!(e, Error::Forbidden { .. }))
+    );
+    assert!(
+        bot.consents_of(&ai)
+            .await
+            .is_err_and(|e| matches!(e, Error::Forbidden { .. }))
+    );
+}

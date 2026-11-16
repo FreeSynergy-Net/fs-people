@@ -42,8 +42,18 @@ snapshot. No Blinc, no app, no store.
 - An asker that is an AI (the entry of the asker has `ai`): no sensitive fields, no address, no address stage in
   `display`, no address search; `find_by_address`, `propose` with an address, every `consent.*` method and `excerpt` with
   a purpose other than `AiAssistance` are `Forbidden` (the purpose check comes first).
-- Composite: each `consent.*` method goes to the first member that offers its capability.
-- `tests/mutants.rs` runs 19 `Defect`s against the rules and demands that the rule written for each one fails.
+- The AI mark sticks to the entry whatever its state (shared, unshared, deleted) and is looked up at the asker's id and
+  at the end of its merge chain: an AI stays an AI after unshare, delete and merge.
+- Retention: `retain_until` is the end of the third year after the WITHDRAWAL (`withdrawal.at`), not after the record;
+  after it the provider deletes the record for good (fake: `purge_expired`, fixture: `purge_expired(today)`). The one who
+  deletes a person records the `Erasure` withdrawals (`recorded_by`); the person only if nobody asks.
+- Composite: each `consent.*` method goes to the first member that offers its capability. A member that offers the
+  capability but is `Unavailable` is not skipped (like `propose`).
+- TODO stage 2 (test needed): "first member with the capability" only works if that member knows ALL persons. With the
+  consents at member A and the person at member B, `check_consent` says Some, `excerpt` says NoConsent (B checks its
+  own store) and `record_consent` at A is Invalid. Decide: people-core is the consent member (knows everyone), OR the
+  composite `excerpt` checks the consent through the consent member. Write the test with that decision.
+- `tests/mutants.rs` runs 24 `Defect`s (`Defect` and `with_defect` are `#[doc(hidden)]`) against the rules and demands that the rule written for each one fails.
 
 ## Who expects what (calendar adapter, not in this crate)
 

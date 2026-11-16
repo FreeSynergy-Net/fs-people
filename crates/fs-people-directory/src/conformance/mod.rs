@@ -8,6 +8,7 @@
 
 mod ai_rules;
 mod ai_views;
+mod consent_gaps;
 mod consent_match;
 mod consent_rights;
 mod consent_rules;

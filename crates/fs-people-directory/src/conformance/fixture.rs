@@ -3,7 +3,7 @@
 //! Pattern: Strategy / Test fixture (the rules are written once; each provider says how to create a deleted,
 //! unshared or merged entry, so the same rules run against the fake and later against `PeopleRepo`).
 
-use crate::person_directory_v1::{Birthday, PersonArt, PersonDirectory, PersonRef};
+use crate::person_directory_v1::{Birthday, Date, PersonArt, PersonDirectory, PersonRef};
 use async_trait::async_trait;
 
 /// The provider under test plus the mutators behind it. A mutator that the provider cannot offer keeps its
@@ -82,5 +82,21 @@ pub trait ConformanceFixture: Send + Sync {
         _rights: &[&str],
     ) -> Option<Box<dyn PersonDirectory>> {
         None
+    }
+
+    /// The same data asked by nobody (not signed in), holding no right.
+    async fn anonymous_view(&self) -> Option<Box<dyn PersonDirectory>> {
+        None
+    }
+
+    /// Delete (tombstone) an entry as `by` (the one who deletes records the Erasure withdrawals).
+    async fn delete_by(&self, _person: &PersonRef, _by: &PersonRef) -> bool {
+        false
+    }
+
+    /// Let the clock reach `today` and delete the records whose retention time is over (`retain_until` before
+    /// `today`), for good, from every place the provider keeps them. `false`: the provider cannot do that.
+    async fn purge_expired(&self, _today: Date) -> bool {
+        false
     }
 }

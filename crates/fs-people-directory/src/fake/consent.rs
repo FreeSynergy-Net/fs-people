@@ -7,7 +7,7 @@ use super::ops::invalid;
 use super::{Defect, FakeDirectory, Inner, Status};
 use crate::person_directory_v1::{
     Consent, ConsentEntry, ConsentOrigin, ConsentQuery, Date, Error, ObjectId, PersonRef, Purpose,
-    Resolved, Result, Revision, Utc, When, Withdrawal, Withdrawn,
+    Resolved, Result, Revision, When, Withdrawal, Withdrawn,
 };
 use fs_types::BasicValue;
 
@@ -17,10 +17,17 @@ fn forbidden<T>(capability: &str) -> Result<T> {
     })
 }
 
+/// The year a withdrawal happened in (`When::On` is a day, `When::At` an instant in UTC).
+fn year_of(when: &When) -> Option<i32> {
+    match when {
+        When::On(day) => Some(day.year()),
+        When::At(at) => at.to_rfc3339()?.get(..4)?.parse().ok(),
+    }
+}
+
 /// Keep the proof three years from the end of the year of the withdrawal (the setting of People; a default here).
-fn retain_until(at: Utc) -> Option<Date> {
-    let year: i32 = at.to_rfc3339()?.get(..4)?.parse().ok()?;
-    Date::parse(&format!("{:04}-12-31", year + 3)).ok()
+fn retain_until(when: &When) -> Option<Date> {
+    Date::parse(&format!("{:04}-12-31", year_of(when)? + 3)).ok()
 }
 
 fn open_or_same<T: PartialEq>(have: Option<&T>, want: Option<&T>) -> bool {
@@ -77,7 +84,7 @@ impl Inner {
     }
 
     /// A deleted person: their active records count as withdrawn with `Erasure`.
-    pub(crate) fn erase_consents(&mut self, person: &PersonRef) {
+    pub(crate) fn erase_consents(&mut self, person: &PersonRef, by: &PersonRef) {
         let at = self.now();
         let end = self.target_id(person);
         let owned: Vec<usize> = (0..self.consents.len())
@@ -87,16 +94,17 @@ impl Inner {
             })
             .collect();
         for i in owned {
+            let withdrawal = Withdrawal {
+                at: When::At(at),
+                origin: ConsentOrigin::Erasure,
+                evidence: None,
+            };
+            self.consents[i].retain_until = retain_until(&withdrawal.at);
             self.consents[i].withdrawn = Some(Withdrawn {
-                withdrawal: Withdrawal {
-                    at: When::At(at),
-                    origin: ConsentOrigin::Erasure,
-                    evidence: None,
-                },
-                recorded_by: person.clone(),
+                withdrawal,
+                recorded_by: by.clone(),
                 recorded_at: at,
             });
-            self.consents[i].retain_until = retain_until(at);
             self.consents[i].rev = Revision(self.consents[i].rev.0 + 1);
         }
     }
@@ -203,13 +211,18 @@ impl FakeDirectory {
             return Ok(g.consents[pos].clone());
         }
         let at = g.now();
+        let from = if g.bad(Defect::RetainFromRecorded) {
+            When::At(at)
+        } else {
+            w.at
+        };
         let c = &mut g.consents[pos];
         c.withdrawn = Some(Withdrawn {
             withdrawal: w.clone(),
             recorded_by: by,
             recorded_at: at,
         });
-        c.retain_until = retain_until(at);
+        c.retain_until = retain_until(&from);
         c.rev = Revision(c.rev.0 + 1);
         let done = c.clone();
         if g.bad(Defect::WithdrawDeletes) {
@@ -223,12 +236,16 @@ impl FakeDirectory {
         self.asker_is_ai(g) && !g.bad(Defect::AiMayConsent)
     }
 
-    /// Is the asker an AI (the entry of the asker has `ai` set)?
+    /// Is the asker an AI? The mark sticks to the entry whatever its state (shared, unshared, deleted) and it is
+    /// looked up at the asker's own id and at the end of its merge chain.
     pub(super) fn asker_is_ai(&self, g: &Inner) -> bool {
         self.asker.as_ref().is_some_and(|a| {
-            g.entries
-                .iter()
-                .any(|e| e.person.id == a.id && e.ai && e.status != Status::NotShared)
+            let end = g.target_id(a);
+            let merged = !g.bad(Defect::AiFlagNoMergeTarget);
+            g.entries.iter().any(|e| {
+                e.ai && (e.person.id == a.id || (merged && e.person.id == end))
+                    && !(g.bad(Defect::AiFlagNeedsShared) && e.status == Status::NotShared)
+            })
         })
     }
 }

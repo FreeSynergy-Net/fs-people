@@ -5,7 +5,9 @@
 use super::ids::uuid7_urn;
 use super::{Entry, FakeDirectory, Rights};
 use crate::conformance::ConformanceFixture;
-use crate::person_directory_v1::{Birthday, ExcerptValue, PersonArt, PersonDirectory, PersonRef};
+use crate::person_directory_v1::{
+    Birthday, Date, ExcerptValue, PersonArt, PersonDirectory, PersonRef,
+};
 use async_trait::async_trait;
 use fs_types::{BasicValue, ContactAddress, Name, Reference};
 
@@ -126,5 +128,20 @@ impl ConformanceFixture for FakeFixture {
             write: rights.contains(&"consent.write"),
         };
         Some(Box::new(self.directory.view_as(Some(who.clone()), held)))
+    }
+
+    async fn anonymous_view(&self) -> Option<Box<dyn PersonDirectory>> {
+        Some(Box::new(self.directory.view_as(None, Rights::none())))
+    }
+
+    async fn delete_by(&self, person: &PersonRef, by: &PersonRef) -> bool {
+        self.directory
+            .view_as(Some(by.clone()), Rights::all())
+            .delete(person)
+    }
+
+    async fn purge_expired(&self, today: Date) -> bool {
+        self.directory.purge_expired(today);
+        true
     }
 }

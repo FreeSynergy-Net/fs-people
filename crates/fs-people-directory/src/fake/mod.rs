@@ -13,6 +13,7 @@ mod sample;
 mod state;
 mod store;
 
+#[doc(hidden)]
 pub use defect::Defect;
 pub use fixture::FakeFixture;
 pub use sample::{sample, sample_ref};
