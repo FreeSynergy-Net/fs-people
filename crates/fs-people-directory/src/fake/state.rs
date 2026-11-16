@@ -19,6 +19,8 @@ pub(crate) struct Inner {
 /// In-memory provider; `asker` is a property of the provider (the "I" card).
 #[derive(Default)]
 pub struct FakeDirectory {
+    /// A foreign address book: reading works, `person.propose` is `Forbidden`.
+    pub(crate) foreign: bool,
     pub(crate) asker: Option<PersonRef>,
     pub(crate) inner: Mutex<Inner>,
 }
@@ -28,6 +30,13 @@ impl FakeDirectory {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// A foreign address book: reading works, writing is `Forbidden`.
+    #[must_use]
+    pub fn foreign_book(mut self) -> Self {
+        self.foreign = true;
+        self
     }
 
     /// Set who asks (`None` = not signed in).
@@ -83,7 +92,21 @@ impl FakeDirectory {
             return false;
         };
         e.merged_into = Some(into.clone());
+        e.rev += 1;
         g.record(from.clone(), ChangeKind::Merged { into: into.clone() });
+        true
+    }
+
+    /// Change the display name of a row; logs `Changed`.
+    pub fn rename(&self, person: &PersonRef, display: &str) -> bool {
+        let mut g = self.lock();
+        let Some(e) = g.find_mut(person) else {
+            return false;
+        };
+        display.clone_into(&mut e.display);
+        e.sort_key = display.to_lowercase();
+        e.rev += 1;
+        g.record(person.clone(), ChangeKind::Changed);
         true
     }
 

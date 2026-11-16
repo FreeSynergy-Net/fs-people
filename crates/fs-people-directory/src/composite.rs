@@ -5,8 +5,8 @@
 
 use crate::person_directory_v1::{
     Candidate, Capabilities, ContactAddress, DirectoryChange, Error, Excerpt, ExcerptField,
-    NoExcerptReason, ObjectId, Page, PersonDirectory, PersonRef, PersonView, Place, ProposeEntry,
-    Reference, Resolved, Result, Suggest, Unreachable, not_possible,
+    NoExcerptReason, ObjectId, Page, PersonDirectory, PersonRef, PersonView, Place, Problem,
+    ProposeEntry, Reference, Resolved, Result, Suggest, Unreachable, not_possible,
 };
 use async_trait::async_trait;
 use std::collections::HashMap;
@@ -82,12 +82,41 @@ impl PersonDirectory for CompositeDirectory {
         seen.map_or(Ok(None), |u| Err(unavailable(Some(u))))
     }
 
+    /// One `resolve_many` per member for the entries that are still `Unknown`; the rest goes on to the next member.
+    /// A member that is down while entries stay `Unknown` makes the whole answer `Unavailable`, like `resolve`.
     async fn resolve_many(&self, people: &[PersonRef]) -> Result<Vec<Resolved>> {
-        let mut out = Vec::with_capacity(people.len());
-        for p in people {
-            out.push(self.resolve(p).await?);
+        let mut out: Vec<Option<Resolved>> = vec![None; people.len()];
+        let mut pending: Vec<usize> = (0..people.len()).collect();
+        let mut seen = None;
+        for m in &self.members {
+            if pending.is_empty() {
+                break;
+            }
+            let ask: Vec<PersonRef> = pending.iter().map(|&i| people[i].clone()).collect();
+            match m.resolve_many(&ask).await {
+                Ok(answers) if answers.len() == ask.len() => {
+                    let mut still = Vec::new();
+                    for (&i, answer) in pending.iter().zip(answers) {
+                        match answer {
+                            Resolved::Unknown => still.push(i),
+                            other => out[i] = Some(other),
+                        }
+                    }
+                    pending = still;
+                }
+                // A wrong length breaks the contract of the member: treat it as a broken store.
+                Ok(_) => seen = Some(Unreachable::Storage),
+                Err(Error::Unavailable(u)) => seen = Some(u),
+                Err(e) => return Err(e),
+            }
         }
-        Ok(out)
+        if !pending.is_empty() && seen.is_some() {
+            return Err(unavailable(seen));
+        }
+        Ok(out
+            .into_iter()
+            .map(|r| r.unwrap_or(Resolved::Unknown))
+            .collect())
     }
 
     /// Change cursors are opaque and belong to one provider, so the feed of the first reachable member is
@@ -97,10 +126,15 @@ impl PersonDirectory for CompositeDirectory {
         for m in &self.members {
             match m.changes(since, size).await {
                 Err(Error::Unavailable(u)) => seen = Some(u),
+                // A member that cannot do it passes on, as with `excerpt`.
+                Err(Error::Unsupported { .. }) => {}
                 other => return other,
             }
         }
-        Err(unavailable(seen))
+        match seen {
+            Some(u) => Err(unavailable(Some(u))),
+            None => not_possible("person.read"),
+        }
     }
 
     async fn find_by_address(&self, address: &ContactAddress) -> Result<Vec<PersonView>> {
@@ -128,26 +162,39 @@ impl PersonDirectory for CompositeDirectory {
         }
     }
 
+    /// The lists of the members are merged by position: every first suggestion in member order, then every
+    /// second one, and so on (a candidate carries no rank of its own to compare across providers); duplicates
+    /// (same reference) keep their first place. `limit` is checked here, so a chain of members that are all down
+    /// still says `Invalid` for a bad `limit`.
     async fn suggest(&self, query: &Suggest) -> Result<Vec<Candidate>> {
-        let mut out: Vec<Candidate> = Vec::new();
+        if query.limit == 0 || query.limit > 50 {
+            return Err(Error::Invalid(vec![Problem {
+                field: "limit".to_owned(),
+                reason: "out_of_range".to_owned(),
+            }]));
+        }
+        let mut lists: Vec<Vec<Candidate>> = Vec::new();
         let mut seen = None;
-        let mut answered = false;
         for m in &self.members {
             match m.suggest(query).await {
-                Ok(list) => {
-                    answered = true;
-                    for c in list {
-                        if !out.iter().any(|o| o.view.person.id == c.view.person.id) {
-                            out.push(c);
-                        }
-                    }
-                }
+                Ok(list) => lists.push(list),
                 Err(Error::Unavailable(u)) => seen = Some(u),
                 Err(e) => return Err(e),
             }
         }
-        if !answered {
+        if lists.is_empty() {
             return Err(unavailable(seen));
+        }
+        let mut out: Vec<Candidate> = Vec::new();
+        let longest = lists.iter().map(Vec::len).max().unwrap_or(0);
+        for rank in 0..longest {
+            for list in &lists {
+                if let Some(c) = list.get(rank)
+                    && !out.iter().any(|o| o.view.person.id == c.view.person.id)
+                {
+                    out.push(c.clone());
+                }
+            }
         }
         out.truncate(usize::from(query.limit));
         Ok(out)

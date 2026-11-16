@@ -1,11 +1,11 @@
-//! Stub providers for the tests: one with only the required methods, one that is down.
+//! Stub provider for the tests: only the required methods, the optional ones keep their Null Object default.
 //!
 //! Pattern: Test double (Null Object defaults and an unavailable provider).
 
 use async_trait::async_trait;
 use fs_people_directory::{
-    Candidate, Capabilities, ContactAddress, DirectoryChange, Error, Excerpt, ExcerptField, Page,
-    PersonDirectory, PersonRef, PersonView, Place, Resolved, Result, Suggest, Unreachable,
+    Candidate, Capabilities, ContactAddress, DirectoryChange, Page, PersonDirectory, PersonRef,
+    PersonView, Place, Resolved, Result, Suggest,
 };
 
 /// A provider with only the required methods: the optional ones keep their Null Object default.
@@ -39,36 +39,5 @@ impl PersonDirectory for ReadOnly {
     }
     async fn suggest(&self, _: &Suggest) -> Result<Vec<Candidate>> {
         Ok(vec![])
-    }
-}
-
-/// A provider that is down.
-pub struct Down;
-
-#[async_trait]
-impl PersonDirectory for Down {
-    fn capabilities(&self) -> Capabilities {
-        Capabilities::default()
-    }
-    async fn resolve(&self, _: &PersonRef) -> Result<Resolved> {
-        Err(Error::Unavailable(Unreachable::Timeout))
-    }
-    async fn asker(&self) -> Result<Option<PersonRef>> {
-        Err(Error::Unavailable(Unreachable::Timeout))
-    }
-    async fn resolve_many(&self, _: &[PersonRef]) -> Result<Vec<Resolved>> {
-        Err(Error::Unavailable(Unreachable::Timeout))
-    }
-    async fn changes(&self, _: Option<&Place>, _: usize) -> Result<Page<DirectoryChange>> {
-        Err(Error::Unavailable(Unreachable::Timeout))
-    }
-    async fn find_by_address(&self, _: &ContactAddress) -> Result<Vec<PersonView>> {
-        Err(Error::Unavailable(Unreachable::Timeout))
-    }
-    async fn suggest(&self, _: &Suggest) -> Result<Vec<Candidate>> {
-        Err(Error::Unavailable(Unreachable::Timeout))
-    }
-    async fn excerpt(&self, _: &PersonRef, _: &[ExcerptField]) -> Result<Excerpt> {
-        Err(Error::Unavailable(Unreachable::Timeout))
     }
 }

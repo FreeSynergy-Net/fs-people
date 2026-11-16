@@ -2,6 +2,7 @@
 //!
 //! Pattern: Fake behind the Repository trait; the rules are those written in the doc comments of `api.rs`.
 
+use super::ids::{uuid7, uuid7_urn};
 use super::store::{find_order, same_address, suggest_rank};
 use super::{Entry, FakeDirectory, Inner, Status};
 use crate::person_directory_v1::{
@@ -13,6 +14,12 @@ use crate::person_directory_v1::{
 use async_trait::async_trait;
 use fs_types::BasicValue;
 
+fn forbidden<T>() -> Result<T> {
+    Err(Error::Forbidden {
+        capability: "person.propose".to_owned(),
+    })
+}
+
 fn invalid<T>(field: &str, reason: &str) -> Result<T> {
     Err(Error::Invalid(vec![Problem {
         field: field.to_owned(),
@@ -21,21 +28,26 @@ fn invalid<T>(field: &str, reason: &str) -> Result<T> {
 }
 
 impl Inner {
-    fn resolve(&self, person: &PersonRef) -> Resolved {
-        let mut current = person.clone();
-        // A merge chain is followed, with a bound against cycles.
+    /// The row a reference ends at; a merge chain is followed, with a bound against cycles.
+    fn target(&self, person: &PersonRef) -> Option<&Entry> {
+        let mut current = person.id.clone();
         for _ in 0..8 {
-            let Some(e) = self.entries.iter().find(|e| e.person.id == current.id) else {
-                return Resolved::Unknown;
-            };
+            let e = self.entries.iter().find(|e| e.person.id == current)?;
             match (&e.merged_into, e.status) {
-                (Some(into), Status::Active) => current = into.clone(),
-                (_, Status::Active) => return Resolved::Found(e.view()),
-                (_, Status::Deleted(since)) => return Resolved::Deleted { since },
-                (_, Status::NotShared) => return Resolved::NotShared,
+                (Some(into), Status::Active) => current = into.id.clone(),
+                _ => return Some(e),
             }
         }
-        Resolved::Unknown
+        None
+    }
+
+    fn resolve(&self, person: &PersonRef) -> Resolved {
+        match self.target(person).map(|e| (e, e.status)) {
+            None => Resolved::Unknown,
+            Some((e, Status::Active)) => Resolved::Found(e.view()),
+            Some((_, Status::Deleted(since))) => Resolved::Deleted { since },
+            Some((_, Status::NotShared)) => Resolved::NotShared,
+        }
     }
 
     fn matching(&self, address: &ContactAddress) -> Vec<PersonView> {
@@ -130,17 +142,20 @@ impl PersonDirectory for FakeDirectory {
     }
 
     async fn open_batch(&self, _origin: &Reference) -> Result<ObjectId> {
+        if self.foreign {
+            return forbidden();
+        }
         let mut g = self.lock();
-        let n = g.now().millis();
-        let mut bytes = [0u8; 16];
-        bytes[0] = 0xB0;
-        bytes[8..].copy_from_slice(&n.to_be_bytes());
-        let id = ObjectId(bytes);
+        let ms = g.now().millis();
+        let id = ObjectId(uuid7(ms).to_be_bytes());
         g.batches.push((id, true));
         Ok(id)
     }
 
     async fn propose(&self, entry: &ProposeEntry, batch: Option<ObjectId>) -> Result<PersonRef> {
+        if self.foreign {
+            return forbidden();
+        }
         let hint = entry.display_hint.trim();
         if hint.is_empty() && entry.address.is_none() {
             return invalid("display_hint", "empty");
@@ -156,8 +171,8 @@ impl PersonDirectory for FakeDirectory {
         {
             return Ok(first.person);
         }
-        let n = g.entries.len() + 1;
-        let id = Reference::parse(&format!("urn:uuid:00000000-0000-7000-8000-{n:012x}"))?;
+        let ms = g.now().millis();
+        let id = Reference::parse(&uuid7_urn(ms))?;
         let person = PersonRef {
             id,
             art: PersonArt::Profile,
@@ -193,7 +208,7 @@ impl PersonDirectory for FakeDirectory {
                 reason,
             })
         };
-        let Some(e) = g.entries.iter().find(|e| e.person.id == person.id) else {
+        let Some(e) = g.target(person) else {
             return refuse(NoExcerptReason::Unknown);
         };
         match e.status {

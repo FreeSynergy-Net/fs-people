@@ -3,7 +3,7 @@
 //! Pattern: Template method (rules as plain checks collected in a `Report`).
 
 use super::{Report, Seeds, address, entry};
-use crate::person_directory_v1::{ChangeKind, Error, ObjectId, PersonArt, PersonDirectory};
+use crate::person_directory_v1::{ChangeKind, Error, ObjectId, PersonDirectory};
 use fs_types::{BasicValue, Reference};
 
 fn is_invalid(e: &Error) -> bool {
@@ -61,6 +61,11 @@ pub(super) async fn propose_rules(dir: &dyn PersonDirectory, s: &Seeds, r: &mut 
     let batch = dir.open_batch(&origin).await;
     r.ensure(batch.is_ok(), "open_batch: opens a batch");
     if let Ok(id) = batch {
+        let (b6, b8) = (id.0[6], id.0[8]);
+        r.ensure(
+            b6 >> 4 == 7 && b8 >> 6 == 0b10,
+            "open_batch: the batch id is a UUIDv7",
+        );
         let inside = dir.propose(&entry("Zzconf Epsilon", None), Some(id)).await;
         r.ensure(inside.is_ok(), "propose: accepted into an open batch");
     }
@@ -96,10 +101,10 @@ pub(super) async fn changes_rules(dir: &dyn PersonDirectory, r: &mut Report) {
         "changes: a proposal is Created",
     );
     r.ensure(
-        page.items
-            .first()
-            .is_some_and(|c| c.person.art == PersonArt::Profile),
-        "changes: carries the reference",
+        created
+            .as_ref()
+            .is_ok_and(|p| page.items.first().is_some_and(|c| c.person.id == p.id)),
+        "changes: the change names the proposed reference",
     );
     let Some(next) = page.next else {
         r.ensure(false, "changes: next is Some after a full page");

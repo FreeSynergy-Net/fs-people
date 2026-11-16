@@ -3,14 +3,18 @@
 //! Pattern: Contract test (the rules of the locked trait run against the fake).
 
 mod common;
-use common::{Down, ReadOnly};
+use common::ReadOnly;
 use fs_people_directory::conformance::{run_conformance, run_unsupported};
 use fs_people_directory::{
     ChangeKind, CompositeDirectory, ContactAddress, Entry, EntryState, Error, Excerpt,
-    ExcerptField, ExcerptValue, FakeDirectory, NoExcerptReason, PersonArt, PersonDirectory,
-    PersonRef, Place, Resolved, Result, Suggest,
+    ExcerptField, ExcerptValue, FailingDirectory, FakeDirectory, NoExcerptReason, PersonArt,
+    PersonDirectory, PersonRef, Place, Resolved, Result, Suggest, Unreachable,
 };
 use fs_types::{BasicValue, Name, Reference, Text};
+
+fn down() -> FailingDirectory {
+    FailingDirectory::new(Error::Unavailable(Unreachable::Timeout))
+}
 
 fn person(n: u32, art: PersonArt) -> PersonRef {
     let id = Reference::parse(&format!("urn:uuid:00000000-0000-7000-8000-{n:012x}")).expect("id");
@@ -178,8 +182,11 @@ async fn optional_methods_are_unsupported() {
 
 #[tokio::test]
 async fn composite_chain_rules() {
-    let chain =
-        CompositeDirectory::new(vec![Box::new(Down), Box::new(ReadOnly), Box::new(seeded())]);
+    let chain = CompositeDirectory::new(vec![
+        Box::new(down()),
+        Box::new(ReadOnly),
+        Box::new(seeded()),
+    ]);
     let ada = person(1, PersonArt::Person);
     // Down and ReadOnly pass the question on; the fake answers.
     assert!(matches!(chain.resolve(&ada).await, Ok(Resolved::Found(_))));
@@ -235,7 +242,7 @@ async fn composite_deleted_is_final_and_all_down_is_unavailable() {
         chain.resolve(&person(1, PersonArt::Person)).await,
         Ok(Resolved::Deleted { .. })
     ));
-    let down = CompositeDirectory::new(vec![Box::new(Down)]);
+    let down = CompositeDirectory::new(vec![Box::new(down())]);
     assert!(matches!(
         down.resolve(&person(1, PersonArt::Person)).await,
         Err(Error::Unavailable(_))

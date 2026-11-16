@@ -96,6 +96,11 @@ fn normal(a: &ContactAddress) -> String {
     {
         return format!("{scheme}:{local}@{}", domain.to_ascii_lowercase());
     }
+    if scheme == "tel" {
+        // RFC 3966 visual separators do not count; the digits are compared (E.164).
+        let digits: String = rest.chars().filter(|c| !"-.() ".contains(*c)).collect();
+        return format!("{scheme}:{digits}");
+    }
     format!("{scheme}:{rest}")
 }
 

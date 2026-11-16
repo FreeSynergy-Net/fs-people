@@ -11,8 +11,10 @@ pub mod person_directory_v1;
 
 pub mod composite;
 pub mod conformance;
+pub mod doubles;
 pub mod fake;
 
 pub use composite::CompositeDirectory;
-pub use fake::{Entry, FakeDirectory, Status};
+pub use doubles::{FailingDirectory, Gate, SlowDirectory};
+pub use fake::{Entry, FakeDirectory, FakeFixture, Status, sample, sample_ref};
 pub use person_directory_v1::*;

@@ -109,12 +109,26 @@ pub(super) async fn suggest_rules(dir: &dyn PersonDirectory, s: &Seeds, r: &mut 
         .await
         .unwrap_or_default();
     r.ensure(one.len() == 1, "suggest: limit caps the list");
-    let mut groups = query("Zzconf", 50, true);
-    groups.arten = vec![PersonArt::Group];
-    let only = dir.suggest(&groups).await.unwrap_or_default();
+    // The seeds have the art of `s.a`: asking for that art finds it, asking for another art does not.
+    let other = if s.a.art == PersonArt::Group {
+        PersonArt::Person
+    } else {
+        PersonArt::Group
+    };
+    let mut same = query("Zzconf Alpha", 50, true);
+    same.arten = vec![s.a.art];
+    let hits = dir.suggest(&same).await.unwrap_or_default();
     r.ensure(
-        only.iter().all(|c| c.view.person.art == PersonArt::Group),
-        "suggest: arten filters",
+        hits.iter().any(|c| c.view.person.id == s.a.id),
+        "suggest: arten of the entry finds it",
+    );
+    let mut different = query("Zzconf Alpha", 50, true);
+    different.arten = vec![other];
+    let hits = dir.suggest(&different).await.unwrap_or_default();
+    r.ensure(
+        hits.iter()
+            .all(|c| c.view.person.id != s.a.id && c.view.person.art == other),
+        "suggest: arten filters the others out",
     );
     let by_address = dir
         .suggest(&query("conf.a@example", 50, true))
