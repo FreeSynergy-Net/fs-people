@@ -4,7 +4,8 @@
 //! Pattern: Test fixture (ein Fake nur für die Zeitzone: feste Verschiebungen; die Rechnung selbst ist die echte).
 
 use crate::draft::person_directory_v2::{
-    CAPABILITIES, ConsentRetention, Error, NullDirectory, PersonDirectory, When, ZoneOffsets,
+    CAPABILITIES, ConsentRetention, Error, NullCatalog, NullDirectory, PersonDirectory,
+    PurposeCatalog, When, ZoneOffsets,
 };
 use fs_types::{BasicValue, Date, Utc, Zone};
 
@@ -74,7 +75,8 @@ fn capabilities_are_the_eight_of_v1_plus_three() {
 fn the_null_provider_refuses_every_capability() {
     let d: Box<dyn PersonDirectory> = Box::new(NullDirectory);
     assert!(d.capabilities().0.iter().all(|(_, on)| !on));
-    let r = block_on(d.purposes());
+    let c: Box<dyn PurposeCatalog> = Box::new(NullCatalog);
+    let r = block_on(c.purposes());
     assert!(
         matches!(r, Err(Error::Unsupported { ref capability, .. }) if capability == "purpose.read")
     );
@@ -152,6 +154,42 @@ fn k28_property_retain_until_depends_on_year_and_current_n_only() {
                 .after(when, None, &instance, &Fixed)
                 .map(|d| d.canonical());
             assert_eq!(got.as_deref(), Some(table(*year, current.years()).as_str()));
+        }
+    }
+}
+
+/// Jahresgrenze (billig): 31.12. zu jeder Minute des Tages in vier Zonen, Ortsjahr aus eigener fester Tabelle
+/// (Minute des Tages + Verschiebung gegen 24 h), nicht aus `after`. Tötet die Mutanten "Jahr aus at + 14 h",
+/// "nur UTC-Jahr" und "Zone ignoriert" auch außerhalb von K24.
+#[test]
+fn k28_year_boundary_in_four_zones() {
+    let instance = zone("UTC");
+    for year in (1970..=2200).step_by(37) {
+        for (id, off) in [
+            ("UTC", 0i32),
+            ("Europe/Berlin", 60),
+            ("Pacific/Kiritimati", 840),
+            ("Pacific/Pago_Pago", -660),
+        ] {
+            for minute in [0i32, 9 * 60 + 29, 10 * 60 + 30, 12 * 60, 23 * 60 + 59] {
+                let at = When::At(
+                    Utc::parse(&format!(
+                        "{year:04}-12-31T{:02}:{:02}:00Z",
+                        minute / 60,
+                        minute % 60
+                    ))
+                    .expect("a time"),
+                );
+                let local_year = year + i32::from(minute + off >= 24 * 60);
+                let got = n(2)
+                    .after(&at, Some(&zone(id)), &instance, &Fixed)
+                    .map(|d| d.canonical());
+                assert_eq!(
+                    got.as_deref(),
+                    Some(table(local_year, 2).as_str()),
+                    "{id} {year} {minute}"
+                );
+            }
         }
     }
 }

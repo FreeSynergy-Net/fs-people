@@ -55,7 +55,7 @@ fn k25_retroactive_new_period_applies_to_existing_proofs() {
     let c = block_on(k.d.record_consent(&entry(&p, Purpose::Newsletter, None, on("2026-01-02"))))
         .unwrap();
     block_on(k.d.withdraw_consent(c.id, &withdrawal(on("2026-05-10")))).unwrap();
-    block_on(k.settings().set_consent_retention(n(5), false)).unwrap();
+    block_on(k.settings().set_consent_retention(n(5), 0)).unwrap();
     let all = block_on(k.d.consents_of(&p)).unwrap();
     assert_eq!(
         all[0].retain_until,
@@ -70,7 +70,7 @@ fn k25b_shortening_is_a_deletion_with_count_hint_and_confirmation() {
     let k = Kern::start();
     let p = k.human();
     k.act(&p);
-    block_on(k.settings().set_consent_retention(n(10), true)).unwrap();
+    block_on(k.settings().set_consent_retention(n(10), 0)).unwrap();
     let c = block_on(k.d.record_consent(&entry(&p, Purpose::Newsletter, None, on("2020-01-02"))))
         .unwrap();
     block_on(k.d.withdraw_consent(c.id, &withdrawal(on("2020-06-01")))).unwrap();
@@ -80,19 +80,21 @@ fn k25b_shortening_is_a_deletion_with_count_hint_and_confirmation() {
         pre.legal_hint,
         "the hint: may still be legally needed, not legal advice"
     );
-    assert!(
-        matches!(
-            block_on(k.settings().set_consent_retention(n(3), false)),
-            Err(Error::Invalid(_))
-        ),
-        "confirmation required"
-    );
+    for wrong in [0, 2] {
+        assert!(
+            matches!(
+                block_on(k.settings().set_consent_retention(n(3), wrong)),
+                Err(Error::Invalid(_))
+            ),
+            "the confirmed number must equal the number deleted ({wrong} is wrong)"
+        );
+    }
     assert_eq!(
         block_on(k.d.consents_of(&p)).unwrap().len(),
         1,
         "nothing written without it"
     );
-    block_on(k.settings().set_consent_retention(n(3), true)).unwrap();
+    block_on(k.settings().set_consent_retention(n(3), 1)).unwrap();
     k.cleanup();
     assert!(
         block_on(k.d.consents_of(&p)).unwrap().is_empty(),
@@ -110,7 +112,7 @@ fn k25c_a_failing_recompute_leaves_the_old_state() {
         .unwrap();
     block_on(k.d.withdraw_consent(c.id, &withdrawal(on("2026-05-10")))).unwrap();
     k.fail_mid_recompute();
-    assert!(block_on(k.settings().set_consent_retention(n(5), false)).is_err());
+    assert!(block_on(k.settings().set_consent_retention(n(5), 0)).is_err());
     assert_eq!(
         block_on(k.settings().consent_retention()).unwrap(),
         ConsentRetention::default()
@@ -141,7 +143,11 @@ fn k26_erasure_and_end_situation_use_the_same_calculation() {
     e.lifetime = Some(Lifetime::WhileScope);
     block_on(k.d.record_consent(&e)).unwrap();
     let scope = e.scope.clone().expect("scope");
-    block_on(k.as_program().end_situation(&scope, on("2026-05-10"), None)).unwrap();
+    block_on(
+        k.as_program()
+            .end_situation(&scope, on("2026-05-10"), None, None),
+    )
+    .unwrap();
     let ended = block_on(k.d.consents_of(&p)).unwrap();
     assert_eq!(
         ended[0].retain_until,

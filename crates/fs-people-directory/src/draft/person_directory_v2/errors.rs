@@ -84,6 +84,11 @@ impl From<TypeProblem> for Error {
     }
 }
 
+/// Eine Objekt-Id als 32 Hexzeichen (stabil, kein Debug-Text).
+fn hex(id: &ObjectId) -> String {
+    id.0.iter().map(|b| format!("{b:02x}")).collect()
+}
+
 impl Error {
     /// v2: die Kennung der Ursache (RFC 9457: `https://freesynergy.net/problems/people/{code}`), stabil, ohne Satz.
     #[must_use]
@@ -111,14 +116,20 @@ impl Error {
             }
             Self::NoExcerpt { person, reason } => vec![
                 ("person", person.id.canonical()),
-                ("reason", format!("{reason:?}")),
+                (
+                    "reason",
+                    match reason {
+                        NoExcerptReason::Deleted => "deleted",
+                        NoExcerptReason::NotShared => "not-shared",
+                        NoExcerptReason::Unknown => "unknown",
+                        NoExcerptReason::NoConsent => "no-consent",
+                    }
+                    .to_owned(),
+                ),
             ],
-            Self::BatchClosed(id) | Self::UnknownConsent(id) => vec![("id", format!("{id:?}"))],
+            Self::BatchClosed(id) | Self::UnknownConsent(id) => vec![("id", hex(id))],
             Self::Changed { id, current } => {
-                vec![
-                    ("id", format!("{id:?}")),
-                    ("current", format!("{current:?}")),
-                ]
+                vec![("id", hex(id)), ("current", current.0.to_string())]
             }
             Self::PurposeRetired(p) => vec![("purpose", p.canonical())],
             Self::Invalid(_) | Self::Unavailable(_) | Self::StandardPurposeFixed => Vec::new(),

@@ -1,8 +1,8 @@
 //! N6: die Zweck-Liste ist editierbar. Standard-Zwecke (die 9 Varianten von `Purpose`) bleiben fest: dieselben Wörter,
 //! dasselbe `needs_consent`; editierbar werden nur TEXTE und EIGENE Zwecke (`Purpose::Other(urn:uuid:<id>)`).
 //!
-//! Pattern: Value Object (Entwurf, Definition) + Repository-Teil (die Methoden `purposes`, `define_purpose`,
-//! `revise_purpose`, `retire_purpose` stehen im Trait, `api.rs`).
+//! Pattern: Value Object (Entwurf, Definition) + Repository-Teil (die Methoden stehen im Trait
+//! `PurposeCatalog`, `catalog.rs`).
 //!
 //! Auflösung der Anzeige: Person, dann Instanz, dann die mitgelieferte MF2-Datei (`people-purpose-<wort>-label` und
 //! `-explanation`, de+en, ADR 0057), dann der Platzhalter "Sonstiger Zweck" mit der IRI, nie leer (K21).
@@ -40,7 +40,7 @@ pub struct PurposeDraft {
     pub recording: Option<RecordingKind>,
 }
 
-/// Ein Zweck mit seinen Texten, wie `purposes` ihn liefert.
+/// Ein Zweck mit seinen Texten, wie `PurposeCatalog::purposes` ihn liefert (je Ebene ein Eintrag; `owner` sagt, welche).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PurposeDef {
     pub purpose: Purpose,

@@ -102,7 +102,7 @@ fn k11_end_situation_revokes_only_ai_in_that_scope() {
     });
     block_on(k.d.record_consent(&photo)).unwrap();
     let program = k.as_program();
-    let ids = block_on(program.end_situation(&s, at(1), None)).unwrap();
+    let ids = block_on(program.end_situation(&s, at(1), None, None)).unwrap();
     assert_eq!(ids.len(), 2);
     let all = block_on(k.d.consents_of(&p)).unwrap();
     let ended = all
@@ -115,7 +115,7 @@ fn k11_end_situation_revokes_only_ai_in_that_scope() {
         .count();
     assert_eq!(ended, 2, "the photo in s and the AI in s2 stay active");
     assert!(
-        block_on(program.end_situation(&s, at(2), None))
+        block_on(program.end_situation(&s, at(2), None, None))
             .unwrap()
             .is_empty(),
         "idempotent"
@@ -129,12 +129,12 @@ fn k12_end_situation_needs_the_right() {
     let (human, ai) = (k.human(), k.agent());
     k.act(&human);
     assert!(matches!(
-        block_on(k.d.end_situation(&scope(1), at(1), None)),
+        block_on(k.d.end_situation(&scope(1), at(1), None, None)),
         Err(Error::Forbidden { .. })
     ));
     k.act(&ai);
     assert!(matches!(
-        block_on(k.d.end_situation(&scope(1), at(1), None)),
+        block_on(k.d.end_situation(&scope(1), at(1), None, None)),
         Err(Error::Forbidden { .. })
     ));
 }
@@ -149,7 +149,7 @@ fn k13_new_consent_after_the_end_is_a_new_entry() {
     e.scope = Some(scope(1));
     e.lifetime = Some(Lifetime::WhileScope);
     let old = block_on(k.d.record_consent(&e)).unwrap();
-    block_on(k.as_program().end_situation(&scope(1), at(1), None)).unwrap();
+    block_on(k.as_program().end_situation(&scope(1), at(1), None, None)).unwrap();
     let new = block_on(k.d.record_consent(&e)).unwrap();
     assert_ne!(old.id, new.id);
     let all = block_on(k.d.consents_of(&p)).unwrap();

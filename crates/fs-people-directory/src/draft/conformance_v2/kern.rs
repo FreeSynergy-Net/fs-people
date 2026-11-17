@@ -8,7 +8,8 @@
 use crate::draft::person_directory_v2::retention::ZoneOffsets;
 use crate::draft::person_directory_v2::{
     ConsentEntry, ConsentOrigin, ConsentRetention, ExcerptField, ExcerptRequest, ObjectId,
-    PersonDirectory, PersonRef, Purpose, Reference, RetentionSettings, ShareField, Utc, When,
+    PersonDirectory, PersonRef, Purpose, PurposeCatalog, Reference, RetentionSettings, ShareField,
+    Utc, When,
 };
 use fs_types::BasicValue;
 
@@ -19,6 +20,7 @@ pub(super) const KERN: &str =
 /// Der Anbieter unter Test plus die Dinge, die der Trait nicht kann.
 pub(super) struct Kern {
     pub(super) d: Box<dyn PersonDirectory>,
+    pub(super) c: Box<dyn PurposeCatalog>,
 }
 
 impl Kern {

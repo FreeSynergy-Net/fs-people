@@ -35,9 +35,10 @@ impl ConsentRetention {
     }
 
     /// 31.12. von (Jahr des Widerrufs + N). `When::On` ist ein Datum und zählt, wie es ist. `When::At` ist ein
-    /// Zeitpunkt: das Jahr zählt in `zone` (die GESPEICHERTE Zone des Widerrufs), ohne sie in `instance` (Zone der
-    /// Instanz); die Verschiebung kommt aus `offsets` (tz-Datenbank beim Anbieter). `None` nur, wenn die Zone
-    /// unbekannt ist (der Anbieter nimmt dann die Instanz-Zone) oder der Zeitpunkt außerhalb des Bereichs liegt.
+    /// Zeitpunkt: das Jahr zählt in `zone` (die GESPEICHERTE Zone des Widerrufs); fehlt sie oder ist sie unbekannt,
+    /// fällt die Rechnung SELBST auf `instance` zurück (alle Wege rechnen gleich, K26); die Verschiebung kommt aus
+    /// `offsets` (tz-Datenbank beim Anbieter). `None` nur bei unbekannter Instanz-Zone oder Zeitpunkt außerhalb des
+    /// Bereichs.
     #[must_use]
     pub fn after(
         self,
@@ -49,7 +50,9 @@ impl ConsentRetention {
         let year = match when {
             When::On(day) => day.year(),
             When::At(at) => {
-                let off = offsets.offset_minutes(zone.unwrap_or(instance), *at)?;
+                let off = zone
+                    .and_then(|z| offsets.offset_minutes(z, *at))
+                    .or_else(|| offsets.offset_minutes(instance, *at))?;
                 let local = Utc::from_millis(at.millis().checked_add(i64::from(off) * 60_000)?);
                 local.to_rfc3339()?.get(..4)?.parse().ok()?
             }
@@ -96,14 +99,17 @@ pub trait RetentionSettings: Send + Sync {
     /// `Forbidden{people.settings}` ohne Recht; `Unavailable`.
     async fn preview_retention(&self, new: ConsentRetention) -> Result<RetentionPreview>;
     /// Einstellung schreiben UND `retain_until` aller bestehenden widerrufenen Nachweise neu berechnen, in EINEM
-    /// Schreibschritt (K25c), mit Protokolleintrag "Aufbewahrung N→M, k Nachweise". Verkürzung (`to_delete > 0`)
-    /// braucht `confirmed = true`, sonst `Invalid` und nichts geschrieben (K25b). Antwort: die Vorschau, die galt.
+    /// Schreibschritt (K25c), mit Protokolleintrag "Aufbewahrung N→M, k Nachweise". `confirm_delete` ist die
+    /// bestätigte Zahl zu löschender Nachweise (aus `preview_retention`): sie muss GENAU dem `to_delete` zur Zeit des
+    /// Schreibens entsprechen (ohne Löschung 0), sonst `Invalid` und nichts geschrieben (K25b); so ist die bestätigte
+    /// Zahl die gelöschte, auch wenn dazwischen ein Widerruf, ein Jahreswechsel oder eine zweite Verwaltung kam.
+    /// Antwort: die Vorschau, die galt.
     ///
     /// # Errors
-    /// `Forbidden`, `Invalid` (Bestätigung fehlt), `Unavailable`.
+    /// `Forbidden`, `Invalid` (bestätigte Zahl stimmt nicht), `Unavailable`.
     async fn set_consent_retention(
         &self,
         new: ConsentRetention,
-        confirmed: bool,
+        confirm_delete: u32,
     ) -> Result<RetentionPreview>;
 }

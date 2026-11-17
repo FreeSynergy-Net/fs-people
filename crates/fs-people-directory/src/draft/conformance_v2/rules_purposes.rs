@@ -31,7 +31,7 @@ fn draft(owner: PurposeOwner) -> PurposeDraft {
 #[ignore = "kern: no v2 provider yet"]
 fn k15_standard_purposes_equal_v1() {
     let k = Kern::start();
-    let all = block_on(k.d.purposes()).unwrap();
+    let all = block_on(k.c.purposes()).unwrap();
     assert!(all.len() >= 9);
     assert_eq!(all[0].purpose, Purpose::Contract);
     assert!(
@@ -48,11 +48,11 @@ fn k16_instance_purpose_needs_the_right() {
     k.act(&p);
     k.grant_admin(&p, false);
     assert!(matches!(
-        block_on(k.d.define_purpose(&draft(PurposeOwner::Instance))),
+        block_on(k.c.define_purpose(&draft(PurposeOwner::Instance))),
         Err(Error::Forbidden { .. })
     ));
     k.grant_admin(&p, true);
-    let def = block_on(k.d.define_purpose(&draft(PurposeOwner::Instance))).unwrap();
+    let def = block_on(k.c.define_purpose(&draft(PurposeOwner::Instance))).unwrap();
     assert!(matches!(&def.purpose, Purpose::Other(r) if r.canonical().starts_with("urn:uuid:")));
     assert!(
         def.needs_consent,
@@ -66,10 +66,10 @@ fn k17_person_purpose_is_private() {
     let k = Kern::start();
     let (a, b) = (k.human(), k.human());
     k.act(&a);
-    let def = block_on(k.d.define_purpose(&draft(PurposeOwner::Person(a)))).unwrap();
+    let def = block_on(k.c.define_purpose(&draft(PurposeOwner::Person(a)))).unwrap();
     k.act(&b);
     assert!(
-        block_on(k.d.purposes())
+        block_on(k.c.purposes())
             .unwrap()
             .iter()
             .all(|d| d.purpose != def.purpose)
@@ -83,13 +83,20 @@ fn k18_stale_revision_is_changed_and_old_version_stays_readable() {
     let p = k.human();
     k.act(&p);
     k.grant_admin(&p, true);
-    let def = block_on(k.d.define_purpose(&draft(PurposeOwner::Instance))).unwrap();
+    let def = block_on(k.c.define_purpose(&draft(PurposeOwner::Instance))).unwrap();
     let v2 =
-        block_on(k.d.revise_purpose(&def.purpose, Some(def.rev), &draft(PurposeOwner::Instance)))
+        block_on(k.c.revise_purpose(&def.purpose, Some(def.rev), &draft(PurposeOwner::Instance)))
             .unwrap();
     assert_ne!(v2.version, def.version);
+    let old = block_on(k.c.purpose_version(&def.version))
+        .unwrap()
+        .expect("the agreed text version stays readable");
+    assert_eq!(
+        old.texts, def.texts,
+        "Art. 7(1): the old text, not the current one"
+    );
     let stale =
-        block_on(k.d.revise_purpose(&def.purpose, Some(def.rev), &draft(PurposeOwner::Instance)));
+        block_on(k.c.revise_purpose(&def.purpose, Some(def.rev), &draft(PurposeOwner::Instance)));
     assert!(matches!(stale, Err(Error::Changed { current, .. }) if current == v2.rev));
 }
 
@@ -99,7 +106,7 @@ fn k19_retire_blocks_new_records_only() {
     let k = Kern::start();
     let p = k.human();
     k.act(&p);
-    let def = block_on(k.d.define_purpose(&draft(PurposeOwner::Person(p.clone())))).unwrap();
+    let def = block_on(k.c.define_purpose(&draft(PurposeOwner::Person(p.clone())))).unwrap();
     let e = entry(
         &p,
         def.purpose.clone(),
@@ -107,7 +114,7 @@ fn k19_retire_blocks_new_records_only() {
         When::On(fs_types::Date::parse("2026-11-17").expect("a date")),
     );
     block_on(k.d.record_consent(&e)).unwrap();
-    block_on(k.d.retire_purpose(&def.purpose, def.rev)).unwrap();
+    block_on(k.c.retire_purpose(&def.purpose, def.rev)).unwrap();
     assert!(matches!(
         block_on(k.d.record_consent(&e)),
         Err(Error::PurposeRetired(_))
@@ -128,14 +135,14 @@ fn k20_standard_purpose_is_fixed_but_its_text_changes() {
     let p = k.human();
     k.act(&p);
     k.grant_admin(&p, true);
-    let all = block_on(k.d.purposes()).unwrap();
+    let all = block_on(k.c.purposes()).unwrap();
     let std = all[0].clone();
     assert!(matches!(
-        block_on(k.d.retire_purpose(&std.purpose, std.rev)),
+        block_on(k.c.retire_purpose(&std.purpose, std.rev)),
         Err(Error::StandardPurposeFixed)
     ));
     let new =
-        block_on(k.d.revise_purpose(&std.purpose, None, &draft(PurposeOwner::Instance))).unwrap();
+        block_on(k.c.revise_purpose(&std.purpose, None, &draft(PurposeOwner::Instance))).unwrap();
     assert_eq!(new.purpose, std.purpose);
     assert_eq!(new.needs_consent, std.needs_consent);
 }
@@ -155,7 +162,7 @@ fn k21_unknown_dpv_purpose_shows_placeholder_and_iri() {
     );
     let c = block_on(k.d.record_consent(&e)).unwrap();
     assert!(
-        block_on(k.d.purposes())
+        block_on(k.c.purposes())
             .unwrap()
             .iter()
             .all(|d| d.purpose != c.entry.purpose),
@@ -170,12 +177,38 @@ fn k22_ai_cannot_touch_purposes() {
     let ai = k.agent();
     k.act(&ai);
     assert!(matches!(
-        block_on(k.d.purposes()),
+        block_on(k.c.purposes()),
         Err(Error::Forbidden { .. })
     ));
     assert!(matches!(
-        block_on(k.d.define_purpose(&draft(PurposeOwner::Instance))),
+        block_on(k.c.define_purpose(&draft(PurposeOwner::Instance))),
         Err(Error::Forbidden { .. })
     ));
     let _ = Revision(0);
+}
+
+#[test]
+#[ignore = "kern: no v2 provider yet"]
+fn k17b_levels_rights_and_owner_mismatch() {
+    // V3: a person defines and changes own purposes and an own text of a standard purpose WITHOUT `purpose.write`;
+    // `owner` unequal to the former owner is `Invalid`; `Person(other)` is `Forbidden`; `purposes()` lists one entry
+    // per level (the instance text next to the own override).
+    let k = Kern::start();
+    let (a, b) = (k.human(), k.human());
+    k.act(&a);
+    k.grant_admin(&a, false);
+    let own = block_on(k.c.define_purpose(&draft(PurposeOwner::Person(a.clone())))).unwrap();
+    let moved =
+        block_on(k.c.revise_purpose(&own.purpose, Some(own.rev), &draft(PurposeOwner::Instance)));
+    assert!(matches!(moved, Err(Error::Invalid(_))));
+    let foreign = block_on(k.c.define_purpose(&draft(PurposeOwner::Person(b))));
+    assert!(matches!(foreign, Err(Error::Forbidden { .. })));
+    let std = block_on(k.c.purposes()).unwrap()[0].purpose.clone();
+    block_on(k.c.revise_purpose(&std, None, &draft(PurposeOwner::Person(a)))).unwrap();
+    let levels = block_on(k.c.purposes())
+        .unwrap()
+        .iter()
+        .filter(|d| d.purpose == std)
+        .count();
+    assert_eq!(levels, 2, "built-in/instance text and the own override");
 }

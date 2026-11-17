@@ -244,15 +244,18 @@ struct PurposeDef { purpose @0 :Purpose; ownerKind @1 :PurposeOwnerKind; owner @
 # The 11 capabilities are named per method: person.read person.find person.pick person.propose person.excerpt consent.read consent.check
 # consent.write (8 of v1) plus consent.situation purpose.read purpose.write. Resolve/suggest/propose/changes of v1 are carried by the
 # existing `Persons` interface in the real wire step; the probe lists the v2 delta only.
+# Rust side: `PersonDirectory` (excerpt .. endSituation, 15 methods incl. v1) and `PurposeCatalog` (purposes, purposeVersion,
+# definePurpose, revisePurpose, retirePurpose); one wire interface carries both.
 interface Directory {
   excerpt        @0 (person :PersonLink, request :ExcerptRequest) -> (excerpt :Excerpt);                 # person.excerpt
   consentsOf     @1 (person :PersonLink) -> (items :List(Consent));                                      # consent.read
   checkConsent   @2 (query :ConsentQuery) -> (found :Bool, id :Uuid);                                    # consent.check
   recordConsent  @3 (entry :ConsentEntry) -> (consent :Consent);                                         # consent.write
   withdrawConsent @4 (id :Uuid, withdrawal :Withdrawal) -> (consent :Consent);                           # consent.write
-  endSituation   @5 (scope :Text, at :When, evidence :Text) -> (ids :List(Uuid));                        # consent.situation (programme accounts only)
+  endSituation   @5 (scope :Text, at :When, zone :Text, evidence :Text) -> (ids :List(Uuid));                        # consent.situation (programme accounts only)
   purposes       @6 () -> (items :List(PurposeDef));                                                     # purpose.read
   definePurpose  @7 (draft :PurposeDraft) -> (def :PurposeDef);                                          # purpose.write (Instance) / own (Person)
   revisePurpose  @8 (purpose :Purpose, hasExpected :Bool, expected :UInt64, draft :PurposeDraft) -> (def :PurposeDef);  # purpose.write
   retirePurpose  @9 (purpose :Purpose, expected :UInt64) -> (def :PurposeDef);                           # purpose.write
+  purposeVersion @10 (version :Text) -> (found :Bool, def :PurposeDef);                                   # purpose.read (agreed text version, Art. 7(1))
 }

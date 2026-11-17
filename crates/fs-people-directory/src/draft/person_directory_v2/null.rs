@@ -1,8 +1,9 @@
-//! Der Null-Anbieter: JEDE der 19 Methoden von `PersonDirectory` v2 antwortet ausdrücklich `not_possible`. Er prüft in
+//! Der Null-Anbieter: JEDE der 15 Methoden von `PersonDirectory` v2 (und der 5 von `PurposeCatalog`) antwortet ausdrücklich `not_possible`. Er prüft in
 //! der Probe, dass der Trait als `dyn` benutzbar ist und keine Methode eine Standard-Implementierung hat.
 //!
 //! Pattern: Null Object (ADR 0043/0045).
 
+use super::PurposeCatalog;
 use super::{
     CAPABILITIES, Candidate, Capabilities, Consent, ConsentEntry, ConsentQuery, ContactAddress,
     DirectoryChange, Error, Excerpt, ExcerptRequest, ObjectId, Page, PersonDirectory, PersonRef,
@@ -10,6 +11,7 @@ use super::{
     Result, Revision, Suggest, When, Withdrawal, not_possible,
 };
 use async_trait::async_trait;
+use fs_types::Zone;
 
 /// Anbieter ohne jede Fähigkeit.
 #[derive(Clone, Copy, Debug, Default)]
@@ -68,11 +70,23 @@ impl PersonDirectory for NullDirectory {
         &self,
         _: &Reference,
         _: When,
+        _: Option<&Zone>,
         _: Option<&Reference>,
     ) -> Result<Vec<ObjectId>> {
         not_possible("consent.situation")
     }
+}
+
+/// Null-Anbieter des Zweck-Katalogs: jede Methode `not_possible`.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct NullCatalog;
+
+#[async_trait]
+impl PurposeCatalog for NullCatalog {
     async fn purposes(&self) -> Result<Vec<PurposeDef>> {
+        not_possible("purpose.read")
+    }
+    async fn purpose_version(&self, _: &Reference) -> Result<Option<PurposeDef>> {
         not_possible("purpose.read")
     }
     async fn define_purpose(&self, _: &PurposeDraft) -> Result<PurposeDef> {

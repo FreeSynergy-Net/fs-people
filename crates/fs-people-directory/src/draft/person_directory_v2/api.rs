@@ -1,4 +1,4 @@
-//! Der Trait `PersonDirectory` v2 (PROBE): v1 unverändert plus `end_situation` (N3) und die Zweck-Methoden (N6).
+//! Der Trait `PersonDirectory` v2 (PROBE): v1 unverändert plus `end_situation` (N3): 15 Methoden. Die Zweck-Methoden (N6) stehen im eigenen Trait `PurposeCatalog` (`catalog.rs`).
 //! Keine Signatur einer v1-Methode ändert sich; Typen kommen aus diesem Ordner.
 //!
 //! Der Trait `PersonDirectory` und seine Fähigkeitskennungen.
@@ -13,6 +13,7 @@ use super::{
     Withdrawal,
 };
 use async_trait::async_trait;
+use fs_types::Zone;
 
 /// Das ausdrückliche "nicht möglich" einer Methode, die der Anbieter nicht kann.
 ///
@@ -149,29 +150,14 @@ pub trait PersonDirectory: Send + Sync {
     /// zu). Widerruft ALLE aktiven `AiAssistance`-Einwilligungen mit diesem `scope` (Origin `SituationEnded`,
     /// `retain_until` wie bei jedem Widerruf); andere Zwecke und andere `scope` bleiben. Idempotent; Antwort = die Ids,
     /// die dieser Aufruf widerrufen hat. Nur Programm-Konten der Besitzer (fs-groups, fs-messages): sonst `Forbidden`;
-    /// KI: `Forbidden`.
+    /// KI: `Forbidden`. `zone` wie `Withdrawal::zone` (Jahr der Aufbewahrung in dieser Zone, `None` = Instanz-Zone). Ein
+    /// abgelaufenes `Lifetime::Until(t)` hält der Anbieter als Widerruf mit `at = When::At(t)` fest (nicht mit der Zeit
+    /// des Aufräumlaufs), Origin `SituationEnded`, Zone der Instanz.
     async fn end_situation(
         &self,
         scope: &Reference,
         at: When,
+        zone: Option<&Zone>,
         evidence: Option<&Reference>,
     ) -> Result<Vec<ObjectId>>;
-
-    /// v2 `purpose.read`: erst die 9 Standard-Zwecke in Listen-Reihenfolge, dann Instanz, dann eigene der fragenden Person.
-    /// KI: `Forbidden` (kein Orakel).
-    async fn purposes(&self) -> Result<Vec<PurposeDef>>;
-    /// v2 `purpose.write` (Instance) oder für sich (Person): neuer eigener Zweck `Other(urn:uuid:...)`, `needs_consent`
-    /// = true (VORLÄUFIG). Mindestens ein Text, sonst `Invalid`. KI: `Forbidden`.
-    async fn define_purpose(&self, draft: &PurposeDraft) -> Result<PurposeDef>;
-    /// v2 `purpose.write`: Texte ändern (neue Revision, alte Fassung bleibt lesbar); Standard-Zweck: nur Texte, `None` =
-    /// erste Überschreibung; veraltetes `expected`: `Changed{current}`. KI: `Forbidden`.
-    async fn revise_purpose(
-        &self,
-        purpose: &Purpose,
-        expected: Option<Revision>,
-        draft: &PurposeDraft,
-    ) -> Result<PurposeDef>;
-    /// v2 `purpose.write`: eigenen Zweck zurückziehen (sperrt neues Erfassen: `PurposeRetired`); Standard-Zweck:
-    /// `StandardPurposeFixed`. Veraltetes `expected`: `Changed`. KI: `Forbidden`.
-    async fn retire_purpose(&self, purpose: &Purpose, expected: Revision) -> Result<PurposeDef>;
 }

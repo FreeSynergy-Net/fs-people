@@ -118,6 +118,10 @@ pub enum Lifetime {
     Until(Utc),
 }
 
+// MOVE-NOTICE: `RecordingKind`, `RecordingKeep` und `RecordingNotice` ziehen mit dem nächsten fs-types-Tag nach
+// fs-types um. Angekündigte Änderung: NUR diese drei Definitionen werden durch `pub use fs_types::...` mit gleichen
+// Namen, Feldern, Varianten und gleichem Sinn ersetzt (neuer Ordner-Hash mit `vorgaenger`, kein v3); jede andere
+// Abweichung ist ein Sprung.
 /// v2: was aufgenommen wird. `non_exhaustive`: Ausgabe-Enum.
 // VORLÄUFIG hier; zieht mit dem nächsten fs-types-Tag nach fs-types um (b7 17.11., Frage 12).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
