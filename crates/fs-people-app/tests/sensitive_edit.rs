@@ -1,13 +1,13 @@
-//! F3: the sensitive marking at card level is set and lifted in the form; it is a mark kept in this
-//! program (the contract `person_directory` carries it with v2). An accident never lifts it; a mark
-//! on a part of the card is not the form's to lift.
+//! F3: the sensitive marking at card level is set in the form; it is a mark kept in this program (the
+//! contract `person_directory` carries it with v2). Lifting is refused with a sentence (the core
+//! never takes a marking away on an update; who may lift one is an open decision), and nothing of that
+//! edit is written. An accident never reduces it.
 //!
 //! Pattern: Integration tests over the real core and store (the store's envelope is the oracle: it
-//! must know what the card says). Mutants: (1) `restore_except` ignoring `lifted` (the category comes
-//! back: `a_category_can_be_lifted`); (2) `still_marked` always `None` (a nested mark is lifted behind
-//! the person's back: `a_category_marked_on_a_part_is_not_lifted`); (3) `note` accepting spaces
-//! (`a_category_has_no_spaces`); (4) `Changes::apply` replacing the whole list
-//! (`a_second_category_keeps_the_first`).
+//! must know what the card says). Mutants: (1) `apply_draft` not refusing `lifted`
+//! (`lifting_a_category_is_refused_and_changes_nothing`, `renaming_a_category_is_a_lifting_and_refused_too`);
+//! (2) `note` accepting spaces (`a_category_has_no_spaces`); (3) `Changes::apply` replacing the whole
+//! list (`a_second_category_keeps_the_first`).
 
 mod common;
 
@@ -79,7 +79,7 @@ fn a_second_category_keeps_the_first() {
 }
 
 #[test]
-fn a_category_can_be_lifted() {
+fn lifting_a_category_is_refused_and_changes_nothing() {
     let w = World::in_memory();
     let mut card = person("Amara", "a@example.org");
     card.mark_sensitive(["pd:Religion", "pd:HealthRecord"]);
@@ -87,24 +87,30 @@ fn a_category_can_be_lifted() {
     let mut s = w.state();
     s.select(&key);
     s.begin_edit();
+    s.set_field("name/full", "Augusta");
     s.set_field("sensitive/pd:Religion", "");
     s.save();
-    assert!(s.editing().is_none(), "{}", error_of(&s));
-    assert_eq!(w.card(&key).sensitive_categories(), ["pd:HealthRecord"]);
-    assert_eq!(stored_marks(&w, &key), ["pd:HealthRecord"]);
-    s.begin_edit();
-    s.set_field("sensitive/pd:HealthRecord", "");
-    s.save();
-    assert!(w.card(&key).sensitive_categories().is_empty());
+    assert!(s.editing().is_some());
     assert!(
-        !w.card(&key).extra.contains_key(KEY),
-        "no empty list is left behind"
+        error_of(&s).contains("cannot be lifted yet"),
+        "{}",
+        error_of(&s)
     );
-    assert!(stored_marks(&w, &key).is_empty());
+    let card = w.card(&key);
+    assert_eq!(
+        card.sensitive_categories(),
+        ["pd:HealthRecord", "pd:Religion"]
+    );
+    assert_eq!(
+        card.display_name(),
+        "Amara",
+        "nothing of the edit was written"
+    );
+    assert_eq!(stored_marks(&w, &key), ["pd:HealthRecord", "pd:Religion"]);
 }
 
 #[test]
-fn a_category_can_be_renamed() {
+fn renaming_a_category_is_a_lifting_and_refused_too() {
     let w = World::in_memory();
     let mut card = person("Amara", "a@example.org");
     card.mark_sensitive(["pd:Religion"]);
@@ -114,32 +120,12 @@ fn a_category_can_be_renamed() {
     s.begin_edit();
     s.set_field("sensitive/pd:Religion", "pd:Belief");
     s.save();
-    assert_eq!(w.card(&key).sensitive_categories(), ["pd:Belief"]);
-}
-
-#[test]
-fn a_category_marked_on_a_part_is_not_lifted() {
-    let w = World::in_memory();
-    let card: Card = serde_json::from_value(json!({
-        "@type": "Card", "version": "1.0", "uid": "urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beaec",
-        "name": {"full": "Amara"}, KEY: ["pd:Religion"],
-        "emails": {"e1": {"address": "a@example.org", KEY: ["pd:Religion"]}}
-    }))
-    .unwrap();
-    let key = w.add(card);
-    let mut s = w.state();
-    s.select(&key);
-    s.begin_edit();
-    s.set_field("sensitive/pd:Religion", "");
-    s.save();
-    assert!(s.editing().is_some());
     assert!(
-        error_of(&s).contains("The category pd:Religion is also marked on a part of the card"),
+        error_of(&s).contains("cannot be lifted yet"),
         "{}",
         error_of(&s)
     );
     assert_eq!(w.card(&key).sensitive_categories(), ["pd:Religion"]);
-    assert!(w.card(&key).extra.contains_key(KEY), "nothing was changed");
 }
 
 #[test]

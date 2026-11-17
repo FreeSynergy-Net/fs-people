@@ -30,7 +30,7 @@ const NAME_ONLY: [&str; 3] = ["sortAs", "phoneticScript", "phoneticSystem"];
 ///
 /// # Errors
 /// [`SourceError`] for a field this form does not know (nothing may be dropped silently), for a
-/// birthday that is no day, for a category that has spaces or one that cannot be lifted, for a name
+/// birthday that is no day, for a category that has spaces or one that is lifted (not possible yet), for a name
 /// that holds more than the form shows when it is emptied, and for a card that would be left with
 /// nothing to call the person by. The rule is the same for a new card and a stored one.
 pub fn apply_draft(card: &mut Card, draft: &PersonDraft) -> Result<(), SourceError> {
@@ -48,7 +48,9 @@ pub fn apply_draft(card: &mut Card, draft: &PersonDraft) -> Result<(), SourceErr
             if !value.is_empty() && birthday::parse(value).is_none() {
                 return Err(SourceError::failed(say::birthday()));
             }
-            birthday::set(card, value);
+            if !birthday::set(card, value) {
+                return Err(SourceError::failed(say::birthday_place()));
+            }
             continue;
         }
         let Some((group, id)) = field.key.split_once('/') else {
@@ -75,15 +77,11 @@ pub fn apply_draft(card: &mut Card, draft: &PersonDraft) -> Result<(), SourceErr
     for (kind, id) in removals {
         kind.remove(card, id);
     }
-    if !categories.is_empty() {
-        categories.apply(card);
+    if !categories.lifted.is_empty() {
+        return Err(SourceError::failed(say::category_lift()));
     }
-    marks.restore_except(card, &categories.lifted);
-    if let Some(cat) = categories.still_marked(card) {
-        return Err(SourceError::failed(crate::words_edit::category_nested(
-            &cat,
-        )));
-    }
+    categories.apply(card);
+    marks.restore(card);
     if has_something_to_call_it(card) {
         Ok(())
     } else {

@@ -71,14 +71,12 @@ impl Marks {
         }
     }
 
-    /// Put back at card level whatever `card` has lost since, except the categories the person lifted
-    /// on purpose (named in `lifted`): an edit by accident never reduces the marking, a lifting does.
-    pub(super) fn restore_except(&self, card: &mut Card, lifted: &[String]) {
+    /// Put back at card level whatever `card` has lost since.
+    pub(super) fn restore(&self, card: &mut Card) {
         let present: BTreeSet<String> = card.sensitive_categories().into_iter().collect();
         let gone: Vec<Value> = self
             .categories
             .difference(&present)
-            .filter(|c| !lifted.contains(c))
             .cloned()
             .map(Value::String)
             .collect();

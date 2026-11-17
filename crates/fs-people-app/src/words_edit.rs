@@ -10,11 +10,14 @@ use crate::words::{say, t};
 pub(crate) fn birthday() -> String {
     t("e-birthday")
 }
+pub(crate) fn birthday_place() -> String {
+    t("e-birthday-place")
+}
 pub(crate) fn category() -> String {
     t("e-category")
 }
-pub(crate) fn category_nested(cat: &str) -> String {
-    say("e-category-nested", &Args::new().text("cat", cat))
+pub(crate) fn category_lift() -> String {
+    t("e-category-lift")
 }
 pub(crate) fn role_ai() -> String {
     t("e-role-ai")

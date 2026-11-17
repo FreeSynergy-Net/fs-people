@@ -4,8 +4,8 @@
 //! Pattern: Integration tests over the real core and the real state machine; the oracle is a card
 //! written as JSON by hand (JSContact, RFC 9553). Mutants: (1) `birthday::parse` accepting 30
 //! February (`a_birthday_is_a_real_day`); (2) `birthday::set` replacing a timestamp birth instead of
-//! adding beside it (`a_timestamp_birth_stays`); (3) `set` removing a birth that has a place
-//! (`a_birth_with_a_place_keeps_it_when_the_date_goes`).
+//! adding beside it (`a_timestamp_birth_stays`); (3) `set` removing a birth that has a place (the place is lost)
+//! (`a_birth_with_a_place_keeps_its_date_and_says_why`).
 
 mod common;
 
@@ -118,7 +118,7 @@ fn a_timestamp_birth_stays() {
 }
 
 #[test]
-fn a_birth_with_a_place_keeps_it_when_the_date_goes() {
+fn a_birth_with_a_place_keeps_its_date_and_says_why() {
     let w = World::in_memory();
     let card: Card = serde_json::from_value(json!({
         "@type": "Card", "version": "1.0", "uid": "urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beaeb",
@@ -128,8 +128,13 @@ fn a_birth_with_a_place_keeps_it_when_the_date_goes() {
     let (key, mut s) = edit(&w, card);
     s.set_field("birthday/day", "");
     s.save();
-    saved(&s);
+    assert!(s.editing().is_some());
+    assert!(
+        error_of(&s).contains("cannot hold a birth without a date"),
+        "{}",
+        error_of(&s)
+    );
     let b = &w.card(&key).to_value()["anniversaries"]["b1"];
     assert_eq!(b["place"]["full"], "Lyon");
-    assert!(b.get("date").is_none());
+    assert_eq!(b["date"]["year"], 1980);
 }

@@ -1,10 +1,12 @@
-//! Setting and lifting the sensitive marking at card level from the form.
+//! Setting the sensitive marking at card level from the form; lifting it is refused.
 //!
 //! Pattern: Command over the card-level list `freesynergy.net:sensitive` (ADR 0029). A category is
-//! added or lifted only by the person typing it; a marking on a part of the card (an e-mail, a name
-//! part) is not listed here and is never lifted by this form. Lifting a category that is also marked
-//! on such a part is refused and nothing is changed. The mark is local to this program: the contract
-//! `person_directory` carries no sensitive state yet (it is connected with v2).
+//! added by the person typing it. Lifting (emptying or renaming a listed category) is refused with a
+//! sentence and nothing is changed: the core never takes a marking away on an update
+//! (`Card::keep_marks_of`), and who may lift one and how that is logged is an open decision, not
+//! something the form decides. A marking on a part of the card (an e-mail, a name part) is not listed
+//! here. The mark is local to this program: the contract `person_directory` carries no sensitive
+//! state yet (it is connected with v2).
 
 use fs_components_workbenches::people::{DraftField, DraftGroup};
 use fs_people_core::Card;
@@ -45,7 +47,7 @@ pub(super) fn blank_group() -> DraftGroup {
     DraftGroup::new(GROUP, field::sensitive_group(), true, Vec::new())
 }
 
-/// What the form changed: categories to lift and to set.
+/// What the form changed: categories asked to lift (refused) and to set.
 #[derive(Default)]
 pub(super) struct Changes {
     pub lifted: Vec<String>,
@@ -71,41 +73,20 @@ impl Changes {
         Ok(())
     }
 
-    pub(super) fn is_empty(&self) -> bool {
-        self.lifted.is_empty() && self.set.is_empty()
-    }
-
-    /// Put the changes on the card level list. A category that was lifted and set again stays.
+    /// Put the new categories on the card level list; the ones that are there stay.
     pub(super) fn apply(&self, card: &mut Card) {
         let mut items: Vec<Value> = match card.extra.get(SENSITIVE_KEY) {
             Some(Value::Array(list)) => list.clone(),
             Some(other) => vec![other.clone()],
             None => Vec::new(),
         };
-        items.retain(|v| {
-            v.as_str().is_none_or(|c| {
-                !self.lifted.iter().any(|l| l == c) || self.set.iter().any(|s| s == c)
-            })
-        });
         for category in &self.set {
             if !items.iter().any(|v| v.as_str() == Some(category)) {
                 items.push(Value::String(category.clone()));
             }
         }
-        if items.is_empty() {
-            card.extra.remove(SENSITIVE_KEY);
-        } else {
+        if !items.is_empty() {
             card.extra.insert(SENSITIVE_KEY.into(), Value::Array(items));
         }
-    }
-
-    /// A lifted category that the card still carries somewhere else.
-    pub(super) fn still_marked(&self, card: &Card) -> Option<String> {
-        let now = card.sensitive_categories();
-        self.lifted
-            .iter()
-            .filter(|c| !self.set.contains(c))
-            .find(|c| now.contains(c))
-            .cloned()
     }
 }

@@ -63,29 +63,27 @@ pub(super) fn parse(text: &str) -> Option<(Option<u32>, u32, u32)> {
 }
 
 /// Put `text` (already checked with [`parse`]) on the card as its birthday; an empty text removes it.
-pub(super) fn set(card: &mut Card, text: &str) {
+/// `false`: nothing was done, the birth holds more than the date.
+pub(super) fn set(card: &mut Card, text: &str) -> bool {
     let found = card
         .anniversaries
         .iter()
         .find(|(_, a)| shown(a).is_some())
         .map(|(id, _)| id.clone());
     if text.is_empty() {
-        let Some(id) = found else { return };
+        let Some(id) = found else { return true };
         let keeps_more = card
             .anniversaries
             .get(&id)
             .is_some_and(|a| a.place.is_some() || !a.extra.is_empty());
         if keeps_more {
-            if let Some(a) = card.anniversaries.get_mut(&id) {
-                a.date = None;
-            }
-        } else {
-            card.anniversaries.remove(&id);
+            return false;
         }
-        return;
+        card.anniversaries.remove(&id);
+        return true;
     }
     let Some((year, month, day)) = parse(text) else {
-        return;
+        return true;
     };
     let date = AnniversaryDate {
         type_: Some("PartialDate".into()),
@@ -113,4 +111,5 @@ pub(super) fn set(card: &mut Card, text: &str) {
             card.anniversaries.insert(id, item);
         }
     }
+    true
 }
