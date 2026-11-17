@@ -10,6 +10,7 @@
 use std::path::Path;
 use std::sync::{Arc, PoisonError};
 use std::thread;
+use std::time::Duration;
 
 use async_trait::async_trait;
 use fs_interfaces::Capabilities;
@@ -26,6 +27,21 @@ use super::worker::worker;
 pub struct RemotePeople {
     calls: mpsc::UnboundedSender<Call>,
     revisions: Revisions,
+    call_limit: Duration,
+}
+
+/// How long the start and one call may take (the same 10 s as `RestartTimes` of `fs-rpc`). A server
+/// that never answers ends in the message `timeout`, never in a window that waits for ever.
+pub const START_LIMIT: Duration = Duration::from_secs(10);
+/// See [`START_LIMIT`].
+pub const CALL_LIMIT: Duration = Duration::from_secs(10);
+
+/// The problem of a limit that ran out: words with the code `timeout` and `limit-ms`.
+fn timed_out(limit: Duration) -> Error {
+    Error::Stored(format!(
+        "timeout: the people server did not answer (limit-ms {})",
+        limit.as_millis()
+    ))
 }
 
 impl RemotePeople {
@@ -34,8 +50,22 @@ impl RemotePeople {
     /// # Errors
     /// The text for the person when nothing answers on the socket.
     pub fn connect(socket: &Path) -> std::result::Result<Self, String> {
+        Self::connect_within(socket, START_LIMIT, CALL_LIMIT)
+    }
+
+    /// Like [`connect`](Self::connect) with the limits of the start and of each call given.
+    ///
+    /// # Errors
+    /// The text for the person when nothing answers on the socket within `start`; it says `timeout`
+    /// and `limit-ms`.
+    pub fn connect_within(
+        socket: &Path,
+        start: Duration,
+        call: Duration,
+    ) -> std::result::Result<Self, String> {
         let (calls, inbox) = mpsc::unbounded_channel();
         let (ready, started) = std::sync::mpsc::channel();
+        let shown = socket_name(socket);
         let socket = socket.to_path_buf();
         let revisions = Revisions::default();
         let shared = Arc::clone(&revisions);
@@ -43,15 +73,36 @@ impl RemotePeople {
             .name("people-rpc".into())
             .spawn(move || worker(&socket, inbox, &ready, &shared))
             .map_err(|e| e.to_string())?;
-        started.recv().map_err(|e| e.to_string())??;
-        Ok(Self { calls, revisions })
+        match started.recv_timeout(start) {
+            Ok(done) => done?,
+            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+                return Err(format!(
+                    "timeout: no answer from {} (limit-ms {})",
+                    shown,
+                    start.as_millis()
+                ));
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+        Ok(Self {
+            calls,
+            revisions,
+            call_limit: call,
+        })
     }
 
     async fn ask<T>(&self, make: impl FnOnce(Reply<T>) -> Call) -> Result<T> {
         let (reply, answer) = oneshot::channel();
         self.calls.send(make(reply)).map_err(|_| gone())?;
-        answer.await.map_err(|_| gone())?
+        match tokio::time::timeout(self.call_limit, answer).await {
+            Ok(got) => got.map_err(|_| gone())?,
+            Err(_) => Err(timed_out(self.call_limit)),
+        }
     }
+}
+
+fn socket_name(socket: &Path) -> String {
+    socket.display().to_string()
 }
 
 fn gone() -> Error {

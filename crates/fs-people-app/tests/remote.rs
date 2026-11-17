@@ -177,3 +177,26 @@ fn the_roles_of_a_person_are_read_over_the_socket_with_their_names() {
         .collect();
     assert_eq!(roles, ["User"], "{sheet:?}");
 }
+
+#[test]
+fn a_call_that_cannot_be_answered_in_its_limit_ends_with_timeout() {
+    let dir = tempfile::tempdir().unwrap();
+    let socket = dir.path().join("people.sock");
+    start_server(&socket);
+    let runtime = tokio::runtime::Runtime::new().unwrap();
+    // No answer comes back within a microsecond: the limit must end the wait.
+    let remote = Arc::new(
+        RemotePeople::connect_within(
+            &socket,
+            std::time::Duration::from_secs(10),
+            std::time::Duration::from_micros(1),
+        )
+        .unwrap(),
+    );
+    let adapter = PeopleAdapter::new(remote.clone(), Arc::new(NoRoles), runtime.handle().clone());
+    let began = std::time::Instant::now();
+    let refused = adapter.rows("", 0, 10).unwrap_err();
+    assert!(refused.message.contains("timeout"), "{refused:?}");
+    assert!(refused.message.contains("limit-ms"), "{refused:?}");
+    assert!(began.elapsed() < std::time::Duration::from_secs(5));
+}

@@ -26,7 +26,7 @@ Latest tag: `v0.0.14`.
 ## What is not there yet
 
 - The window is a first version. It cannot yet manage groups, relations or roles, set the sensitive mark, undo, or update live. A closed window loses an unsaved draft.
-- The window talks to the server of `fs-people serve` (it starts one if none runs), but it has no time limit yet: a server that never answers freezes it (planned for 0.0.15).
+- The window talks to the server of `fs-people serve` (it starts one if none runs), and each call has a 10 s limit: a server that never answers ends in the message `timeout`. The window still waits for that long (a work thread is planned).
 - No sign-in. The acting person is a fixed placeholder.
 - No CardDAV and no sync between devices.
 - A "same person" proposal that was turned down is not offered again, also after a restart (tested over the socket); the window has no screen for these proposals yet.
