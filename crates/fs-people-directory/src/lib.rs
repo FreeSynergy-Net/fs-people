@@ -17,6 +17,9 @@ pub mod doubles;
 pub mod fake;
 pub mod retention;
 
+// Probe `person_directory_v2` (ohne Sperre): Entwurfsort, nichts davon ist ein Vertrag, bis ein Fixpunkt gesetzt ist.
+pub mod draft;
+
 pub use composite::CompositeDirectory;
 pub use doubles::{FailingDirectory, Gate, SlowDirectory};
 #[doc(hidden)]
