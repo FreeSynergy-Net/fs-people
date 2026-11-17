@@ -86,7 +86,11 @@ impl From<TypeProblem> for Error {
 
 /// Eine Objekt-Id als 32 Hexzeichen (stabil, kein Debug-Text).
 fn hex(id: &ObjectId) -> String {
-    id.0.iter().map(|b| format!("{b:02x}")).collect()
+    use fmt::Write as _;
+    id.0.iter().fold(String::new(), |mut s, b| {
+        let _ = write!(s, "{b:02x}");
+        s
+    })
 }
 
 impl Error {

@@ -9,8 +9,7 @@
 use super::{
     Candidate, Capabilities, Consent, ConsentEntry, ConsentQuery, ContactAddress, DirectoryChange,
     Error, Excerpt, ExcerptRequest, ObjectId, Page, PersonRef, PersonView, Place, ProposeEntry,
-    Purpose, PurposeDef, PurposeDraft, Reference, Resolved, Result, Revision, Suggest, When,
-    Withdrawal,
+    Reference, Resolved, Result, Suggest, When, Withdrawal,
 };
 use async_trait::async_trait;
 use fs_types::Zone;

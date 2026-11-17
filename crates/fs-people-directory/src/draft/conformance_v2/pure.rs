@@ -114,8 +114,18 @@ fn k24_the_year_is_taken_in_the_stored_zone() {
     assert_eq!(year(Some(&zone("UTC"))), Some(date("2029-12-31")));
     assert_eq!(
         year(Some(&zone("Nowhere/Land"))),
+        year(None),
+        "unknown stored zone: `after` itself falls back to the instance zone (V5)"
+    );
+    assert_eq!(
+        n(3).after(
+            &at,
+            Some(&zone("Nowhere/Land")),
+            &zone("Nowhere/Also"),
+            &Fixed
+        ),
         None,
-        "unknown zone: the provider falls back to the instance zone"
+        "only an unknown instance zone gives None"
     );
 }
 
