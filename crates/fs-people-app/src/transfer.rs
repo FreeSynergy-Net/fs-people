@@ -10,7 +10,9 @@ use fs_people_core::{ListFilter, People, VCardFormat};
 use tokio::runtime::Handle;
 
 use crate::source::{is_marked, reason_text};
+use crate::words::say;
 use fs_components_app::{write_new_file, write_new_private_file};
+use fs_components_words::Args;
 
 /// Asked of the core at a time while exporting.
 const EXPORT_PAGE: usize = 500;
@@ -49,26 +51,42 @@ impl ImportSummary {
         self.failed.is_empty() && self.stopped.is_none()
     }
 
-    /// In words, for the status line.
+    /// In words, for the status line (the language of the session).
     pub fn message(&self) -> String {
-        let mut text = format!("Imported {}, {} already known", self.created, self.skipped);
+        let mut text = say(
+            "import-done",
+            &Args::new()
+                .text("created", self.created.to_string())
+                .text("skipped", self.skipped.to_string()),
+        );
         if !self.failed.is_empty() {
             let _ = write!(
                 text,
-                ", {} failed: {}",
-                self.failed.len(),
-                self.failed.join("; ")
+                ", {}",
+                say(
+                    "import-failed",
+                    &Args::new()
+                        .text("n", self.failed.len().to_string())
+                        .text("list", self.failed.join("; "))
+                )
             );
         }
         if !self.unclear.is_empty() {
             let _ = write!(
                 text,
-                ". Sensitive without a category, kept as sensitive: {}",
-                self.unclear.join("; ")
+                ". {}",
+                say(
+                    "import-unclear",
+                    &Args::new().text("list", self.unclear.join("; "))
+                )
             );
         }
         if let Some(why) = &self.stopped {
-            let _ = write!(text, ". The import stopped: {why}");
+            let _ = write!(
+                text,
+                ". {}",
+                say("import-stopped", &Args::new().text("why", why.as_str()))
+            );
         }
         text
     }
@@ -113,21 +131,30 @@ pub struct ExportReport {
 }
 
 impl ExportReport {
-    /// In words.
+    /// In words (the language of the session).
     pub fn message(&self, path: &Path) -> String {
-        let mut text = format!("Wrote {} to {}", self.written, path.display());
+        let list = |items: &[String]| Args::new().text("list", items.join(", "));
+        let mut text = say(
+            "export-wrote",
+            &Args::new()
+                .text("n", self.written.to_string())
+                .text("path", path.display().to_string()),
+        );
         if !self.released.is_empty() {
-            let _ = write!(text, ". Released by you: {}", self.released.join(", "));
+            let _ = write!(text, ". {}", say("export-released", &list(&self.released)));
         }
         if !self.left_out.is_empty() {
-            let _ = write!(
-                text,
-                ". Left out as sensitive (name one with --export-sensitive <uid>): {}",
-                self.left_out.join(", ")
-            );
+            let _ = write!(text, ". {}", say("export-left-out", &list(&self.left_out)));
         }
         if !self.failed.is_empty() {
-            let _ = write!(text, ". Failed: {}", self.failed.join("; "));
+            let _ = write!(
+                text,
+                ". {}",
+                say(
+                    "export-failed",
+                    &Args::new().text("list", self.failed.join("; "))
+                )
+            );
         }
         text
     }

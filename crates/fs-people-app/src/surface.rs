@@ -6,10 +6,8 @@
 
 use std::sync::Arc;
 
-use fs_components::blinc::layout::div::div;
-use fs_components_app::{AppError, AppWidget, Element, Screen, Surface};
-use fs_components_widgets::states::EmptyState;
-use fs_components_widgets::{Glyph, styles};
+use fs_components::blinc::core::BlincContextState;
+use fs_components_app::{AppError, AppWidget, Element, Menu, MenuEntry, Screen, Surface};
 use fs_components_workbenches::people::{PeopleSource, PeopleWidget};
 
 use crate::words::{labels, t, title};
@@ -23,30 +21,18 @@ impl Surface for PeopleScreen {
     }
 
     fn styles(&self) -> String {
-        self.0.styles()
+        [self.0.styles(), MORE_AIR.to_owned()].concat()
     }
 }
 
-/// "Groups": People keeps no groups, FreeSynergy Groups does; the page says so with a symbol.
-struct GroupsPage;
-
-impl Surface for GroupsPage {
-    fn build(&self, width: f32, height: f32) -> Box<dyn Element> {
-        let empty = EmptyState::new(&t("groups-title"))
-            .id("groups")
-            .glyph(Glyph::Person)
-            .text(&t("groups-text"));
-        Box::new(div().w(width).h(height).child(empty.build()))
-    }
-
-    fn styles(&self) -> String {
-        styles()
-    }
-}
-
-/// The symbol in front of a name in the navigation (characters every font has; the screen list takes text only).
-const ALL_SYMBOL: &str = "\u{263A}";
-const GROUPS_SYMBOL: &str = "\u{263B}";
+/// The style sheet: the workbench's, with more air and larger type than its defaults (theme variables only).
+const MORE_AIR: &str = r"
+.fs-people-page { padding: var(--space-6); gap: var(--space-5); }
+.fs-people-title-text { font-size: var(--text-3xl); }
+.fs-people-section-title { font-size: var(--text-base); }
+.fs-people-label { width: 140px; }
+.fs-people-field { gap: var(--space-4); font-size: var(--text-lg); }
+";
 
 /// The shell around the workbench over `source`.
 ///
@@ -54,17 +40,50 @@ const GROUPS_SYMBOL: &str = "\u{263B}";
 /// [`AppError`] if the shell cannot be made.
 pub fn app_widget(source: Arc<dyn PeopleSource>) -> Result<AppWidget, AppError> {
     let widget = PeopleWidget::new(source, labels());
-    let screens = vec![
-        Screen::new(
-            "all",
-            format!("{ALL_SYMBOL}  {}", t("nav-all")),
-            Arc::new(PeopleScreen(widget)),
-        ),
-        Screen::new(
-            "groups",
-            format!("{GROUPS_SYMBOL}  {}", t("nav-groups")),
-            Arc::new(GroupsPage),
-        ),
-    ];
-    AppWidget::new(title(), screens)
+    // One screen: the shell draws no navigation, so there are two areas, the list and the detail. Groups are not kept here
+    // (FreeSynergy Groups keeps them): the menu says so instead of a page of its own.
+    let screens = vec![Screen::new(
+        "all",
+        t("nav-all"),
+        Arc::new(PeopleScreen(widget.clone())),
+    )];
+    let app = AppWidget::new(title(), screens)?;
+    app.set_menus(menus(), handler(&widget))?;
+    Ok(app)
+}
+
+/// The menu "Contacts": what the workbench can do now, and what waits for a later run (locked, with the reason).
+fn menus() -> Vec<Menu> {
+    let later = t("menu-later");
+    vec![Menu::new(
+        t("menu-contacts"),
+        vec![
+            MenuEntry::new("new", t("create")),
+            MenuEntry::new("edit", t("edit")),
+            MenuEntry::new("delete", t("delete")),
+            MenuEntry::separator(),
+            MenuEntry::new("groups", t("menu-groups")).disabled_because(t("groups-text")),
+            MenuEntry::new("import", t("menu-import")).disabled_because(later.clone()),
+            MenuEntry::new("export", t("menu-export")).disabled_because(later),
+        ],
+    )]
+}
+
+/// A chosen menu line acts on the workbench exactly as its button does (the state decides what is possible),
+/// then the window is drawn again.
+fn handler(widget: &PeopleWidget) -> impl Fn(&str) + Send + Sync + use<> {
+    let widget = widget.clone();
+    move |id| {
+        widget.with_state(|state| match id {
+            "new" => {
+                let _ = state.begin_create();
+            }
+            "edit" => state.begin_edit(),
+            "delete" => state.ask_delete(),
+            _ => {}
+        });
+        if BlincContextState::is_initialized() {
+            BlincContextState::get().request_rebuild();
+        }
+    }
 }

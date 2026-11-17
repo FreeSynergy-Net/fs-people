@@ -53,7 +53,7 @@ pub(crate) fn tpl(id: &str) -> String {
     say(id, &Args::new().text("v", "{}"))
 }
 
-fn say(id: &str, args: &Args) -> String {
+pub(crate) fn say(id: &str, args: &Args) -> String {
     session().say(&id.into(), args).text().to_owned()
 }
 
@@ -84,7 +84,7 @@ pub fn labels_with(texts: &Mf2Texts) -> PeopleLabels {
     };
     let mut l = PeopleLabels::default();
     l.search = t("search");
-    l.columns = vec![t("col-name"), t("col-email")];
+    l.columns = vec![t("col-name")];
     l.more = t("more");
     l.create = t("create");
     l.edit = t("edit");
@@ -282,6 +282,26 @@ mod tests {
             de.add_field.contains("{}") && de.delete_confirm.contains("{}"),
             "the value stays a place"
         );
+    }
+
+    #[test]
+    fn the_german_file_holds_no_english_sentence() {
+        // Words that are English and not German; names and options (FreeSynergy, --export-sensitive, vCard) are not in the list.
+        let english = [
+            " the ", " and ", " not ", " with ", " your ", " you ", " is ", " are ", " this ",
+            "Save", "Cancel", "Delete", "Edit", "New ", "Search", "Nobody", "Nothing", "Failed",
+            "Imported", "Released", "Wrote", "Contact ",
+        ];
+        for line in TEXTS[1]
+            .text
+            .lines()
+            .filter(|l| !l.starts_with('#') && l.contains('='))
+        {
+            let value = line.split_once('=').map_or("", |(_, v)| v);
+            for word in english {
+                assert!(!value.contains(word), "{line}: English word {word:?}");
+            }
+        }
     }
 
     #[test]
