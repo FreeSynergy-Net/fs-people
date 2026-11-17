@@ -7,6 +7,7 @@ mod about;
 mod build;
 mod display;
 mod legacy;
+mod marked;
 mod marks;
 mod model;
 mod parts;
@@ -17,6 +18,7 @@ mod types;
 mod vendor;
 
 pub use about::{Anniversary, AnniversaryDate, Author, Note, PersonalInfo};
+pub use marked::{Marks, is_marked};
 pub use model::Card;
 pub use parts::{
     Address, AddressComponent, EmailAddress, LanguagePref, Name, NameComponent, Nickname,

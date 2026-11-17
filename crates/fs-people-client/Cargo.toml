@@ -1,0 +1,16 @@
+[package]
+name = "fs-people-client"
+description = "Client of the FreeSynergy people contract: People and RoleBook over the socket of the people server (sorted out of fs-people-app)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+fs-people-core = { path = "../fs-people-core" }
+fs-objects = { git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.1" }
+fs-interfaces = { git = "https://github.com/FreeSynergy/fs-interfaces", tag = "v0.0.22", features = ["rpc"] }
+capnp = "0.27"
+async-trait = "0.1"
+tokio = { version = "1", features = ["rt-multi-thread", "sync"] }

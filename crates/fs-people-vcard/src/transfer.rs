@@ -1,4 +1,5 @@
 //! vCard files in and out, by a path from the command line.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/transfer.rs
 //!
 //! Pattern: Template method over the contract — fixed flow: read, import or export per person,
 //! report. Nothing is hidden: what failed or was left out is in the report.
@@ -6,10 +7,11 @@
 use std::fmt::Write as _;
 use std::path::Path;
 
+use fs_people_core::card::is_marked;
 use fs_people_core::{ListFilter, People, VCardFormat};
+use fs_people_view::reason_text;
 use tokio::runtime::Handle;
 
-use crate::source::{is_marked, reason_text};
 use fs_components_app::{write_new_file, write_new_private_file};
 
 /// Asked of the core at a time while exporting.

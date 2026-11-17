@@ -1,4 +1,5 @@
 //! A form written back onto a card.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/apply.rs
 //!
 //! Pattern: Command — only the fields that differ from what the form started with are applied, each
 //! to the entry its key names. Everything else on the card stays untouched: unknown properties,
@@ -13,10 +14,9 @@
 use fs_components_workbenches::SourceError;
 use fs_components_workbenches::people::{DraftField, PersonDraft};
 use fs_people_core::Card;
-use fs_people_core::card::{Name, SENSITIVE_KEY};
+use fs_people_core::card::{Marks, Name, SENSITIVE_KEY};
 
-use super::draft::{EMAILS, NAME, ORGANISATIONS, PHONES};
-use super::marks::Marks;
+use crate::draft::{EMAILS, NAME, ORGANISATIONS, PHONES};
 
 /// What a name may lose together with its text: it only describes that text.
 const NAME_ONLY: [&str; 3] = ["sortAs", "phoneticScript", "phoneticSystem"];

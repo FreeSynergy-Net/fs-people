@@ -16,32 +16,6 @@ pub fn labels() -> PeopleLabels {
     labels
 }
 
-/// Headings and labels of what is shown about a person.
-pub(crate) mod field {
-    pub const AI: &str = "AI";
-    pub const SENSITIVE: &str = "Sensitive: {}";
-    pub const SENSITIVE_ROW: &str = "Sensitive";
-    pub const UNCLEAR: &str = "categories unclear";
-    pub const CONTACT: &str = "Contact";
-    pub const WORK: &str = "Organisation";
-    pub const PLACES: &str = "Addresses";
-    pub const ABOUT: &str = "About";
-    pub const ROLES: &str = "Roles";
-    pub const KEPT: &str = "Kept on the card";
-    pub const NAME: &str = "Name";
-    pub const EMAIL: &str = "E-mail";
-    pub const PHONE: &str = "Phone";
-    pub const ORGANISATION: &str = "Organisation";
-    pub const JOB: &str = "Title";
-    pub const ADDRESS: &str = "Address";
-    pub const NICKNAME: &str = "Nickname";
-    pub const LINK: &str = "Link";
-    pub const NOTE: &str = "Note";
-    pub const KIND: &str = "Kind";
-    pub const ROLE: &str = "Role";
-    pub const OTHER: &str = "Not shown here";
-    pub const UNREADABLE: &str = "could not be read: {}";
-}
 
 /// What is wrong with a typed contact value, as a sentence (one per code, ADR 0057).
 pub(crate) fn problem(problem: fs_people_core::values::ValueProblem) -> &'static str {

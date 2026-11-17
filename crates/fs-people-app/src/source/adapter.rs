@@ -20,12 +20,10 @@ use fs_people_core::values::{ContactValue, EmailAddress, PhoneNumber};
 use fs_people_core::{Card, Error, ListFilter, People, Revision, RoleBook, card_of};
 use tokio::runtime::Handle;
 
-use crate::words::field;
-
-use super::apply::apply_draft;
-use super::draft::{blank_draft, draft_of};
-use super::marks::is_marked;
-use super::sheet::{first_email, sensitive_mark, sheet_of};
+use fs_people_core::card::is_marked;
+use fs_people_view::{
+    apply_draft, blank_draft, draft_of, field, first_email, reason, sensitive_mark, sheet_of,
+};
 
 /// The contract of the people program, for the workbench. Do not call it from inside the runtime:
 /// it blocks the calling thread until the core has answered.
@@ -57,26 +55,6 @@ impl PeopleAdapter {
 fn id_of(key: &str) -> Result<ObjectId, SourceError> {
     key.parse()
         .map_err(|_| SourceError::not_found(format!("\"{key}\" names nobody.")))
-}
-
-/// What the core said, in the workbench's terms. A store refusing a sensitive card is said plainly.
-fn reason(error: &Error) -> SourceError {
-    match error {
-        Error::Store(fs_objects::Error::EncryptionRequired(_)) => SourceError::failed(format!(
-            "this card is marked sensitive and this store is not encrypted, so it was refused ({error})"
-        )),
-        Error::Changed(_) => {
-            SourceError::conflict("Someone else changed this person since you started.")
-        }
-        Error::NotFound(_) | Error::ListNotFound(_) => SourceError::not_found(error.to_string()),
-        Error::Unsupported(_) => SourceError::unsupported(error.to_string()),
-        _ => SourceError::failed(error.to_string()),
-    }
-}
-
-/// The same reason as plain text.
-pub(crate) fn reason_text(error: &Error) -> String {
-    reason(error).message
 }
 
 /// `updated` alone could repeat within the store's clock tick.

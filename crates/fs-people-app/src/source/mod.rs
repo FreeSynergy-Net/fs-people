@@ -1,17 +1,12 @@
 //! From the program's contract to the workbench's source.
 //!
-//! Pattern: Adapter — `adapter.rs` drives the async contract from the interface thread, `sheet.rs`
-//! shows a card, `draft.rs` makes a form of a card, `apply.rs` writes a form back onto a card.
+//! Pattern: Adapter — `adapter.rs` drives the async contract from the interface thread. What was
+//! here besides is sorted out (not compiled): the card as form, sheet and the write-back are in
+//! `fs-people-view`, the sensitive marking in `fs-people-core`, the socket client in
+//! `fs-people-client` (see `sortierung/people.md`).
 
 mod adapter;
-mod apply;
-mod draft;
-mod marks;
-mod remote;
-mod sheet;
 
 pub use adapter::PeopleAdapter;
-pub(crate) use adapter::reason_text;
-pub use apply::apply_draft;
-pub(crate) use marks::is_marked;
-pub use remote::{NoRoles, RemotePeople};
+pub use fs_people_client::{NoRoles, RemotePeople};
+pub use fs_people_view::apply_draft;

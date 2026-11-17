@@ -1,4 +1,5 @@
 //! The calls the proxy hands to the worker thread.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/remote/call.rs
 //!
 //! Pattern: Command — an enum of the operations, each with the channel for its answer.
 

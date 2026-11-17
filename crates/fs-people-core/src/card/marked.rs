@@ -1,4 +1,5 @@
 //! The sensitive marking of a card, which an edit never reduces, and how to tell it is there.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/marks.rs
 //!
 //! Pattern: Memento + Visitor — every marking on the card is found by walking its properties, the
 //! same way the core does on `people-core-fixes` (main's core only knows the categories; replace
@@ -9,12 +10,12 @@
 use std::collections::BTreeSet;
 
 use fs_objects::StoredObject;
-use fs_people_core::Card;
-use fs_people_core::card::SENSITIVE_KEY;
+use super::model::Card;
+use super::types::SENSITIVE_KEY;
 use serde_json::Value;
 
 /// Is this stored person marked sensitive in any form?
-pub(crate) fn is_marked(object: &StoredObject) -> bool {
+pub fn is_marked(object: &StoredObject) -> bool {
     !object.envelope.sensitive.is_empty() || !markings(&object.content).is_empty()
 }
 
@@ -51,7 +52,7 @@ fn names_categories(marking: &Value) -> bool {
 }
 
 /// What a card is marked with now.
-pub(super) struct Marks {
+pub struct Marks {
     categories: BTreeSet<String>,
     unclear: Vec<Value>,
 }
@@ -64,7 +65,8 @@ fn unclear_of(card: &Card) -> Vec<Value> {
 }
 
 impl Marks {
-    pub(super) fn of(card: &Card) -> Self {
+    /// What `card` is marked with now.
+    pub fn of(card: &Card) -> Self {
         Self {
             categories: card.sensitive_categories().into_iter().collect(),
             unclear: unclear_of(card),
@@ -72,7 +74,7 @@ impl Marks {
     }
 
     /// Put back at card level whatever `card` has lost since.
-    pub(super) fn restore(&self, card: &mut Card) {
+    pub fn restore(&self, card: &mut Card) {
         let present: BTreeSet<String> = card.sensitive_categories().into_iter().collect();
         let gone: Vec<Value> = self
             .categories

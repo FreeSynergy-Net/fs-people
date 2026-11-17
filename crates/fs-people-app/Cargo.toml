@@ -9,6 +9,9 @@ repository.workspace = true
 
 [dependencies]
 fs-people-core = { path = "../fs-people-core" }
+fs-people-client = { path = "../fs-people-client" }
+fs-people-view = { path = "../fs-people-view" }
+fs-people-vcard = { path = "../fs-people-vcard" }
 fs-objects = { git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.1" }
 # provisional: becomes a tag once reviewed
 fs-components-app = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.23" }

@@ -1,4 +1,5 @@
 //! A role book that says nothing.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/remote/no_roles.rs
 //!
 //! Pattern: Null object — the contract answered with "not possible" (ADR 0045).
 

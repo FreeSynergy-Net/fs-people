@@ -1,4 +1,5 @@
 //! The worker thread: owns the connection, carries out the calls.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/remote/worker.rs
 //!
 //! Pattern: Command — each `Call` is carried out against the server's capabilities, one task each.
 

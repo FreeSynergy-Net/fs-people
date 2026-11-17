@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/fs-people-core", "crates/fs-people-server", "crates/fs-people-app", "crates/fs-people-cli", "crates/fs-people", "crates/fs-people-directory"]
+members = ["crates/fs-people-core", "crates/fs-people-server", "crates/fs-people-app", "crates/fs-people-client", "crates/fs-people-view", "crates/fs-people-vcard", "crates/fs-people-cli", "crates/fs-people", "crates/fs-people-directory"]
 
 [workspace.package]
 version = "0.0.14"

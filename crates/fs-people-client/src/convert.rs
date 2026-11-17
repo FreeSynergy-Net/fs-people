@@ -1,4 +1,5 @@
 //! Server problems and persons in the core's terms.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/remote/convert.rs
 //!
 //! Pattern: Adapter — wire values converted into the core's errors and stored objects.
 

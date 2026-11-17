@@ -1,4 +1,5 @@
 //! The role calls against the server.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/remote/roles.rs
 //!
 //! Pattern: Adapter — each role question as a request on the server's roles capability.
 

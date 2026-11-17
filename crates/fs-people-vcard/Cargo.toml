@@ -1,0 +1,17 @@
+[package]
+name = "fs-people-vcard"
+description = "Module vCard exchange of FreeSynergy people: import and export of vCard files by path (sorted out of fs-people-app)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+fs-people-core = { path = "../fs-people-core" }
+# provisional (OPEN, see sortierung/people.md): reason_text needs the workbench's SourceError
+fs-people-view = { path = "../fs-people-view" }
+# provisional (OPEN): only for write_new_file / write_new_private_file
+# provisional: becomes a tag once reviewed
+fs-components-app = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.23" }
+tokio = { version = "1", features = ["rt-multi-thread", "sync"] }

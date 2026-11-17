@@ -1,4 +1,5 @@
 //! A card as neutral sections of labelled fields, to be read.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/sheet.rs
 //!
 //! Pattern: Adapter — the JSContact card and its roles in the workbench's terms. Marks (an AI,
 //! sensitive data) stand out at the top (ADR 0029, 0054). What the card holds that is not shown is
@@ -9,11 +10,11 @@ use fs_objects::StoredObject;
 use fs_people_core::{Card, Error, RoleBook, is_ai_role};
 use tokio::runtime::Handle;
 
-use super::marks::is_marked;
-use crate::words::field;
+use fs_people_core::card::is_marked;
+use crate::field;
 
 /// The e-mail to show in a row: the preferred one, else the first.
-pub(super) fn first_email(card: &Card) -> String {
+pub fn first_email(card: &Card) -> String {
     card.emails
         .values()
         .min_by_key(|e| e.pref.unwrap_or(u32::MAX))
@@ -22,7 +23,7 @@ pub(super) fn first_email(card: &Card) -> String {
 }
 
 /// The sheet of `card`, stored as `object`.
-pub(super) fn sheet_of(
+pub fn sheet_of(
     card: &Card,
     object: &StoredObject,
     roles: &dyn RoleBook,
@@ -67,7 +68,7 @@ fn photo_of(card: &Card) -> Option<String> {
 }
 
 /// The marking of someone sensitive, with the categories; `None` for everyone else (ADR 0029).
-pub(super) fn sensitive_mark(card: &Card, object: &StoredObject) -> Option<String> {
+pub fn sensitive_mark(card: &Card, object: &StoredObject) -> Option<String> {
     is_marked(object).then(|| {
         let categories = card.sensitive_categories().join(", ");
         let categories = if categories.is_empty() {

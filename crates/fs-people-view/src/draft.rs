@@ -1,4 +1,5 @@
 //! A card as a form.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/draft.rs
 //!
 //! Pattern: Adapter — the fields the form edits (name, e-mails, phones, organisations) as neutral
 //! labelled fields. A field's key names what it belongs to on the card (`emails/e1`), so a save
@@ -7,20 +8,20 @@
 use fs_components_workbenches::people::{DraftField, DraftGroup, FieldCheck, PersonDraft};
 use fs_people_core::Card;
 
-use crate::words::field;
+use crate::field;
 
 /// The key of the name field.
-pub(super) const NAME: &str = "name/full";
+pub(crate) const NAME: &str = "name/full";
 /// The group of e-mail addresses.
-pub(super) const EMAILS: &str = "emails";
+pub(crate) const EMAILS: &str = "emails";
 /// The group of phone numbers.
-pub(super) const PHONES: &str = "phones";
+pub(crate) const PHONES: &str = "phones";
 /// The group of organisations.
-pub(super) const ORGANISATIONS: &str = "organizations";
+pub(crate) const ORGANISATIONS: &str = "organizations";
 
 /// The name as the form shows it: `name.full`, else the joined parts. Not the display name, which
 /// falls back on an e-mail address.
-pub(super) fn written_name(card: &Card) -> String {
+pub(crate) fn written_name(card: &Card) -> String {
     let Some(name) = &card.name else {
         return String::new();
     };
@@ -37,7 +38,7 @@ pub(super) fn written_name(card: &Card) -> String {
 }
 
 /// `card` as a form, marked with `revision`.
-pub(super) fn draft_of(card: &Card, revision: Option<String>) -> PersonDraft {
+pub fn draft_of(card: &Card, revision: Option<String>) -> PersonDraft {
     let entries = |group: &str, label: &str, values: Vec<(&String, String)>| {
         values
             .into_iter()
@@ -93,7 +94,7 @@ pub(super) fn draft_of(card: &Card, revision: Option<String>) -> PersonDraft {
 }
 
 /// The form for a new person: one empty field of each kind.
-pub(super) fn blank_draft() -> PersonDraft {
+pub fn blank_draft() -> PersonDraft {
     let added = |group: &str, label: &str| {
         let mut one = DraftField::new(format!("{group}/+0"), label, "");
         one.added = true;

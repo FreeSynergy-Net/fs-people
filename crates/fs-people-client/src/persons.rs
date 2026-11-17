@@ -1,4 +1,5 @@
 //! The person calls against the server.
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/remote/persons.rs
 //!
 //! Pattern: Adapter — each core operation as a request on the server's persons capability.
 

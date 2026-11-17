@@ -1,4 +1,5 @@
 //! `RemotePeople`: `People` over the Cap'n Proto socket of the people server (ADR 0063).
+//! Herkunft: fs-people@52438a65:crates/fs-people-app/src/source/remote/proxy.rs
 //!
 //! Pattern: Proxy — the same contract as the in-process core, answered by the server. A Cap'n Proto
 //! client lives on one thread, so a worker thread owns the connection and the proxy hands it calls
