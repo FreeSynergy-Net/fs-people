@@ -108,15 +108,18 @@ impl Drop for Scratch {
 /// The key of the field `added` by `add_field(group)`: the last field of that group.
 pub fn added_key(s: &mut PeopleState, group: &str) -> String {
     s.add_field(group);
-    s.editing()
+    let last = s
+        .editing()
         .unwrap()
         .draft
         .groups
         .iter()
         .find(|g| g.key == group)
-        .and_then(|g| g.fields.last())
-        .map(|f| f.key.clone())
-        .unwrap_or_else(|| panic!("no group {group} in the form"))
+        .and_then(|g| g.fields.last());
+    let Some(last) = last else {
+        panic!("no group {group} in the form");
+    };
+    last.key.clone()
 }
 
 /// What the form says went wrong, or empty.
