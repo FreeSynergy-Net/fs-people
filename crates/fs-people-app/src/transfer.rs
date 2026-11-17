@@ -24,11 +24,26 @@ pub struct ImportSummary {
     pub skipped: usize,
     /// What could not be imported, with the reason.
     pub failed: Vec<String>,
+    /// Stored, but marked sensitive without a category (treated as sensitive until clarified, ADR
+    /// 0029): name and `uid`. Said in the report, never dropped.
+    pub unclear: Vec<String>,
     /// The import stopped here: the store refused a card (the people before it are in).
     pub stopped: Option<String>,
 }
 
 impl ImportSummary {
+    /// What the core reported, all four lists (new, known, failed, unclear) and nothing dropped.
+    #[must_use]
+    pub fn from_report(report: fs_people_core::ImportReport) -> Self {
+        Self {
+            created: report.created.len(),
+            skipped: report.skipped.len(),
+            failed: report.failed,
+            unclear: report.unclear,
+            stopped: None,
+        }
+    }
+
     /// Did all of it work?
     pub fn is_clean(&self) -> bool {
         self.failed.is_empty() && self.stopped.is_none()
@@ -43,6 +58,13 @@ impl ImportSummary {
                 ", {} failed: {}",
                 self.failed.len(),
                 self.failed.join("; ")
+            );
+        }
+        if !self.unclear.is_empty() {
+            let _ = write!(
+                text,
+                ". Sensitive without a category, kept as sensitive: {}",
+                self.unclear.join("; ")
             );
         }
         if let Some(why) = &self.stopped {
@@ -69,9 +91,7 @@ pub fn import_file(
     let mut summary = ImportSummary::default();
     match runtime.block_on(people.import_vcard(&text)) {
         Ok(report) => {
-            summary.created = report.created.len();
-            summary.skipped = report.skipped.len();
-            summary.failed = report.failed;
+            summary = ImportSummary::from_report(report);
         }
         Err(e) => summary.stopped = Some(reason_text(&e)),
     }

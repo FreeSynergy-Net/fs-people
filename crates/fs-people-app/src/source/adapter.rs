@@ -4,8 +4,8 @@
 //! thread. Provisional: in process, not RPC, until the Cap'n Proto servers exist (`DESIGN.md`).
 //!
 //! Revision: the store's `updated` time and a fingerprint of the content, compared first; the write
-//! itself is `People::update_checked` (compare and set in one step, also over the socket), and a
-//! provider without it gets a plain `update` (then not atomic).
+//! itself is `People::update_checked` (compare and set in one step, also over the socket). A
+//! provider without it is not written to: editing is locked with the reason `people/no-checked-update`.
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -179,20 +179,18 @@ impl PeopleSource for PeopleAdapter {
         }
         let mut card = card_of(&object).map_err(|e| reason(&e))?;
         apply_draft(&mut card, draft)?;
-        // Compare and write in one step where the provider can; the check above stays as the first line.
-        let checked = self.runtime.block_on(self.people.update_checked(
-            id,
-            Revision::of(&object),
-            card.clone(),
-        ));
-        match checked {
-            Err(Error::Unsupported(_)) => self
-                .runtime
-                .block_on(self.people.update(id, card))
-                .map(|_| ())
-                .map_err(|e| reason(&e)),
-            other => other.map(|_| ()).map_err(|e| reason(&e)),
-        }
+        // Compare and write in ONE step, or not at all: a source without `update_checked` is not
+        // written to (a plain `update` after the check above would lose a change made in between).
+        self.runtime
+            .block_on(
+                self.people
+                    .update_checked(id, Revision::of(&object), card.clone()),
+            )
+            .map(|_| ())
+            .map_err(|e| match e {
+                Error::Unsupported(_) => SourceError::unsupported(crate::words::NO_CHECKED_UPDATE),
+                other => reason(&other),
+            })
     }
 
     fn create(&self, draft: &PersonDraft) -> Result<String, SourceError> {

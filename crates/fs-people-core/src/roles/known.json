@@ -34,6 +34,24 @@
       "scope": "group"
     },
     {
+      "id": "manager",
+      "type": "org:Role",
+      "names": {"en": "Manager", "de": "Verwalter"},
+      "description": {"en": "Someone who manages a group: members, roles, invitations. Defined by fs-groups (ADR 0095); the rights carry the ranking, not this entry."},
+      "standard": "org:Role",
+      "owner": "fs-groups",
+      "scope": "group"
+    },
+    {
+      "id": "owner",
+      "type": "org:Role",
+      "names": {"en": "Owner", "de": "Eigentümer"},
+      "description": {"en": "A person who owns a group: a direct member with this role; several owners are allowed. Defined by fs-groups (ADR 0095); never held by an account that someone else answers for."},
+      "standard": "org:Role",
+      "owner": "fs-groups",
+      "scope": "group"
+    },
+    {
       "id": "customer",
       "type": "skos:Concept",
       "names": {"en": "Customer", "de": "Kunde"},

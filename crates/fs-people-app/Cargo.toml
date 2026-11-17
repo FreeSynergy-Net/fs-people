@@ -11,9 +11,9 @@ repository.workspace = true
 fs-people-core = { path = "../fs-people-core" }
 fs-objects = { git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.6" }
 # provisional: becomes a tag once reviewed
-fs-components-app = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.27" }
+fs-components-app = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.28" }
 # provisional: becomes a tag once reviewed
-fs-components-workbenches = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.27" }
+fs-components-workbenches = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.28" }
 fs-interfaces = { git = "https://github.com/FreeSynergy/fs-interfaces", tag = "v0.0.27" }
 fs-rpc = { git = "https://github.com/FreeSynergy/fs-rpc", tag = "v0.0.2" }
 capnp = "0.27"
@@ -25,4 +25,4 @@ tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 fs-people-server = { path = "../fs-people-server" }
 tempfile = "3"
 # provisional: becomes a tag once reviewed
-fs-components-render = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.27" }
+fs-components-render = { git = "https://github.com/FreeSynergy/fs-components", tag = "v0.0.28" }

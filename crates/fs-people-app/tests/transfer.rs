@@ -6,7 +6,7 @@ mod common;
 
 use common::{Scratch, World, person};
 use fs_components_workbenches::people::PeopleSource;
-use fs_people_app::{export_all, import_file};
+use fs_people_app::{ImportSummary, export_all, import_file};
 use fs_people_core::{Card, vcard::card_to_vcard};
 
 const TWO: &str = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae1\r\nFN:Amara\r\nEMAIL:amara@x.org\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:3.0\r\nFN:Bob\r\nTEL:+49 30 1\r\nEND:VCARD\r\n";
@@ -148,4 +148,47 @@ fn an_export_after_an_edit_says_the_new_name_not_the_imported_one() {
         !text.contains("amara@x.org"),
         "the old address lives on: {text}"
     );
+}
+
+/// A stray line outside any card: counted as failed, nothing else is lost.
+const BAD: &str = "junk\r\n";
+
+#[test]
+fn b6_the_report_says_new_known_failed_and_unclear_and_drops_none() {
+    let (w, dir) = (World::in_memory(), Scratch::new());
+    let known = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae2\r\nFN:Known\r\nEMAIL:k@x.org\r\nEND:VCARD\r\n";
+    let first = dir.file("known.vcf");
+    std::fs::write(&first, known).unwrap();
+    import_file(w.repo.as_ref(), w.runtime.handle(), &first).unwrap();
+    let file = dir.file("mixed.vcf");
+    let good = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:urn:uuid:01a1aaef-ba80-7f7a-8dff-9f85769beae3\r\nFN:Good\r\nEMAIL:g@x.org\r\nEND:VCARD\r\n";
+    std::fs::write(&file, format!("{BAD}{good}{known}")).unwrap();
+    let sum = import_file(w.repo.as_ref(), w.runtime.handle(), &file).unwrap();
+    assert_eq!(
+        (sum.created, sum.skipped, sum.failed.len()),
+        (1, 1, 1),
+        "{sum:?}"
+    );
+    assert_eq!(
+        w.adapter.rows("", 0, 10).unwrap().len(),
+        2,
+        "the rest is stored"
+    );
+}
+
+#[test]
+fn b6_an_unclear_entry_of_the_core_report_reaches_the_summary_and_the_words() {
+    let report = fs_people_core::ImportReport {
+        created: vec![fs_objects::ObjectId::new()],
+        skipped: vec!["u".into()],
+        failed: vec!["f: why".into()],
+        unclear: vec!["x: Unclear".into(), "2 more".into()],
+    };
+    let sum = ImportSummary::from_report(report);
+    assert_eq!(sum.unclear, ["x: Unclear", "2 more"]);
+    let text = sum.message();
+    assert!(text.contains("Imported 1, 1 already known"), "{text}");
+    assert!(text.contains("1 failed: f: why"), "{text}");
+    assert!(text.contains("Sensitive without a category"), "{text}");
+    assert!(text.contains("x: Unclear; 2 more"), "{text}");
 }

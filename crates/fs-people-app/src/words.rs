@@ -16,6 +16,9 @@ pub fn labels() -> PeopleLabels {
     labels
 }
 
+/// Editing is locked: the source cannot compare and write in one step (`people/no-checked-update`).
+pub(crate) const NO_CHECKED_UPDATE: &str = "Editing is locked: this source cannot compare and write in one step, so a change by someone else could be lost (people/no-checked-update).";
+
 /// Headings and labels of what is shown about a person.
 pub(crate) mod field {
     pub const AI: &str = "AI";
@@ -41,6 +44,9 @@ pub(crate) mod field {
     pub const ROLE: &str = "Role";
     pub const OTHER: &str = "Not shown here";
     pub const UNREADABLE: &str = "could not be read: {}";
+    /// A section the source does not offer: said, never left out (code, capability and source named).
+    pub const UNSUPPORTED: &str =
+        "not offered by this source (code unsupported, capability {capability}, source {provider})";
 }
 
 /// What is wrong with a typed contact value, as a sentence (one per code, ADR 0057).

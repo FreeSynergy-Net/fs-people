@@ -32,6 +32,7 @@ mod revision;
 mod role_book;
 pub mod roles;
 mod subject;
+pub mod supervision;
 pub mod validate;
 /// Contact values (`EmailAddress`, `PhoneNumber`): they live in `fs-types` so every program shares them.
 pub use fs_types as values;

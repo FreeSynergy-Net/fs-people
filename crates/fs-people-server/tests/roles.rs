@@ -54,7 +54,8 @@ async fn definitions_arrive_as_they_were_defined() {
         assert_eq!(
             all_ids(&roles).await,
             iris(&[
-                "ai", "customer", "lead", "member", "prospect", "supplier", "user"
+                "ai", "customer", "lead", "manager", "member", "owner", "prospect", "supplier",
+                "user"
             ])
         );
 
@@ -64,7 +65,8 @@ async fn definitions_arrive_as_they_were_defined() {
         assert_eq!(
             all_ids(&roles).await,
             iris(&[
-                "ai", "coach", "customer", "lead", "member", "prospect", "supplier", "user"
+                "ai", "coach", "customer", "lead", "manager", "member", "owner", "prospect",
+                "supplier", "user"
             ])
         );
 
@@ -127,13 +129,15 @@ async fn a_configuration_is_checked_then_added_or_swapped() {
         let mut broken = roles.load_config_request();
         broken.get().set_json("no json");
         expect_problem(broken.send().promise.await, INVALID);
-        assert_eq!(all_ids(&roles).await.len(), 7, "nothing changed");
+        assert_eq!(all_ids(&roles).await.len(), 9, "nothing changed");
 
         let good = json!([{"id": "x", "names": {"en": "X"}, "owner": "o", "scope": "public"}]);
         let mut load = roles.load_config_request();
         load.get().set_json(good.to_string().as_str());
         load.send().promise.await.unwrap();
-        let mut all = iris(&["ai", "customer", "lead", "member", "prospect", "supplier"]);
+        let mut all = iris(&[
+            "ai", "customer", "lead", "manager", "member", "owner", "prospect", "supplier",
+        ]);
         all.extend(iris(&["user", "x"]));
         assert_eq!(
             all_ids(&roles).await,

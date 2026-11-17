@@ -4,6 +4,7 @@
 //! JSON; RFC 9554 parameters (`PROP-ID`, `JSCOMPS`, `JSPROP`) carry the lossless return.
 
 use calcard::jscontact::JSContact;
+use calcard::vcard::VCardVersion;
 use serde_json::Value;
 
 use crate::card::Card;
@@ -24,7 +25,11 @@ pub fn card_to_vcard(card: &Card) -> Result<String> {
     let v = js
         .into_vcard()
         .ok_or_else(|| Error::VCard("card cannot be expressed as vCard".into()))?;
-    Ok(v.to_string())
+    // Always 4.0: the card may have come in as 3.0, and `Display` would write that version back.
+    let mut text = String::new();
+    v.write_to(&mut text, VCardVersion::V4_0)
+        .map_err(|e| Error::VCard(format!("vCard write failed: {e}")))?;
+    Ok(text)
 }
 
 fn strip_nested_types(v: &mut Value) {

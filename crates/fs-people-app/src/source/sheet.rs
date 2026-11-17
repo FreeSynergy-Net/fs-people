@@ -138,8 +138,8 @@ fn about(card: &Card) -> PersonSection {
     )
 }
 
-/// The roles, read only, and whether one of them marks an AI. A provider without roles has no such
-/// section; a failure is shown, not hidden.
+/// The roles, read only, and whether one of them marks an AI. A provider without roles shows the
+/// section with the reason (`unsupported`, the capability); a failure is shown, not hidden.
 fn role_section(
     object: &StoredObject,
     roles: &dyn RoleBook,
@@ -147,7 +147,14 @@ fn role_section(
 ) -> (PersonSection, bool) {
     let held = match runtime.block_on(roles.roles_of(object.envelope.id)) {
         Ok(held) => held,
-        Err(Error::Unsupported(_)) => Vec::new(),
+        // Never silent: a source without roles says so, with the code and what it cannot do.
+        Err(Error::Unsupported(u)) => {
+            let why = field::UNSUPPORTED
+                .replacen("{capability}", u.capability(), 1)
+                .replacen("{provider}", "people", 1);
+            let fields = vec![PersonField::new(field::ROLE, why)];
+            return (PersonSection::new(field::ROLES, fields), false);
+        }
         Err(e) => {
             let why = field::UNREADABLE.replacen("{}", &e.to_string(), 1);
             let fields = vec![PersonField::new(field::ROLE, why)];

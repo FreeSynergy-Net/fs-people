@@ -943,7 +943,7 @@ checksum = "fe6d2e5af09e8c8ad56c969f2157a3d4238cebc7c55f0a517728c38f7b200f81"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.3",
 ]
 
 [[package]]
@@ -1431,8 +1431,8 @@ checksum = "aa9a19cbb55df58761df49b23516a86d432839add4af60fc256da840f66ed35b"
 
 [[package]]
 name = "fs-components-app"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 dependencies = [
  "blinc_app",
  "blinc_cn",
@@ -1449,18 +1449,18 @@ dependencies = [
 
 [[package]]
 name = "fs-components-commands"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 
 [[package]]
 name = "fs-components-editor"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 
 [[package]]
 name = "fs-components-mf2"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 dependencies = [
  "fs-components-words",
  "mf2",
@@ -1468,8 +1468,8 @@ dependencies = [
 
 [[package]]
 name = "fs-components-primitives"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 dependencies = [
  "blinc_cn",
  "blinc_core",
@@ -1481,8 +1481,8 @@ dependencies = [
 
 [[package]]
 name = "fs-components-render"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 dependencies = [
  "blinc_app",
  "blinc_cn",
@@ -1499,13 +1499,13 @@ dependencies = [
 
 [[package]]
 name = "fs-components-styles"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 
 [[package]]
 name = "fs-components-widgets"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 dependencies = [
  "blinc_cn",
  "blinc_core",
@@ -1513,6 +1513,7 @@ dependencies = [
  "blinc_noto_emoji",
  "blinc_theme",
  "fontdb",
+ "fs-components-commands",
  "fs-components-mf2",
  "fs-components-primitives",
  "fs-components-styles",
@@ -1523,13 +1524,13 @@ dependencies = [
 
 [[package]]
 name = "fs-components-words"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 
 [[package]]
 name = "fs-components-workbenches"
-version = "0.0.27"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
 dependencies = [
  "blinc_app",
  "blinc_cn",

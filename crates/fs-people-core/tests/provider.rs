@@ -79,7 +79,7 @@ async fn the_shipped_roles_load() {
     assert_eq!(
         ids,
         [
-            "ai", "customer", "lead", "member", "prospect", "supplier", "user"
+            "ai", "customer", "lead", "manager", "member", "owner", "prospect", "supplier", "user"
         ]
         .map(full_id)
     );
