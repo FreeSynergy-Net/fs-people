@@ -128,7 +128,7 @@ impl PeopleSource for PeopleAdapter {
                     vec![object.envelope.name.clone(), mail],
                 );
                 if is_marked(object) {
-                    row.guarded(field::SENSITIVE_ROW)
+                    row.guarded(field::sensitive_row())
                 } else {
                     row
                 }
@@ -188,7 +188,9 @@ impl PeopleSource for PeopleAdapter {
             )
             .map(|_| ())
             .map_err(|e| match e {
-                Error::Unsupported(_) => SourceError::unsupported(crate::words::NO_CHECKED_UPDATE),
+                Error::Unsupported(_) => {
+                    SourceError::unsupported(crate::words::no_checked_update())
+                }
                 other => reason(&other),
             })
     }

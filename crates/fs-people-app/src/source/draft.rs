@@ -64,29 +64,29 @@ pub(super) fn draft_of(card: &Card, revision: Option<String>) -> PersonDraft {
         vec![
             DraftGroup::new(
                 "name",
-                field::NAME,
+                field::name(),
                 false,
-                vec![DraftField::new(NAME, field::NAME, written_name(card))],
+                vec![DraftField::new(NAME, field::name(), written_name(card))],
             ),
             DraftGroup::new(
                 EMAILS,
-                field::EMAIL,
+                field::email(),
                 true,
-                entries(EMAILS, field::EMAIL, emails),
+                entries(EMAILS, &field::email(), emails),
             )
             .with_check(FieldCheck::Email),
             DraftGroup::new(
                 PHONES,
-                field::PHONE,
+                field::phone(),
                 true,
-                entries(PHONES, field::PHONE, phones),
+                entries(PHONES, &field::phone(), phones),
             )
             .with_check(FieldCheck::Phone),
             DraftGroup::new(
                 ORGANISATIONS,
-                field::ORGANISATION,
+                field::organisation(),
                 true,
-                entries(ORGANISATIONS, field::ORGANISATION, organisations),
+                entries(ORGANISATIONS, &field::organisation(), organisations),
             ),
         ],
     )
@@ -104,13 +104,13 @@ pub(super) fn blank_draft() -> PersonDraft {
         vec![
             DraftGroup::new(
                 "name",
-                field::NAME,
+                field::name(),
                 false,
-                vec![DraftField::new(NAME, field::NAME, "")],
+                vec![DraftField::new(NAME, field::name(), "")],
             ),
-            added(EMAILS, field::EMAIL).with_check(FieldCheck::Email),
-            added(PHONES, field::PHONE).with_check(FieldCheck::Phone),
-            added(ORGANISATIONS, field::ORGANISATION),
+            added(EMAILS, &field::email()).with_check(FieldCheck::Email),
+            added(PHONES, &field::phone()).with_check(FieldCheck::Phone),
+            added(ORGANISATIONS, &field::organisation()),
         ],
     )
 }

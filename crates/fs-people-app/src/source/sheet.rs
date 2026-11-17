@@ -45,7 +45,7 @@ pub(super) fn sheet_of(
             .collect(),
     );
     if is_ai {
-        sheet.marks.push(field::AI.to_string());
+        sheet.marks.push(field::ai().to_string());
     }
     sheet.marks.extend(sensitive_mark(card, object));
     if let Some(photo) = photo_of(card) {
@@ -71,11 +71,11 @@ pub(super) fn sensitive_mark(card: &Card, object: &StoredObject) -> Option<Strin
     is_marked(object).then(|| {
         let categories = card.sensitive_categories().join(", ");
         let categories = if categories.is_empty() {
-            field::UNCLEAR
+            field::unclear()
         } else {
-            categories.as_str()
+            categories
         };
-        field::SENSITIVE.replacen("{}", categories, 1)
+        field::sensitive().replacen("{}", &categories, 1)
     })
 }
 
@@ -83,16 +83,16 @@ fn contact(card: &Card) -> PersonSection {
     let mails = card
         .emails
         .values()
-        .map(|e| PersonField::new(field::EMAIL, &e.address));
+        .map(|e| PersonField::new(field::email(), &e.address));
     let phones = card
         .phones
         .values()
-        .map(|p| PersonField::new(field::PHONE, &p.number));
+        .map(|p| PersonField::new(field::phone(), &p.number));
     let links = card
         .links
         .values()
-        .map(|l| PersonField::new(field::LINK, &l.uri));
-    PersonSection::new(field::CONTACT, mails.chain(phones).chain(links).collect())
+        .map(|l| PersonField::new(field::link(), &l.uri));
+    PersonSection::new(field::contact(), mails.chain(phones).chain(links).collect())
 }
 
 fn work(card: &Card) -> PersonSection {
@@ -100,12 +100,12 @@ fn work(card: &Card) -> PersonSection {
         .organizations
         .values()
         .filter_map(|o| o.name.as_ref())
-        .map(|n| PersonField::new(field::ORGANISATION, n));
+        .map(|n| PersonField::new(field::organisation(), n));
     let titles = card
         .titles
         .values()
-        .map(|t| PersonField::new(field::JOB, &t.name));
-    PersonSection::new(field::WORK, organisations.chain(titles).collect())
+        .map(|t| PersonField::new(field::job(), &t.name));
+    PersonSection::new(field::work(), organisations.chain(titles).collect())
 }
 
 fn places(card: &Card) -> PersonSection {
@@ -117,23 +117,23 @@ fn places(card: &Card) -> PersonSection {
             .map(|c| c.value.as_str())
             .collect::<Vec<_>>()
             .join(" ");
-        PersonField::new(field::ADDRESS, a.full.clone().unwrap_or(joined))
+        PersonField::new(field::address(), a.full.clone().unwrap_or(joined))
     });
-    PersonSection::new(field::PLACES, lines.collect())
+    PersonSection::new(field::places(), lines.collect())
 }
 
 fn about(card: &Card) -> PersonSection {
-    let kind = (card.kind() != "individual").then(|| PersonField::new(field::KIND, card.kind()));
+    let kind = (card.kind() != "individual").then(|| PersonField::new(field::kind(), card.kind()));
     let nicknames = card
         .nicknames
         .values()
-        .map(|n| PersonField::new(field::NICKNAME, &n.name));
+        .map(|n| PersonField::new(field::nickname(), &n.name));
     let notes = card
         .notes
         .values()
-        .map(|n| PersonField::new(field::NOTE, &n.note));
+        .map(|n| PersonField::new(field::note(), &n.note));
     PersonSection::new(
-        field::ABOUT,
+        field::about(),
         kind.into_iter().chain(nicknames).chain(notes).collect(),
     )
 }
@@ -149,16 +149,14 @@ fn role_section(
         Ok(held) => held,
         // Never silent: a source without roles says so, with the code and what it cannot do.
         Err(Error::Unsupported(u)) => {
-            let why = field::UNSUPPORTED
-                .replacen("{capability}", u.capability(), 1)
-                .replacen("{provider}", "people", 1);
-            let fields = vec![PersonField::new(field::ROLE, why)];
-            return (PersonSection::new(field::ROLES, fields), false);
+            let why = field::unsupported(u.capability(), "people");
+            let fields = vec![PersonField::new(field::role(), why)];
+            return (PersonSection::new(field::roles(), fields), false);
         }
         Err(e) => {
-            let why = field::UNREADABLE.replacen("{}", &e.to_string(), 1);
-            let fields = vec![PersonField::new(field::ROLE, why)];
-            return (PersonSection::new(field::ROLES, fields), false);
+            let why = field::unreadable().replacen("{}", &e.to_string(), 1);
+            let fields = vec![PersonField::new(field::role(), why)];
+            return (PersonSection::new(field::roles(), fields), false);
         }
     };
     let is_ai = held.iter().any(|a| is_ai_role(&a.role));
@@ -176,15 +174,21 @@ fn role_section(
                         .cloned()
                 })
                 .unwrap_or_else(|| assignment.role.clone());
-            PersonField::new(field::ROLE, name)
+            PersonField::new(field::role(), name)
         })
         .collect();
-    (PersonSection::new(field::ROLES, fields), is_ai)
+    (PersonSection::new(field::roles(), fields), is_ai)
 }
 
 /// The names of what the card holds beyond what is shown above.
 fn kept(card: &Card) -> PersonSection {
-    let mut names: Vec<&str> = card.extra.keys().map(String::as_str).collect();
+    // `vCard` is the marker of the kept original (ADR 0030), not something the person typed.
+    let mut names: Vec<&str> = card
+        .extra
+        .keys()
+        .map(String::as_str)
+        .filter(|name| *name != "vCard")
+        .collect();
     // Typed since the whole of RFC 9553 is, but not shown in the window (see DESIGN.md).
     let unshown = [
         ("language", card.language.is_some()),
@@ -215,7 +219,7 @@ fn kept(card: &Card) -> PersonSection {
     let fields = if names.is_empty() {
         Vec::new()
     } else {
-        vec![PersonField::new(field::OTHER, names.join(", "))]
+        vec![PersonField::new(field::other(), names.join(", "))]
     };
-    PersonSection::new(field::KEPT, fields)
+    PersonSection::new(field::kept(), fields)
 }

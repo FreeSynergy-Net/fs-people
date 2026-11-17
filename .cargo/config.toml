@@ -10,3 +10,7 @@ debug = false                    # no debug info for dependencies
 debug = false
 strip = "symbols"
 lto = "thin"
+
+# The tests read the English words whatever the language of the machine (the German ones are tested through `words(&Locale)`).
+[env]
+LC_ALL = { value = "en_US.UTF-8", force = true }

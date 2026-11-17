@@ -17,6 +17,8 @@ pub struct Args {
     pub export_sensitive: Vec<String>,
     /// Draw a picture to this file instead of opening a window.
     pub snapshot: Option<PathBuf>,
+    /// The screen to show first (`all`, `groups`); for a picture of that screen.
+    pub screen: Option<String>,
     /// Size of the window or picture.
     pub size: (u32, u32),
     /// The server's socket (default: the people socket of this user).
@@ -35,6 +37,7 @@ impl Default for Args {
             export: None,
             export_sensitive: Vec::new(),
             snapshot: None,
+            screen: None,
             size: (1200, 800),
             socket: None,
             local: false,
@@ -61,6 +64,7 @@ pub fn parse(args: &[String]) -> Result<Args, String> {
             "--import" => out.import = Some(PathBuf::from(value("--import")?)),
             "--export" => out.export = Some(PathBuf::from(value("--export")?)),
             "--export-sensitive" => out.export_sensitive.push(value("--export-sensitive")?),
+            "--screen" => out.screen = Some(value("--screen")?),
             "--snapshot" => out.snapshot = Some(PathBuf::from(value("--snapshot")?)),
             "--size" => out.size = fs_components_app::parse_size(&value("--size")?)?,
             "--socket" => out.socket = Some(PathBuf::from(value("--socket")?)),
@@ -87,5 +91,6 @@ pub const HELP: &str = "fs-people: the people window (without arguments it opens
                      people marked sensitive are left out and named
   --export-sensitive <uid>
                      release this person marked sensitive for --export; repeat for each person
+  --screen <id>      the screen to show first: all, groups
   --snapshot <png>   draw a picture instead of opening a window
   --size <WxH>       window or picture size (default 1200x800)";

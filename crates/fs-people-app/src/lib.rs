@@ -20,4 +20,4 @@ mod words;
 pub use source::{CALL_LIMIT, NoRoles, PeopleAdapter, RemotePeople, START_LIMIT, apply_draft};
 pub use surface::{PeopleScreen, app_widget};
 pub use transfer::{ExportReport, ImportSummary, export_all, import_file};
-pub use words::labels;
+pub use words::{labels, session_locale, title};

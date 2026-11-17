@@ -943,7 +943,7 @@ checksum = "fe6d2e5af09e8c8ad56c969f2157a3d4238cebc7c55f0a517728c38f7b200f81"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.2.3",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -1430,6 +1430,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa9a19cbb55df58761df49b23516a86d432839add4af60fc256da840f66ed35b"
 
 [[package]]
+name = "fs-components"
+version = "0.0.28"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
+dependencies = [
+ "blinc_animation",
+ "blinc_app",
+ "blinc_cn",
+ "blinc_core",
+ "blinc_layout",
+ "blinc_noto_emoji",
+ "blinc_theme",
+]
+
+[[package]]
 name = "fs-components-app"
 version = "0.0.28"
 source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.28#14d18b8ac698a866d01d4e00754658ace74ac68a"
@@ -1595,8 +1609,12 @@ version = "0.0.14"
 dependencies = [
  "async-trait",
  "capnp",
+ "fs-components",
  "fs-components-app",
+ "fs-components-mf2",
  "fs-components-render",
+ "fs-components-widgets",
+ "fs-components-words",
  "fs-components-workbenches",
  "fs-interfaces",
  "fs-objects",

@@ -72,6 +72,11 @@ pub fn run(words: &[String]) -> Result<(), String> {
     };
     let app = app_widget(Arc::new(adapter)).map_err(|e| e.to_string())?;
     app.set_status(status);
+    if let Some(screen) = &args.screen {
+        if !app.select(screen) {
+            return Err(format!("--screen {screen}: no such screen (all, groups)"));
+        }
+    }
     let (width, height) = args.size;
     if let Some(file) = &args.snapshot {
         app.picture(width, height, file)

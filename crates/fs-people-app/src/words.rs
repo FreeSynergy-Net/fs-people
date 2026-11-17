@@ -1,74 +1,294 @@
-//! The words of the program.
+//! The words of the program: `MessageFormat` 2 files in German and English (ADR 0057), picked by the
+//! language of the session (`LC_ALL`, `LC_MESSAGES`, `LANG`; else English).
 //!
-//! Pattern: Value objects — all English text of this frontend in one place; translation (ADR 0053)
-//! will replace this file's content, not its users.
+//! Pattern: Factory over embedded `.mf2` files; one `Mf2Texts` per process. Texts with a place for a
+//! value keep `{}` (one value) or `{name}` after resolving, so the callers fill them as before.
 
+use std::sync::OnceLock;
+
+use fs_components_mf2::{Mf2Texts, Source};
+use fs_components_words::{Args, Locale, Words};
 use fs_components_workbenches::people::PeopleLabels;
 
-/// The title of the window.
-pub const TITLE: &str = "FreeSynergy People";
+/// The two language files; `fs_components_mf2::check_pairs(TEXTS)` must be empty (a test asserts it).
+pub const TEXTS: &[Source] = &[
+    Source {
+        language: "en",
+        text: include_str!("texts/en.mf2"),
+    },
+    Source {
+        language: "de",
+        text: include_str!("texts/de.mf2"),
+    },
+];
 
-/// The words of the workbench.
-pub fn labels() -> PeopleLabels {
-    let mut labels = PeopleLabels::default();
-    labels.search = "Search people".into();
-    labels.columns = vec!["Name".into(), "E-mail".into()];
-    labels
+/// The language of this session.
+#[must_use]
+pub fn session_locale() -> Locale {
+    ["LC_ALL", "LC_MESSAGES", "LANG"]
+        .iter()
+        .filter_map(|name| std::env::var(name).ok())
+        .find_map(|value| Locale::from_posix(&value))
+        .unwrap_or_else(Locale::english)
+}
+
+/// The words in `locale`.
+#[must_use]
+pub fn words(locale: &Locale) -> Mf2Texts {
+    Mf2Texts::new(TEXTS, locale)
+}
+
+fn session() -> &'static Mf2Texts {
+    static TEXTS_OF_SESSION: OnceLock<Mf2Texts> = OnceLock::new();
+    TEXTS_OF_SESSION.get_or_init(|| words(&session_locale()))
+}
+
+/// The text `id`, in the language of the session.
+pub(crate) fn t(id: &str) -> String {
+    session().plain(id)
+}
+
+/// The text `id` with the value left as `{}` for the caller to fill.
+pub(crate) fn tpl(id: &str) -> String {
+    say(id, &Args::new().text("v", "{}"))
+}
+
+fn say(id: &str, args: &Args) -> String {
+    session().say(&id.into(), args).text().to_owned()
+}
+
+/// The title of the window.
+pub fn title() -> String {
+    t("app-name")
 }
 
 /// Editing is locked: the source cannot compare and write in one step (`people/no-checked-update`).
-pub(crate) const NO_CHECKED_UPDATE: &str = "Editing is locked: this source cannot compare and write in one step, so a change by someone else could be lost (people/no-checked-update).";
+pub(crate) fn no_checked_update() -> String {
+    t("no-checked-update")
+}
 
-/// Headings and labels of what is shown about a person.
+/// The words of the workbench, in the language of the session.
+pub fn labels() -> PeopleLabels {
+    labels_with(session())
+}
+
+/// The words of the workbench from `texts`.
+#[must_use]
+pub fn labels_with(texts: &Mf2Texts) -> PeopleLabels {
+    let t = |id: &str| texts.plain(id);
+    let tpl = |id: &str| {
+        texts
+            .say(&id.into(), &Args::new().text("v", "{}"))
+            .text()
+            .to_owned()
+    };
+    let mut l = PeopleLabels::default();
+    l.search = t("search");
+    l.columns = vec![t("col-name"), t("col-email")];
+    l.more = t("more");
+    l.create = t("create");
+    l.edit = t("edit");
+    l.save = t("save");
+    l.cancel = t("cancel");
+    l.delete = t("delete");
+    l.delete_really = t("delete-really");
+    l.delete_keep = t("delete-keep");
+    l.add_field = tpl("add-field");
+    l.nothing_selected = t("nothing-selected");
+    l.nobody = t("nobody");
+    l.nobody_found = tpl("nobody-found");
+    l.delete_confirm = tpl("delete-confirm");
+    l.gone = t("gone");
+    l.unsaved = t("unsaved");
+    l.discard_confirm = t("discard-confirm");
+    l.discard_keep = t("discard-keep");
+    l.discard_really = t("discard-really");
+    l.saved = t("saved");
+    l.created = t("created");
+    l.deleted = tpl("deleted");
+    l.no_changes = t("no-changes");
+    l.not_saved = tpl("not-saved");
+    l.fix_fields = t("fix-fields");
+    l.email_placeholder = t("email-placeholder");
+    l.phone_placeholder = t("phone-placeholder");
+    l.not_deleted = tpl("not-deleted");
+    l.cannot_edit = tpl("cannot-edit");
+    l.unreadable = tpl("unreadable");
+    l.list_failed = tpl("list-failed");
+    l.conflict_confirm = tpl("conflict-confirm");
+    l
+}
+
+/// Headings and labels of what is shown about a person (functions, because the language is the session's).
 pub(crate) mod field {
-    pub const AI: &str = "AI";
-    pub const SENSITIVE: &str = "Sensitive: {}";
-    pub const SENSITIVE_ROW: &str = "Sensitive";
-    pub const UNCLEAR: &str = "categories unclear";
-    pub const CONTACT: &str = "Contact";
-    pub const WORK: &str = "Organisation";
-    pub const PLACES: &str = "Addresses";
-    pub const ABOUT: &str = "About";
-    pub const ROLES: &str = "Roles";
-    pub const KEPT: &str = "Kept on the card";
-    pub const NAME: &str = "Name";
-    pub const EMAIL: &str = "E-mail";
-    pub const PHONE: &str = "Phone";
-    pub const ORGANISATION: &str = "Organisation";
-    pub const JOB: &str = "Title";
-    pub const ADDRESS: &str = "Address";
-    pub const NICKNAME: &str = "Nickname";
-    pub const LINK: &str = "Link";
-    pub const NOTE: &str = "Note";
-    pub const KIND: &str = "Kind";
-    pub const ROLE: &str = "Role";
-    pub const OTHER: &str = "Not shown here";
-    pub const UNREADABLE: &str = "could not be read: {}";
+    use super::{Args, say, t, tpl};
+
+    pub fn ai() -> String {
+        t("f-ai")
+    }
+    pub fn sensitive() -> String {
+        tpl("f-sensitive")
+    }
+    pub fn sensitive_row() -> String {
+        t("f-sensitive-row")
+    }
+    pub fn unclear() -> String {
+        t("f-unclear")
+    }
+    pub fn contact() -> String {
+        t("f-contact")
+    }
+    pub fn work() -> String {
+        t("f-work")
+    }
+    pub fn places() -> String {
+        t("f-places")
+    }
+    pub fn about() -> String {
+        t("f-about")
+    }
+    pub fn roles() -> String {
+        t("f-roles")
+    }
+    pub fn kept() -> String {
+        t("f-kept")
+    }
+    pub fn name() -> String {
+        t("f-name")
+    }
+    pub fn email() -> String {
+        t("f-email")
+    }
+    pub fn phone() -> String {
+        t("f-phone")
+    }
+    pub fn organisation() -> String {
+        t("f-organisation")
+    }
+    pub fn job() -> String {
+        t("f-job")
+    }
+    pub fn address() -> String {
+        t("f-address")
+    }
+    pub fn nickname() -> String {
+        t("f-nickname")
+    }
+    pub fn link() -> String {
+        t("f-link")
+    }
+    pub fn note() -> String {
+        t("f-note")
+    }
+    pub fn kind() -> String {
+        t("f-kind")
+    }
+    pub fn role() -> String {
+        t("f-role")
+    }
+    pub fn other() -> String {
+        t("f-other")
+    }
+    pub fn unreadable() -> String {
+        tpl("f-unreadable")
+    }
     /// A section the source does not offer: said, never left out (code, capability and source named).
-    pub const UNSUPPORTED: &str =
-        "not offered by this source (code unsupported, capability {capability}, source {provider})";
+    pub fn unsupported(capability: &str, provider: &str) -> String {
+        say(
+            "f-unsupported",
+            &Args::new()
+                .text("capability", capability)
+                .text("provider", provider),
+        )
+    }
 }
 
 /// What is wrong with a typed contact value, as a sentence (one per code, ADR 0057).
-pub(crate) fn problem(problem: fs_people_core::values::ValueProblem) -> &'static str {
+pub(crate) fn problem(problem: fs_people_core::values::ValueProblem) -> String {
     use fs_people_core::values::ValueProblem as P;
-    match problem {
-        P::Empty => "Nothing typed.",
-        P::MissingAt => "An e-mail address needs an @, like name@example.org.",
-        P::ManyAt => "An e-mail address has only one @.",
-        P::EmptyLocal => "Type the part before the @.",
-        P::EmptyDomain => "Type the part after the @, like example.org.",
-        P::LocalCharacter => {
-            "The part before the @ holds a character that is not allowed (a space, or a dot at the start, at the end or twice)."
+    let id = match problem {
+        P::Empty => "p-empty",
+        P::MissingAt => "p-missing-at",
+        P::ManyAt => "p-many-at",
+        P::EmptyLocal => "p-empty-local",
+        P::EmptyDomain => "p-empty-domain",
+        P::LocalCharacter => "p-local-character",
+        P::LocalTooLong => "p-local-too-long",
+        P::BadDomain => "p-bad-domain",
+        P::DomainWithoutDot => "p-domain-without-dot",
+        P::NoCountryCode => "p-no-country-code",
+        P::PhoneCharacter => "p-phone-character",
+        P::AddressTooLong => "p-address-too-long",
+        P::PhoneLength => "p-phone-length",
+    };
+    t(id)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{TEXTS, words};
+    use fs_components_mf2::check_pairs;
+    use fs_components_words::Locale;
+
+    #[test]
+    fn both_languages_have_the_same_ids_and_variables() {
+        assert!(check_pairs(TEXTS).is_empty(), "{:?}", check_pairs(TEXTS));
+    }
+
+    #[test]
+    fn the_german_labels_leave_no_english_default_behind() {
+        let de = super::labels_with(&words(&Locale::parse("de").unwrap()));
+        let en = super::labels_with(&words(&Locale::english()));
+        let default = fs_components_workbenches::people::PeopleLabels::default();
+        // English words are the shipped English file; German ones must differ from it everywhere
+        // except where a word is the same in both languages (a placeholder, the name column).
+        assert_eq!(en.create, default.create);
+        let same = [
+            (
+                de.email_placeholder == en.email_placeholder,
+                "email placeholder",
+            ),
+            (
+                de.phone_placeholder == en.phone_placeholder,
+                "phone placeholder",
+            ),
+        ];
+        assert!(same.iter().all(|(s, _)| *s));
+        for (g, e, what) in [
+            (&de.search, &en.search, "search"),
+            (&de.create, &en.create, "create"),
+            (&de.edit, &en.edit, "edit"),
+            (&de.save, &en.save, "save"),
+            (&de.cancel, &en.cancel, "cancel"),
+            (&de.delete, &en.delete, "delete"),
+            (&de.delete_really, &en.delete_really, "delete really"),
+            (&de.add_field, &en.add_field, "add field"),
+            (
+                &de.nothing_selected,
+                &en.nothing_selected,
+                "nothing selected",
+            ),
+            (&de.nobody, &en.nobody, "nobody"),
+            (&de.nobody_found, &en.nobody_found, "nobody found"),
+            (&de.delete_confirm, &en.delete_confirm, "delete confirm"),
+            (&de.discard_confirm, &en.discard_confirm, "discard confirm"),
+            (&de.saved, &en.saved, "saved"),
+            (&de.not_saved, &en.not_saved, "not saved"),
+            (&de.list_failed, &en.list_failed, "list failed"),
+        ] {
+            assert_ne!(g, e, "{what} is not translated");
         }
-        P::LocalTooLong => "The part before the @ is longer than 64 characters.",
-        P::BadDomain => "The part after the @ is not a valid domain name.",
-        P::DomainWithoutDot => "The domain needs a dot, like example.org.",
-        P::NoCountryCode => "Start with + and the country code (not 0), like +49 30 1234567.",
-        P::PhoneCharacter => {
-            "A phone number holds digits, and spaces, dots, hyphens or brackets between them."
-        }
-        P::AddressTooLong => "The whole address is longer than 254 characters.",
-        P::PhoneLength => "A phone number has 7 to 15 digits after the +, the first not 0.",
+        assert!(
+            de.add_field.contains("{}") && de.delete_confirm.contains("{}"),
+            "the value stays a place"
+        );
+    }
+
+    #[test]
+    fn german_and_english_say_different_things() {
+        let en = words(&Locale::english()).plain("nav-all");
+        let de = words(&Locale::parse("de").unwrap()).plain("nav-all");
+        assert_eq!(en, "All contacts");
+        assert_eq!(de, "Alle Kontakte");
     }
 }
