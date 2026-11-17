@@ -36,15 +36,14 @@ pub(super) fn written(card: &Card) -> String {
 
 /// `(year, month, day)` of a text like `1990-05-17` or `--05-17`; `None` if it is not a real day.
 pub(super) fn parse(text: &str) -> Option<(Option<u32>, u32, u32)> {
-    let (year, rest) = match text.strip_prefix("--") {
-        Some(rest) => (None, rest),
-        None => {
-            let (y, rest) = text.split_once('-')?;
-            if y.len() != 4 {
-                return None;
-            }
-            (Some(y.parse::<u32>().ok().filter(|y| *y >= 1)?), rest)
+    let (year, rest) = if let Some(rest) = text.strip_prefix("--") {
+        (None, rest)
+    } else {
+        let (y, rest) = text.split_once('-')?;
+        if y.len() != 4 {
+            return None;
         }
+        (Some(y.parse::<u32>().ok().filter(|y| *y >= 1)?), rest)
     };
     let (m, d) = rest.split_once('-')?;
     if m.len() != 2 || d.len() != 2 {
@@ -92,24 +91,21 @@ pub(super) fn set(card: &mut Card, text: &str) -> bool {
         day: Some(day),
         ..AnniversaryDate::default()
     };
-    match found.and_then(|id| card.anniversaries.get_mut(&id)) {
-        Some(a) => {
-            // Whatever else the date said (a calendar scale) described the old one.
-            a.date = Some(date);
-        }
-        None => {
-            let id = (1..=u32::MAX)
-                .map(|i| format!("b{i}"))
-                .find(|k| !card.anniversaries.contains_key(k))
-                .unwrap_or_default();
-            let item = Anniversary {
-                type_: Some("Anniversary".into()),
-                kind: Some("birth".into()),
-                date: Some(date),
-                ..Anniversary::default()
-            };
-            card.anniversaries.insert(id, item);
-        }
+    if let Some(a) = found.and_then(|id| card.anniversaries.get_mut(&id)) {
+        // Whatever else the date said (a calendar scale) described the old one.
+        a.date = Some(date);
+        return true;
     }
+    let id = (1..=u32::MAX)
+        .map(|i| format!("b{i}"))
+        .find(|k| !card.anniversaries.contains_key(k))
+        .unwrap_or_default();
+    let item = Anniversary {
+        type_: Some("Anniversary".into()),
+        kind: Some("birth".into()),
+        date: Some(date),
+        ..Anniversary::default()
+    };
+    card.anniversaries.insert(id, item);
     true
 }

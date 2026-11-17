@@ -109,7 +109,7 @@ pub(super) async fn assign(
         .map_err(|e| problem(&e, Some(person)))?;
     let a = answer
         .get()
-        .and_then(|r| r.get_assignment())
+        .and_then(roles::assign_results::Reader::get_assignment)
         .map_err(|e| problem(&e, Some(person)))?;
     let text = |t: capnp::Result<capnp::text::Reader<'_>>| -> Result<String> {
         t.and_then(|t| t.to_string().map_err(Into::into))
