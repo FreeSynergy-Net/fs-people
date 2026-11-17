@@ -4,8 +4,8 @@
 //! that does not fit one message ends the connection and loses the report with it.
 
 use fs_interfaces::people_capnp::import_report;
-use fs_interfaces::rpc::MAX_PAGE_BYTES;
 use fs_people_core::ImportReport;
+use fs_rpc::MAX_PAGE_BYTES;
 
 use super::person::{UUID_BYTES, count, write_ids};
 

@@ -6,7 +6,7 @@ use common::{
     CONFLICT, NOT_FOUND, card, create, expect_problem, id_of, json_of, name_of, persons_of,
     revision_now, revision_of, update_if, with_server,
 };
-use fs_interfaces::rpc::write_uuid;
+use fs_rpc::write_uuid;
 
 fn marked(uid: &str, name: &str) -> String {
     format!(

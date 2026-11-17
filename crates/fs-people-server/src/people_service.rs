@@ -9,9 +9,10 @@ use std::sync::Arc;
 
 use capnp_rpc::new_client;
 use fs_interfaces::people_capnp::people;
-use fs_interfaces::rpc::write_uuid;
 use fs_people_core::{Card, People, PeopleFeed, RoleBook};
-use fs_types::{TypeRegistry, describe::CatalogServer};
+use fs_rpc::catalog::CatalogServer;
+use fs_rpc::write_uuid;
+use fs_types::TypeRegistry;
 
 use crate::feed::subscribe;
 use crate::persons::PersonsImpl;
@@ -41,7 +42,7 @@ impl PeopleServer {
         }
     }
 
-    /// The capability to hand to `fs_interfaces::rpc::serve`.
+    /// The capability to hand to `fs_rpc::serve`.
     #[must_use]
     pub fn into_client(self) -> people::Client {
         new_client(self)

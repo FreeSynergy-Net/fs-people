@@ -6,7 +6,7 @@ use std::path::Path;
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::{people, persons, roles};
-use fs_interfaces::rpc::connect;
+use fs_rpc::connect;
 use tokio::sync::mpsc;
 
 use super::call::{Call, Revisions};

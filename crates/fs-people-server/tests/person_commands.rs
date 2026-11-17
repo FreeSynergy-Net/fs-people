@@ -5,8 +5,8 @@ mod common;
 use common::{
     INVALID, create, expect_problem, id_of, json_of, persons_of, problem_of, with_server,
 };
-use fs_interfaces::rpc::write_uuid;
-use fs_interfaces::types_capnp::BasicType;
+use fs_rpc::write_uuid;
+use fs_types::types_capnp::BasicType;
 
 #[tokio::test(flavor = "current_thread")]
 async fn the_server_reports_the_description_of_person() {

@@ -8,13 +8,13 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use common::{TOO_LARGE, expect_problem, persons_of, roles_of, unknown_id, with_root};
 use fs_interfaces::Capabilities;
-use fs_interfaces::rpc::{MAX_PAGE_BYTES, write_uuid};
 use fs_objects::{ObjectId, StoredObject};
 use fs_people_core::{
     Exporter, ListFilter, MatchKind, MatchReason, People, PeopleFeed, Result as CoreResult,
     RoleAssignment, RoleBook, RoleDefinition, RoleScope, SameAsProposal,
 };
 use fs_people_server::PeopleServer;
+use fs_rpc::{MAX_PAGE_BYTES, write_uuid};
 use serde_json::{Map, json};
 
 const MANY: usize = 2_000_000;

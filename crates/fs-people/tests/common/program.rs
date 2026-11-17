@@ -55,7 +55,7 @@ pub async fn wait_for(socket: &Path) {
 pub async fn wait_ready(socket: &Path) {
     use fs_interfaces::people_capnp::people;
     for _ in 0..1200 {
-        if let Ok(c) = fs_interfaces::rpc::connect::<people::Client>(socket).await
+        if let Ok(c) = fs_rpc::connect::<people::Client>(socket).await
             && c.client
                 .support_report_request()
                 .send()

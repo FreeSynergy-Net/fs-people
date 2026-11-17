@@ -3,7 +3,7 @@
 mod common;
 
 use common::{SENSITIVE, expect_problem, id_of, persons_of, with_server};
-use fs_interfaces::rpc::{read_envelope, write_uuid};
+use fs_rpc::{read_envelope, write_uuid};
 
 #[tokio::test(flavor = "current_thread")]
 async fn a_list_carries_the_mark_and_nothing_sensitive_leaves_without_release() {

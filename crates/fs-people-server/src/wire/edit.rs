@@ -3,8 +3,8 @@
 //! Pattern: Adapter — the generated reader into the plain `Edit` of `fs-types`. The sizes are bounded
 //! here, before anything is checked: an edit is typed input of a form, not a bulk channel.
 
-use fs_interfaces::rpc::{check_intake, invalid_request};
-use fs_interfaces::types_capnp::{BasicType, edit};
+use fs_rpc::{check_intake, invalid_request};
+use fs_types::types_capnp::{BasicType, edit};
 use fs_types::{Edit, FieldEdit};
 
 /// At most this many fields in one edit.

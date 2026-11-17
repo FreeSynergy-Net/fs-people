@@ -1431,29 +1431,36 @@ checksum = "aa9a19cbb55df58761df49b23516a86d432839add4af60fc256da840f66ed35b"
 
 [[package]]
 name = "fs-components-app"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 dependencies = [
  "blinc_app",
  "blinc_cn",
  "blinc_core",
  "blinc_layout",
  "blinc_theme",
+ "fs-components-commands",
  "fs-components-mf2",
  "fs-components-render",
  "fs-components-widgets",
  "fs-components-words",
+ "tracing",
 ]
 
 [[package]]
+name = "fs-components-commands"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
+
+[[package]]
 name = "fs-components-editor"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 
 [[package]]
 name = "fs-components-mf2"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 dependencies = [
  "fs-components-words",
  "mf2",
@@ -1461,21 +1468,21 @@ dependencies = [
 
 [[package]]
 name = "fs-components-primitives"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 dependencies = [
  "blinc_cn",
  "blinc_core",
  "blinc_layout",
  "blinc_theme",
- "fs-interfaces 0.0.1",
+ "fs-types",
  "libc",
 ]
 
 [[package]]
 name = "fs-components-render"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 dependencies = [
  "blinc_app",
  "blinc_cn",
@@ -1492,13 +1499,13 @@ dependencies = [
 
 [[package]]
 name = "fs-components-styles"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 
 [[package]]
 name = "fs-components-widgets"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 dependencies = [
  "blinc_cn",
  "blinc_core",
@@ -1516,13 +1523,13 @@ dependencies = [
 
 [[package]]
 name = "fs-components-words"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 
 [[package]]
 name = "fs-components-workbenches"
-version = "0.0.23"
-source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.23#57ddfd36091a5f1b475f3d15093a9245cab5f3a9"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-components?tag=v0.0.27#15cdf6eb1ab51d31c1bb4281349108727410605e"
 dependencies = [
  "blinc_app",
  "blinc_cn",
@@ -1539,35 +1546,17 @@ dependencies = [
 
 [[package]]
 name = "fs-interfaces"
-version = "0.0.1"
-source = "git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.19#90e62c30ad3af06beaa4edabce14e1448fdce9f3"
+version = "0.0.27"
+source = "git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.27#2745e306a13e0b7e7339ffc3f9c09185515fe152"
 dependencies = [
  "capnp",
- "idna",
-]
-
-[[package]]
-name = "fs-interfaces"
-version = "0.0.22"
-source = "git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.22#7743056396ffa80bc77d3af9d1946229dd1f6155"
-dependencies = [
- "capnp",
- "capnp-rpc",
- "chrono",
- "fs-objects",
- "futures",
- "idna",
- "rustix 1.1.6",
- "tokio",
- "tokio-util",
- "uuid",
- "windows-sys 0.61.2",
+ "fs-types",
 ]
 
 [[package]]
 name = "fs-objects"
-version = "0.0.1"
-source = "git+https://github.com/FreeSynergy/fs-objects?tag=v0.0.1#7cf0f05e3a9835b582aa2ac22014f2a1f1bff200"
+version = "0.0.6"
+source = "git+https://github.com/FreeSynergy/fs-objects?tag=v0.0.6#cc3102a53968c4fc8e900a8193d4d15593e12881"
 dependencies = [
  "async-trait",
  "base64",
@@ -1587,12 +1576,13 @@ name = "fs-people"
 version = "0.0.14"
 dependencies = [
  "capnp",
- "fs-interfaces 0.0.22",
+ "fs-interfaces",
  "fs-objects",
  "fs-people-app",
  "fs-people-cli",
  "fs-people-core",
  "fs-people-server",
+ "fs-rpc",
  "serde_json",
  "tempfile",
  "tokio",
@@ -1607,10 +1597,11 @@ dependencies = [
  "fs-components-app",
  "fs-components-render",
  "fs-components-workbenches",
- "fs-interfaces 0.0.22",
+ "fs-interfaces",
  "fs-objects",
  "fs-people-core",
  "fs-people-server",
+ "fs-rpc",
  "serde_json",
  "tempfile",
  "tokio",
@@ -1621,10 +1612,11 @@ name = "fs-people-cli"
 version = "0.0.14"
 dependencies = [
  "capnp",
- "fs-interfaces 0.0.22",
+ "fs-interfaces",
  "fs-objects",
  "fs-people-core",
  "fs-people-server",
+ "fs-rpc",
  "serde_json",
  "tempfile",
  "tokio",
@@ -1637,7 +1629,7 @@ dependencies = [
  "async-trait",
  "calcard",
  "chrono",
- "fs-interfaces 0.0.22",
+ "fs-interfaces",
  "fs-objects",
  "fs-types",
  "proptest",
@@ -1664,9 +1656,10 @@ dependencies = [
  "async-trait",
  "capnp",
  "capnp-rpc",
- "fs-interfaces 0.0.22",
+ "fs-interfaces",
  "fs-objects",
  "fs-people-core",
+ "fs-rpc",
  "fs-types",
  "rustix 1.1.6",
  "serde_json",
@@ -1676,15 +1669,33 @@ dependencies = [
 ]
 
 [[package]]
-name = "fs-types"
-version = "0.0.22"
-source = "git+https://github.com/FreeSynergy/fs-interfaces?tag=v0.0.22#7743056396ffa80bc77d3af9d1946229dd1f6155"
+name = "fs-rpc"
+version = "0.0.2"
+source = "git+https://github.com/FreeSynergy/fs-rpc?tag=v0.0.2#59f78ef5d5114c91bc06282db0575a484623227c"
 dependencies = [
  "capnp",
  "capnp-rpc",
  "chrono",
- "fs-interfaces 0.0.22",
+ "fs-interfaces",
+ "fs-objects",
+ "fs-types",
+ "futures",
+ "rustix 1.1.6",
+ "tokio",
+ "tokio-util",
+ "uuid",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "fs-types"
+version = "0.0.1"
+source = "git+https://github.com/FreeSynergy/fs-types?tag=v0.0.1#6323518a1a1abba7c241e94d948668eb208649f5"
+dependencies = [
+ "capnp",
+ "chrono",
  "geo-uri",
+ "idna",
  "iri-string",
  "oxilangtag",
  "unicode-normalization",

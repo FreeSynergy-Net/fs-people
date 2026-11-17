@@ -7,12 +7,12 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-fs-objects = { git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.1" }
+fs-objects = { git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.6" }
 # Last MIT/Apache version before Stalwart moved later releases to AGPL: pinned exactly (see DESIGN.md).
 calcard = "=0.3.14"
 # The contract and the provider rule (ADR 0045).
-fs-interfaces = { git = "https://github.com/FreeSynergy/fs-interfaces", tag = "v0.0.22", features = ["values"] }
-fs-types = { git = "https://github.com/FreeSynergy/fs-interfaces", tag = "v0.0.22" }
+fs-interfaces = { git = "https://github.com/FreeSynergy/fs-interfaces", tag = "v0.0.27" }
+fs-types = { git = "https://github.com/FreeSynergy/fs-types", tag = "v0.0.1" }
 serde = { version = "1", features = ["derive"] }
 # Without it the parser can be one step off a double, and a valid float would not come back exactly.
 serde_json = { version = "1", features = ["float_roundtrip"] }

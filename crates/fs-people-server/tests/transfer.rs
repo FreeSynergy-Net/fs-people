@@ -6,7 +6,7 @@ use common::{
     CLUB, INVALID, NOT_POSSIBLE, card, create, expect_problem, id_of, name_of, persons_of,
     roles_of, uuids, with_server,
 };
-use fs_interfaces::rpc::write_uuid;
+use fs_rpc::write_uuid;
 
 const VCF: &str = "BEGIN:VCARD\r\nVERSION:4.0\r\nUID:vcard-1\r\nFN:Amara Zolenko\r\nEMAIL:amara@x.org\r\nEND:VCARD\r\n";
 

@@ -6,7 +6,7 @@ use common::{
     CLUB, CONFLICT, INVALID, create, expect_problem, persons_of, roles_of, uuids, with_server,
 };
 use fs_interfaces::people_capnp::{RoleScope, roles};
-use fs_interfaces::rpc::{read_uuid, write_uuid};
+use fs_rpc::{read_uuid, write_uuid};
 use serde_json::json;
 
 fn fill_coach(mut d: fs_interfaces::people_capnp::role_definition::Builder<'_>) {

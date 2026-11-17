@@ -5,10 +5,10 @@
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::{people, person, persons, roles};
-use fs_interfaces::rpc::{Problem, bind_socket, connect, read_envelope, read_uuid, serve};
 use fs_objects::{Store, TursoStore};
 use fs_people_core::PeopleRepo;
 use fs_people_server::PeopleServer;
+use fs_rpc::{Problem, bind_socket, connect, read_envelope, read_uuid, serve};
 use uuid::Uuid;
 
 pub const ME: &str = "https://local.invalid/users/owner";
@@ -164,7 +164,7 @@ pub async fn update_if(
     card: &str,
 ) -> Result<capnp::capability::Response<persons::update_if_results::Owned>, capnp::Error> {
     let mut req = persons.update_if_request();
-    fs_interfaces::rpc::write_uuid(req.get().init_id(), Some(id));
+    fs_rpc::write_uuid(req.get().init_id(), Some(id));
     req.get().set_revision(revision);
     req.get().set_jscontact(card);
     req.send().promise.await
@@ -173,7 +173,7 @@ pub async fn update_if(
 /// Read a person by id: the revision it has now.
 pub async fn revision_now(persons: &persons::Client, id: Uuid) -> u64 {
     let mut get = persons.get_request();
-    fs_interfaces::rpc::write_uuid(get.get().init_id(), Some(id));
+    fs_rpc::write_uuid(get.get().init_id(), Some(id));
     let answer = get.send().promise.await.unwrap();
     answer.get().unwrap().get_person().unwrap().get_revision()
 }

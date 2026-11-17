@@ -4,7 +4,7 @@ mod common;
 
 use common::{CONFLICT, create, expect_problem, id_of, json_of, persons_of, uuids, with_server};
 use fs_interfaces::people_capnp::SameState;
-use fs_interfaces::rpc::{read_uuid, write_uuid};
+use fs_rpc::{read_uuid, write_uuid};
 
 #[tokio::test(flavor = "current_thread")]
 async fn relations_stay_on_the_card() {

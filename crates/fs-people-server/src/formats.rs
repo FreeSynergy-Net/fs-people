@@ -4,8 +4,8 @@
 //! possible" of the provider rule (ADR 0045), not a silent fallback to another format.
 
 use fs_interfaces::Unsupported;
-use fs_interfaces::rpc::unsupported;
 use fs_people_core::{Exporter, Importer, JsContactFormat, VCardFormat};
+use fs_rpc::unsupported;
 
 const IMPORTERS: [&dyn Importer; 2] = [&VCardFormat, &JsContactFormat];
 const EXPORTERS: [&dyn Exporter; 2] = [&VCardFormat, &JsContactFormat];

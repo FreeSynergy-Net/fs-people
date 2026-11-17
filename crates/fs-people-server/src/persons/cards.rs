@@ -5,8 +5,8 @@
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::persons as wire;
-use fs_interfaces::rpc::{check_answer, read_object_id};
 use fs_people_core::{ListFilter, People, Revision};
+use fs_rpc::{check_answer, read_object_id};
 
 use crate::errors::{finish, rpc_error};
 use crate::formats::{exporter, importer};
