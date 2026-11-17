@@ -1,4 +1,6 @@
 //! Tests of the words: both languages agree, German has no English left, the labels are translated.
+//!
+//! Pattern: Oracle by comparison (the English file and the shipped defaults are the references).
 
 use super::{TEXTS, words};
 use fs_components_mf2::check_pairs;
