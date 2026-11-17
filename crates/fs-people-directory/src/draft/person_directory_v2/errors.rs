@@ -113,9 +113,12 @@ impl Error {
                 ("person", person.id.canonical()),
                 ("reason", format!("{reason:?}")),
             ],
-            Self::BatchClosed(id) | Self::UnknownConsent(id) => vec![("id", id.canonical())],
+            Self::BatchClosed(id) | Self::UnknownConsent(id) => vec![("id", format!("{id:?}"))],
             Self::Changed { id, current } => {
-                vec![("id", id.canonical()), ("current", format!("{current:?}"))]
+                vec![
+                    ("id", format!("{id:?}")),
+                    ("current", format!("{current:?}")),
+                ]
             }
             Self::PurposeRetired(p) => vec![("purpose", p.canonical())],
             Self::Invalid(_) | Self::Unavailable(_) | Self::StandardPurposeFixed => Vec::new(),

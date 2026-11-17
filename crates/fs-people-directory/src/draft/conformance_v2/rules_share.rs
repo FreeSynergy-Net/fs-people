@@ -81,12 +81,9 @@ fn k04_expired_or_revoked_share_is_not_shared() {
     let profile = k.foreign_profile(&other);
     let share = k.share(&other, ShareField::Email, &me, None);
     k.act(&me);
-    assert!(
-        futures_block(k.d.excerpt(&profile, &req(ExcerptField::Email, Purpose::OwnUse)))
-            .unwrap()
-            .withheld
-            .is_empty()
-    );
+    let shared =
+        futures_block(k.d.excerpt(&profile, &req(ExcerptField::Email, Purpose::OwnUse))).unwrap();
+    assert_eq!(shared.withheld, Vec::new());
     k.revoke_share(share);
     let ex =
         futures_block(k.d.excerpt(&profile, &req(ExcerptField::Email, Purpose::OwnUse))).unwrap();
@@ -126,7 +123,7 @@ fn k06_ai_sees_no_reason() {
         ex.missing.contains(&ExcerptField::Postal),
         "traceless in `missing`"
     );
-    assert!(ex.withheld.is_empty());
+    assert_eq!(ex.withheld, Vec::new());
 }
 
 #[test]

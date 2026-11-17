@@ -9,7 +9,8 @@
 use super::{
     Candidate, Capabilities, Consent, ConsentEntry, ConsentQuery, ContactAddress, DirectoryChange,
     Error, Excerpt, ExcerptRequest, ObjectId, Page, PersonRef, PersonView, Place, ProposeEntry,
-    Purpose, PurposeDef, PurposeDraft, Reference, Resolved, Result, Suggest, Withdrawal,
+    Purpose, PurposeDef, PurposeDraft, Reference, Resolved, Result, Revision, Suggest, When,
+    Withdrawal,
 };
 use async_trait::async_trait;
 

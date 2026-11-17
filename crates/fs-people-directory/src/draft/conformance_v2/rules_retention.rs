@@ -179,3 +179,37 @@ fn k29_given_by_may_withdraw_without_consent_write() {
     k.grant_admin(&parent, false);
     assert!(block_on(k.d.withdraw_consent(c.id, &withdrawal(on("2026-05-10")))).is_ok());
 }
+
+#[test]
+#[ignore = "kern: no v2 provider yet"]
+fn k24_withdrawal_at_year_end_uses_the_stored_zone() {
+    let k = Kern::start();
+    let p = k.human();
+    k.act(&p);
+    let at = When::At(Utc::parse("2026-12-31T23:30:00Z").expect("a time"));
+    for (zone, until) in [
+        ("Pacific/Pago_Pago", "2029-12-31"),
+        ("Pacific/Kiritimati", "2030-12-31"),
+    ] {
+        let c =
+            block_on(k.d.record_consent(&entry(&p, Purpose::Newsletter, None, on("2026-01-02"))))
+                .unwrap();
+        let mut w = withdrawal(at);
+        w.zone = Some(fs_types::Zone::iana(zone).expect("a zone"));
+        let done = block_on(k.d.withdraw_consent(c.id, &w)).unwrap();
+        assert_eq!(
+            done.retain_until,
+            Some(Date::parse(until).expect("a date")),
+            "{zone}"
+        );
+    }
+}
+
+#[test]
+#[ignore = "kern: no v2 provider yet"]
+fn k28_property_provider_follows_the_calendar_table() {
+    // Orakel: `pure::k28_*` (Kalendertabelle Jahr -> 31.12.). Hier dieselbe Folge von Widerrufen UND Einstellungswechseln
+    // gegen den Anbieter (1970-2200, beide `When`); jeder Nachweis: Tabelle(Widerrufsjahr, AKTUELLES N).
+    let k = Kern::start();
+    let _ = k.settings();
+}
