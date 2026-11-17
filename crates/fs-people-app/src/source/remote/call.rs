@@ -24,4 +24,6 @@ pub(super) enum Call {
     Delete(ObjectId, Reply<()>),
     RolesOf(ObjectId, Reply<Vec<RoleAssignment>>),
     Role(String, Reply<Option<RoleDefinition>>),
+    Assign(ObjectId, String, Option<String>, Reply<RoleAssignment>),
+    Unassign(ObjectId, Reply<()>),
 }

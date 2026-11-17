@@ -2,7 +2,7 @@
 //!
 //! Pattern: Adapter — each role question as a request on the server's roles capability.
 
-use fs_interfaces::people_capnp::roles;
+use fs_interfaces::people_capnp::{RoleScope as Wire, roles};
 use fs_objects::ObjectId;
 use fs_people_core::{Result, RoleAssignment, RoleDefinition, RoleScope};
 use fs_rpc::{read_object_id, write_uuid};
@@ -74,5 +74,68 @@ pub(super) async fn role(roles: &roles::Client, id: &str) -> Result<Option<RoleD
         );
         definition.names.insert(language, text);
     }
+    // How far the role reaches, so the form can say a missing group before anything is written.
+    definition.scope = match wire
+        .get_scope()
+        .map_err(|e| problem(&capnp::Error::from(e), None))?
+    {
+        Wire::Personal => RoleScope::Personal,
+        Wire::Group => RoleScope::Group,
+        Wire::Public => RoleScope::Public,
+    };
     Ok(Some(definition))
+}
+
+/// Give `person` the role, within the group with this IRI or (`None`) personally. The server judges
+/// it (an unknown role, the reach, the kind of card) and says why not.
+pub(super) async fn assign(
+    roles: &roles::Client,
+    person: ObjectId,
+    role: &str,
+    scope: Option<&str>,
+) -> Result<RoleAssignment> {
+    let mut request = roles.assign_request();
+    {
+        let mut params = request.get();
+        write_uuid(params.reborrow().init_person(), Some(person.as_uuid()));
+        params.reborrow().set_role(role);
+        params.reborrow().set_scope(scope.unwrap_or_default());
+        params.set_details("{}");
+    }
+    let answer = request
+        .send()
+        .promise
+        .await
+        .map_err(|e| problem(&e, Some(person)))?;
+    let a = answer
+        .get()
+        .and_then(|r| r.get_assignment())
+        .map_err(|e| problem(&e, Some(person)))?;
+    let text = |t: capnp::Result<capnp::text::Reader<'_>>| -> Result<String> {
+        t.and_then(|t| t.to_string().map_err(Into::into))
+            .map_err(|e: capnp::Error| problem(&e, Some(person)))
+    };
+    let given = text(a.get_scope())?;
+    Ok(RoleAssignment {
+        id: a
+            .get_id()
+            .and_then(read_object_id)
+            .map_err(|e| problem(&e, Some(person)))?,
+        person,
+        role: text(a.get_role())?,
+        scope: (!given.is_empty()).then_some(given),
+        details: serde_json::Map::new(),
+    })
+}
+
+/// End an assignment.
+pub(super) async fn unassign(roles: &roles::Client, assignment: ObjectId) -> Result<()> {
+    let mut request = roles.unassign_request();
+    write_uuid(request.get().init_assignment(), Some(assignment.as_uuid()));
+    request
+        .send()
+        .promise
+        .await
+        .map(|_| ())
+        .map_err(|e| problem(&e, None))
 }

@@ -15,54 +15,95 @@ use fs_components_workbenches::people::{DraftField, PersonDraft};
 use fs_people_core::Card;
 use fs_people_core::card::{Name, SENSITIVE_KEY};
 
-use super::draft::{EMAILS, NAME, ORGANISATIONS, PHONES};
+use super::draft::NAME;
+use super::groups::{CONTEXTS, Kind};
 use super::marks::Marks;
+use super::sensitive::{self, Changes};
+use super::{birthday, role_edit};
+use crate::words_edit as say;
 
 /// What a name may lose together with its text: it only describes that text.
 const NAME_ONLY: [&str; 3] = ["sortAs", "phoneticScript", "phoneticSystem"];
 
-/// Put what changed in `draft` onto `card`.
+/// Put what changed in `draft` onto `card`. Roles are not on the card: the fields of the group
+/// `roles` are the adapter's to carry out (`role_edit.rs`) and are skipped here.
 ///
 /// # Errors
-/// [`SourceError`] for a field this form does not know (nothing may be dropped silently), for a name
+/// [`SourceError`] for a field this form does not know (nothing may be dropped silently), for a
+/// birthday that is no day, for a category that has spaces or one that cannot be lifted, for a name
 /// that holds more than the form shows when it is emptied, and for a card that would be left with
 /// nothing to call the person by. The rule is the same for a new card and a stored one.
 pub fn apply_draft(card: &mut Card, draft: &PersonDraft) -> Result<(), SourceError> {
     let marks = Marks::of(card);
-    let changed: Vec<&DraftField> = draft.fields().filter(|f| f.changed()).collect();
     let mut removals = Vec::new();
     let mut additions = Vec::new();
-    for field in changed {
+    let mut categories = Changes::default();
+    for field in draft.fields().filter(|f| f.changed()) {
         let value = field.value.trim();
         if field.key == NAME {
             set_name(card, value)?;
             continue;
         }
+        if field.key == birthday::KEY {
+            if !value.is_empty() && birthday::parse(value).is_none() {
+                return Err(SourceError::failed(say::birthday()));
+            }
+            birthday::set(card, value);
+            continue;
+        }
         let Some((group, id)) = field.key.split_once('/') else {
             return Err(unknown(field));
         };
-        if !matches!(group, EMAILS | PHONES | ORGANISATIONS) {
-            return Err(unknown(field));
+        match group {
+            role_edit::GROUP => continue,
+            sensitive::GROUP => {
+                categories.note(id, value).map_err(SourceError::failed)?;
+                continue;
+            }
+            _ => {}
         }
+        let (kind, context) = kind_of(group).ok_or_else(|| unknown(field))?;
         if value.is_empty() {
-            removals.push((group, id));
-        } else if !change(card, group, id, value) {
-            additions.push((group, value));
+            removals.push((kind, id));
+        } else if !kind.set(card, id, value) {
+            additions.push((kind, value, context));
         }
     }
-    for (group, value) in additions {
-        add(card, group, value);
+    for (kind, value, context) in additions {
+        kind.add(card, value, context);
     }
-    for (group, id) in removals {
-        remove(card, group, id);
+    for (kind, id) in removals {
+        kind.remove(card, id);
     }
-    marks.restore(card);
+    if !categories.is_empty() {
+        categories.apply(card);
+    }
+    marks.restore_except(card, &categories.lifted);
+    if let Some(cat) = categories.still_marked(card) {
+        return Err(SourceError::failed(crate::words_edit::category_nested(
+            &cat,
+        )));
+    }
     if has_something_to_call_it(card) {
         Ok(())
     } else {
         Err(SourceError::failed(
             "enter at least a name, an e-mail, a phone or an organisation",
         ))
+    }
+}
+
+/// The kind a group key names, and the context of a group like `emails.work`.
+fn kind_of(group: &str) -> Option<(Kind, Option<&str>)> {
+    let (base, context) = match group.split_once('.') {
+        Some((base, context)) => (base, Some(context)),
+        None => (group, None),
+    };
+    let kind = Kind::of_base(base)?;
+    match context {
+        Some(c) if kind.has_contexts() && CONTEXTS.contains(&c) => Some((kind, Some(c))),
+        Some(_) => None,
+        None => Some((kind, None)),
     }
 }
 
@@ -108,53 +149,4 @@ fn set_name(card: &mut Card, value: &str) -> Result<(), SourceError> {
     name.default_separator = None;
     name.full = Some(value.to_string());
     Ok(())
-}
-
-/// Change the entry `id`; `false` if there is none.
-fn change(card: &mut Card, group: &str, id: &str, value: &str) -> bool {
-    match group {
-        EMAILS => card
-            .emails
-            .get_mut(id)
-            .map(|e| value.clone_into(&mut e.address)),
-        PHONES => card
-            .phones
-            .get_mut(id)
-            .map(|p| value.clone_into(&mut p.number)),
-        _ => card
-            .organizations
-            .get_mut(id)
-            .map(|o| o.name = Some(value.to_string())),
-    }
-    .is_some()
-}
-
-fn add(card: &mut Card, group: &str, value: &str) {
-    match group {
-        EMAILS => card.add_email(value),
-        PHONES => card.add_phone(value),
-        _ => card.add_organization(value),
-    };
-}
-
-fn remove(card: &mut Card, group: &str, id: &str) {
-    match group {
-        EMAILS => {
-            card.emails.remove(id);
-        }
-        PHONES => {
-            card.phones.remove(id);
-        }
-        _ => match card.organizations.get_mut(id) {
-            Some(organisation) if !organisation.units.is_empty() => organisation.name = None,
-            _ => {
-                card.organizations.remove(id);
-                for title in card.titles.values_mut() {
-                    if title.organization_id.as_deref() == Some(id) {
-                        title.organization_id = None;
-                    }
-                }
-            }
-        },
-    }
 }

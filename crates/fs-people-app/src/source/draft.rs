@@ -1,22 +1,21 @@
 //! A card as a form.
 //!
-//! Pattern: Adapter — the fields the form edits (name, e-mails, phones, organisations) as neutral
-//! labelled fields. A field's key names what it belongs to on the card (`emails/e1`), so a save
-//! finds the very entry again and keeps everything else about it.
+//! Pattern: Adapter — the fields the form edits (name, nicknames, e-mails, phones, organisations,
+//! titles, addresses, links, notes, birthday, sensitive categories) as neutral labelled text fields,
+//! the kinds of entries from one table (`groups.rs`). A field's key names what it belongs to on the
+//! card (`emails/e1`), so a save finds the very entry again and keeps everything else about it. An
+//! entry that has a context says it in the label (`E-mail (work)`); a new e-mail address or phone
+//! number can be given one by adding it in the group of that context (`emails.work`).
 
-use fs_components_workbenches::people::{DraftField, DraftGroup, FieldCheck, PersonDraft};
+use fs_components_workbenches::people::{DraftField, DraftGroup, PersonDraft};
 use fs_people_core::Card;
 
+use super::groups::{ALL, CONTEXTS, Kind};
+use super::{birthday, sensitive};
 use crate::words::field;
 
 /// The key of the name field.
 pub(super) const NAME: &str = "name/full";
-/// The group of e-mail addresses.
-pub(super) const EMAILS: &str = "emails";
-/// The group of phone numbers.
-pub(super) const PHONES: &str = "phones";
-/// The group of organisations.
-pub(super) const ORGANISATIONS: &str = "organizations";
 
 /// The name as the form shows it: `name.full`, else the joined parts. Not the display name, which
 /// falls back on an e-mail address.
@@ -36,81 +35,87 @@ pub(super) fn written_name(card: &Card) -> String {
     parts.join(" ")
 }
 
-/// `card` as a form, marked with `revision`.
-pub(super) fn draft_of(card: &Card, revision: Option<String>) -> PersonDraft {
-    let entries = |group: &str, label: &str, values: Vec<(&String, String)>| {
-        values
-            .into_iter()
-            .map(|(id, value)| DraftField::new(format!("{group}/{id}"), label, value))
-            .collect::<Vec<_>>()
-    };
-    let emails = card
-        .emails
-        .iter()
-        .map(|(id, e)| (id, e.address.clone()))
+/// The group of `kind`: every entry of the card, then room to add one.
+fn group_of(kind: Kind, card: &Card) -> DraftGroup {
+    let base = kind.base();
+    let fields = kind
+        .entries(card)
+        .into_iter()
+        .map(|e| {
+            let label = if e.contexts.is_empty() {
+                kind.label()
+            } else {
+                field::in_context(&kind.label(), &e.contexts.join(", "))
+            };
+            DraftField::new(format!("{base}/{}", e.id), label, e.text).with_check(kind.check())
+        })
         .collect();
-    let phones = card
-        .phones
+    DraftGroup::new(base, kind.label(), true, fields).with_check(kind.check())
+}
+
+/// The groups for a new e-mail address or phone number with a context: empty, to be added to.
+fn context_groups(kind: Kind) -> Vec<DraftGroup> {
+    if !kind.has_contexts() {
+        return Vec::new();
+    }
+    CONTEXTS
         .iter()
-        .map(|(id, p)| (id, p.number.clone()))
-        .collect();
-    let organisations = card
-        .organizations
-        .iter()
-        .map(|(id, o)| (id, o.name.clone().unwrap_or_default()))
-        .collect();
-    PersonDraft::new(
-        revision,
-        vec![
-            DraftGroup::new(
-                "name",
-                field::name(),
-                false,
-                vec![DraftField::new(NAME, field::name(), written_name(card))],
-            ),
-            DraftGroup::new(
-                EMAILS,
-                field::email(),
-                true,
-                entries(EMAILS, &field::email(), emails),
-            )
-            .with_check(FieldCheck::Email),
-            DraftGroup::new(
-                PHONES,
-                field::phone(),
-                true,
-                entries(PHONES, &field::phone(), phones),
-            )
-            .with_check(FieldCheck::Phone),
-            DraftGroup::new(
-                ORGANISATIONS,
-                field::organisation(),
-                true,
-                entries(ORGANISATIONS, &field::organisation(), organisations),
-            ),
-        ],
+        .map(|c| {
+            let label = field::in_context(&kind.label(), c);
+            DraftGroup::new(format!("{}.{c}", kind.base()), label, true, Vec::new())
+                .with_check(kind.check())
+        })
+        .collect()
+}
+
+fn birthday_group(text: String) -> DraftGroup {
+    DraftGroup::new(
+        birthday::GROUP,
+        field::birthday(),
+        false,
+        vec![DraftField::new(birthday::KEY, field::birthday(), text)],
     )
 }
 
-/// The form for a new person: one empty field of each kind.
+/// `card` as a form, marked with `revision`. The roles are the source's to add: they are not on the
+/// card.
+pub(super) fn draft_of(card: &Card, revision: Option<String>) -> PersonDraft {
+    let mut groups = vec![DraftGroup::new(
+        "name",
+        field::name(),
+        false,
+        vec![DraftField::new(NAME, field::name(), written_name(card))],
+    )];
+    for kind in ALL {
+        groups.push(group_of(kind, card));
+        groups.extend(context_groups(kind));
+    }
+    groups.push(birthday_group(birthday::written(card)));
+    groups.push(sensitive::group_of(card));
+    PersonDraft::new(revision, groups)
+}
+
+/// The form for a new person: one empty field of each of the usual kinds.
 pub(super) fn blank_draft() -> PersonDraft {
-    let added = |group: &str, label: &str| {
-        let mut one = DraftField::new(format!("{group}/+0"), label, "");
-        one.added = true;
-        DraftGroup::new(group, label, true, vec![one])
-    };
-    PersonDraft::new(
-        None,
-        vec![
-            DraftGroup::new(
-                "name",
-                field::name(),
-                false,
-                vec![DraftField::new(NAME, field::name(), "")],
-            ),
-            added(EMAILS, &field::email()).with_check(FieldCheck::Email),
-            added(PHONES, &field::phone()).with_check(FieldCheck::Phone),
-            added(ORGANISATIONS, &field::organisation()),
-        ],
-    )
+    let mut groups = vec![DraftGroup::new(
+        "name",
+        field::name(),
+        false,
+        vec![DraftField::new(NAME, field::name(), "")],
+    )];
+    for kind in ALL {
+        let mut group =
+            DraftGroup::new(kind.base(), kind.label(), true, Vec::new()).with_check(kind.check());
+        if matches!(kind, Kind::Emails | Kind::Phones | Kind::Organizations) {
+            let mut one = DraftField::new(format!("{}/+0", kind.base()), kind.label(), "")
+                .with_check(kind.check());
+            one.added = true;
+            group.fields.push(one);
+        }
+        groups.push(group);
+        groups.extend(context_groups(kind));
+    }
+    groups.push(birthday_group(String::new()));
+    groups.push(sensitive::blank_group());
+    PersonDraft::new(None, groups)
 }

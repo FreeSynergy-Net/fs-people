@@ -11,7 +11,7 @@ use tokio::sync::mpsc;
 
 use super::call::{Call, Revisions};
 use super::persons::{create, delete, get, list, update, update_if};
-use super::roles::{role, roles_of};
+use super::roles::{assign, role, roles_of, unassign};
 
 pub(super) fn worker(
     socket: &Path,
@@ -93,6 +93,12 @@ async fn carry_out(
         }
         Call::Role(id, reply) => {
             let _ = reply.send(role(roles, &id).await);
+        }
+        Call::Assign(person, role, scope, reply) => {
+            let _ = reply.send(assign(roles, person, &role, scope.as_deref()).await);
+        }
+        Call::Unassign(id, reply) => {
+            let _ = reply.send(unassign(roles, id).await);
         }
         Call::Get(id, reply) => {
             let _ = reply.send(get(persons, revisions, id).await);

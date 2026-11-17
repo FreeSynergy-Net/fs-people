@@ -25,7 +25,7 @@ Latest tag: `v0.0.14`.
 
 ## What is not there yet
 
-- The window is a first version. It cannot yet manage groups, relations or roles, set the sensitive mark, undo, or update live. A closed window loses an unsaved draft.
+- The window is a first version. It cannot yet manage groups or relations, undo, or update live. A closed window loses an unsaved draft. On the way to 0.0.15 the form edits all the kinds of entries, gives and takes back roles (typed, not chosen) and sets and lifts the sensitive categories (typed; kept in this program until the contract `person_directory` v2).
 - The window talks to the server of `fs-people serve` (it starts one if none runs), and each call has a 10 s limit: a server that never answers ends in the message `timeout`. The window still waits for that long (a work thread is planned).
 - No sign-in. The acting person is a fixed placeholder.
 - No CardDAV and no sync between devices.

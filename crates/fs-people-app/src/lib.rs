@@ -16,6 +16,7 @@ mod source;
 mod surface;
 mod transfer;
 mod words;
+mod words_edit;
 
 pub use source::{CALL_LIMIT, NoRoles, PeopleAdapter, RemotePeople, START_LIMIT, apply_draft};
 pub use surface::{PeopleScreen, app_widget};

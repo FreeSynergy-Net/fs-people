@@ -104,3 +104,24 @@ impl Drop for Scratch {
         let _ = std::fs::remove_dir_all(&self.0);
     }
 }
+
+/// The key of the field `added` by `add_field(group)`: the last field of that group.
+pub fn added_key(s: &mut PeopleState, group: &str) -> String {
+    s.add_field(group);
+    s.editing()
+        .unwrap()
+        .draft
+        .groups
+        .iter()
+        .find(|g| g.key == group)
+        .and_then(|g| g.fields.last())
+        .map(|f| f.key.clone())
+        .unwrap_or_else(|| panic!("no group {group} in the form"))
+}
+
+/// What the form says went wrong, or empty.
+pub fn error_of(s: &PeopleState) -> String {
+    s.editing()
+        .and_then(|e| e.error.clone())
+        .unwrap_or_default()
+}

@@ -25,6 +25,7 @@ use crate::words::field;
 use super::apply::apply_draft;
 use super::draft::{blank_draft, draft_of};
 use super::marks::is_marked;
+use super::role_edit;
 use super::sheet::{first_email, sensitive_mark, sheet_of};
 
 /// The contract of the people program, for the workbench. Do not call it from inside the runtime:
@@ -148,6 +149,23 @@ impl PeopleSource for PeopleAdapter {
         let card = card_of(&object).map_err(|e| reason(&e))?;
         let mut draft = draft_of(&card, Some(revision_of(&object)));
         draft.marks.extend(sensitive_mark(&card, &object));
+        // Never silent: a source without roles, or a failing one, says so instead of showing no group.
+        match self
+            .runtime
+            .block_on(self.roles.roles_of(object.envelope.id))
+        {
+            Ok(held) => draft.groups.push(role_edit::group_of(&held)),
+            Err(Error::Unsupported(u)) => draft.marks.push(format!(
+                "{}: {}",
+                field::roles(),
+                field::unsupported(u.capability(), "people")
+            )),
+            Err(e) => draft.marks.push(format!(
+                "{}: {}",
+                field::roles(),
+                field::unreadable().replacen("{}", &e.to_string(), 1)
+            )),
+        }
         Ok(draft)
     }
 
@@ -179,6 +197,9 @@ impl PeopleSource for PeopleAdapter {
         }
         let mut card = card_of(&object).map_err(|e| reason(&e))?;
         apply_draft(&mut card, draft)?;
+        // Roles are assignments of their own: judged before the card is written, given after it.
+        let roles = role_edit::plan(draft)?;
+        role_edit::check(&roles, self.roles.as_ref(), &self.runtime)?;
         // Compare and write in ONE step, or not at all: a source without `update_checked` is not
         // written to (a plain `update` after the check above would lose a change made in between).
         self.runtime
@@ -192,13 +213,17 @@ impl PeopleSource for PeopleAdapter {
                     SourceError::unsupported(crate::words::no_checked_update())
                 }
                 other => reason(&other),
-            })
+            })?;
+        role_edit::run(&roles, id, self.roles.as_ref(), &self.runtime)
     }
 
     fn create(&self, draft: &PersonDraft) -> Result<String, SourceError> {
         let mut card = Card::individual("");
         card.name = None;
         apply_draft(&mut card, draft)?;
+        if !role_edit::plan(draft)?.is_empty() {
+            return Err(SourceError::failed(crate::words_edit::role_create()));
+        }
         self.runtime
             .block_on(self.people.create(card))
             .map(|object| object.envelope.id.to_string())

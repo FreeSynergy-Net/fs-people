@@ -192,6 +192,24 @@ pub(crate) mod field {
     pub fn unreadable() -> String {
         tpl("f-unreadable")
     }
+    pub fn birthday() -> String {
+        t("f-birthday")
+    }
+    pub fn role_field() -> String {
+        t("f-role-field")
+    }
+    pub fn sensitive_group() -> String {
+        t("f-sensitive-group")
+    }
+    /// `what` in a context: "E-mail (work)". `ctx` is `work` or `private`, or any other word as it came.
+    pub fn in_context(what: &str, ctx: &str) -> String {
+        let known = match ctx {
+            "work" => t("f-ctx-work"),
+            "private" => t("f-ctx-private"),
+            other => other.to_owned(),
+        };
+        say("f-ctx", &Args::new().text("what", what).text("ctx", &known))
+    }
     /// A section the source does not offer: said, never left out (code, capability and source named).
     pub fn unsupported(capability: &str, provider: &str) -> String {
         say(

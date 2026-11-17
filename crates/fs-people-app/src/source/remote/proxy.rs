@@ -4,8 +4,8 @@
 //! client lives on one thread, so a worker thread owns the connection and the proxy hands it calls
 //! through a channel; the window thread waits for the answer like for the in-process core.
 //!
-//! Provisional: only what the window needs (read, list, search, create, update, delete). Roles are
-//! not asked, so the window shows none over the socket (`RoleBook` is not implemented here).
+//! Provisional: only what the window needs (read, list, search, create, update, delete, and of the
+//! roles: read one, read a person's, give and end). The rest of `RoleBook` answers "not possible".
 
 use std::path::Path;
 use std::sync::{Arc, PoisonError};
@@ -188,5 +188,26 @@ impl RoleBook for RemotePeople {
     async fn role(&self, id: &str) -> Result<Option<RoleDefinition>> {
         let id = id.to_string();
         self.ask(|r| Call::Role(id, r)).await
+    }
+
+    async fn assign_role(
+        &self,
+        person: ObjectId,
+        role: &str,
+        scope: Option<&str>,
+        details: serde_json::Map<String, serde_json::Value>,
+    ) -> Result<RoleAssignment> {
+        // The wire carries `details` for roles this program owns; none of the form's roles does.
+        if !details.is_empty() {
+            return Err(Error::Conflict(
+                "role details are not sent over the socket yet".into(),
+            ));
+        }
+        let (role, scope) = (role.to_string(), scope.map(str::to_string));
+        self.ask(|r| Call::Assign(person, role, scope, r)).await
+    }
+
+    async fn unassign_role(&self, assignment: ObjectId) -> Result<()> {
+        self.ask(|r| Call::Unassign(assignment, r)).await
     }
 }
