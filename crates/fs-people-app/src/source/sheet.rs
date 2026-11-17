@@ -45,7 +45,7 @@ pub(super) fn sheet_of(
             .collect(),
     );
     if is_ai {
-        sheet.marks.push(field::ai().to_string());
+        sheet.marks.push(field::ai());
     }
     sheet.marks.extend(sensitive_mark(card, object));
     if let Some(photo) = photo_of(card) {

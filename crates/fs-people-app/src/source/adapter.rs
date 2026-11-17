@@ -161,7 +161,7 @@ impl PeopleSource for PeopleAdapter {
             FieldCheck::Phone => PhoneNumber::check(text),
             _ => Ok(()),
         };
-        found.err().map(|p| crate::words::problem(p).to_string())
+        found.err().map(crate::words::problem)
     }
 
     fn blank(&self) -> Result<PersonDraft, SourceError> {
