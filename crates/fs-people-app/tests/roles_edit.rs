@@ -110,7 +110,7 @@ fn a_group_role_needs_its_group() {
         "{}",
         error_of(&s)
     );
-    assert!(roles_of(&w, &key).is_empty());
+    assert_eq!(roles_of(&w, &key), []);
     assert_eq!(
         w.card(&key).display_name(),
         "Amara",
@@ -147,7 +147,7 @@ fn the_ai_role_is_not_given_here() {
     let mut s = start(&w, &key);
     give(&mut s, "ai");
     s.save();
-    assert!(roles_of(&w, &key).is_empty());
+    assert_eq!(roles_of(&w, &key), []);
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn the_form_lists_the_roles_but_not_the_ai_marking() {
             key.parse().unwrap(),
             "member",
             Some(GROUP),
-            Default::default(),
+            serde_json::Map::default(),
         ))
         .unwrap();
     let bot = w.add(fs_people_core::Card::application("Bot"));

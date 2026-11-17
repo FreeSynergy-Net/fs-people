@@ -12,10 +12,6 @@
 mod common;
 
 use common::{World, added_key, error_of, person};
-use fs_people_core::Card;
-use serde_json::json;
-
-const KEY: &str = "freesynergy.net:sensitive";
 
 fn stored_marks(w: &World, key: &str) -> Vec<String> {
     w.runtime
@@ -143,7 +139,7 @@ fn a_category_has_no_spaces() {
         "{}",
         error_of(&s)
     );
-    assert!(w.card(&key).sensitive_categories().is_empty());
+    assert_eq!(w.card(&key).sensitive_categories(), [] as [String; 0]);
 }
 
 #[test]
