@@ -4,6 +4,7 @@ schema = 2
 
 [program]
 name = "people"
+version = "0.0.1"
 skeleton = "0.1.0"
 capability = "people"
 summary = { en = "People, roles and contacts", de = "Menschen, Rollen und Kontakte" }
