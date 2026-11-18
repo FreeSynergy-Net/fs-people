@@ -259,7 +259,7 @@ label = { en = "Group", de = "Gruppe" }
 # The main view is a forms description (written by task V-F).
 [frontend]
 standard = "list"
-layout = "layout/list.toml"
+layout = "forms/list.toml"
 covers = "all"
 
 # Exceptions: rules without a standard (to be held as talks; the records do not exist yet, so the check says talk-not-found).
@@ -268,7 +268,7 @@ what = "Same-person proposals: match rules (shared e-mail, shared phone, same na
 why = "no standard describes proposing that two profiles are one person (ADR 0019/0029/0058); owl:sameAs only states the result"
 checked = ["JSContact RFC 9553", "owl:sameAs", "schema.org sameAs"]
 alternatives = ["no proposals, manual link only"]
-talk = "conventions/talks/2026-11-xx-people-same-person.md"
+talk = "conventions/talks/2026-11-18-people-gleiche-person.md"
 paths = ["crates/fs-people-core/src/matching/"]
 
 [[exception]]
@@ -276,5 +276,5 @@ what = "Sensitive mark of a card and release per recipient at export (ADR 0029)"
 why = "the mark and the explicit release are a project rule for protected data; W3C DPV is the vocabulary candidate, not a rule"
 checked = ["W3C DPV", "ADR 0029"]
 alternatives = ["DPV categories only (kit Schutzangabe, ADR 0098)"]
-talk = "conventions/talks/2026-11-xx-people-sensitive-mark.md"
+talk = "conventions/talks/2026-11-18-people-sensibel-markierung.md"
 paths = ["crates/fs-people-core/src/card/vendor.rs"]
