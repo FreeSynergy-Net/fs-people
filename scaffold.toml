@@ -275,7 +275,7 @@ paths = ["crates/fs-people-core/src/matching/", "crates/fs-people-core/src/repo/
 
 [[exception]]
 what = "Sensitive mark of a card and release per recipient at export (ADR 0029)"
-why = "the mark and the explicit release are a project rule for protected data (decision of the owner: "sensitive" is a protection building block with DPV vocabulary); DPV is a vocabulary candidate, not a W3C recommendation"
+why = "the mark and the explicit release are a project rule for protected data (decision of the owner: sensitive is a protection building block with DPV vocabulary); DPV is a vocabulary candidate, not a W3C recommendation"
 checked = ["DPVCG (W3C Data Privacy Vocabularies and Controls CG)", "ADR 0029"]
 alternatives = ["DPV categories only (kit Schutzangabe, ADR 0098)"]
 talk = "conventions/talks/2026-11-18-people-sensibel-markierung.md"
