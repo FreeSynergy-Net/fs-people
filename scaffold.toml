@@ -14,7 +14,7 @@ categories = ["Office", "ContactManagement"]
 [contract]
 version = "0.1"
 id = "0xf41de01e6495cb24"
-provides = ["people.persons"]
+provides = [{ contract = "people.persons", version = "0.1" }]
 
 [[type]]
 name = "Person"
