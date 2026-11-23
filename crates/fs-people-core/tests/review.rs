@@ -7,7 +7,7 @@ mod common;
 use std::sync::Arc;
 
 use common::{ME, person, repo};
-use fs_objects::{ObjectId, Store, TursoStore};
+use fs_objects::{Store, TursoStore};
 use fs_people_core::index::{normalise_email, normalise_phone};
 use fs_people_core::{Card, Error, PeopleRepo};
 use serde_json::json;
@@ -194,9 +194,9 @@ async fn item_4_an_import_keeps_a_card_with_an_unclear_marking_names_it_and_trea
 
 #[tokio::test]
 async fn item_4_a_plain_store_reports_an_unclear_marking_as_failed_with_its_reason() {
-    let dir = std::env::temp_dir().join(format!("fs-review-{}", ObjectId::new()));
-    std::fs::create_dir_all(&dir).unwrap();
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open(dir.join("c.db")).await.unwrap());
+    // Removed when `dir` is dropped, also when an assert below fails.
+    let dir = tempfile::tempdir().unwrap();
+    let store: Arc<dyn Store> = Arc::new(TursoStore::open(dir.path().join("c.db")).await.unwrap());
     let r = PeopleRepo::new(store, ME);
     let mut card = person("Unclear", "u@x.org");
     card.extra
@@ -207,5 +207,4 @@ async fn item_4_a_plain_store_reports_an_unclear_marking_as_failed_with_its_reas
     assert_eq!(report.failed.len(), 1, "{report:?}");
     assert!(report.failed[0].contains("Unclear"), "{report:?}");
     assert!(report.failed[0].contains("not encrypted"), "{report:?}");
-    std::fs::remove_dir_all(dir).ok();
 }
