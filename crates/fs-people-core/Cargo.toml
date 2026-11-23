@@ -8,8 +8,8 @@ rust-version.workspace = true
 
 [dependencies]
 fs-objects = { git = "https://github.com/FreeSynergy/fs-objects", tag = "v0.0.1" }
-# Last MIT/Apache version before Stalwart moved later releases to AGPL: pinned exactly (see DESIGN.md).
-calcard = "=0.3.14"
+# Maintained fork of calcard 0.3.14 (Apache-2.0 OR MIT), pinned exactly; only the adapter modules name it (see DESIGN.md).
+calcard-next = "=3.0.1"
 # The contract and the provider rule (ADR 0045).
 fs-interfaces = { git = "https://github.com/FreeSynergy/fs-interfaces", tag = "v0.0.22", features = ["values"] }
 fs-types = { git = "https://github.com/FreeSynergy/fs-interfaces", tag = "v0.0.22" }

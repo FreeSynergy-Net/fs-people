@@ -1,6 +1,6 @@
 //! vCard as an [`Importer`] / [`Exporter`].
 //!
-//! Pattern: Adapter — [`VCardFormat`] puts the `calcard` based `vcard` module behind our traits.
+//! Pattern: Adapter — [`VCardFormat`] puts the `calcard-next` based `vcard` module behind our traits.
 
 use super::traits::{Exporter, ImportItems, ImportedCard, Importer};
 use crate::card::Card;

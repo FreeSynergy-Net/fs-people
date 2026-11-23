@@ -1,6 +1,6 @@
-//! vCard 4.0 (RFC 6350) via `calcard`: module map.
+//! vCard 4.0 (RFC 6350) via `calcard-next`: module map.
 //!
-//! Pattern: Adapter (declarations) — the files wrap the foreign `calcard` crate; the
+//! Pattern: Adapter (declarations) — the files wrap the foreign `calcard-next` crate; the
 //! `format::VCardFormat` type puts them behind the `Importer` / `Exporter` traits.
 
 mod export;

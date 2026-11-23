@@ -1,9 +1,9 @@
-//! vCard text to validated [`Card`]s through `calcard` (also reads vCard 2.1 and 3.0).
+//! vCard text to validated [`Card`]s through `calcard-next` (also reads vCard 2.1 and 3.0).
 //!
-//! Pattern: Adapter — `calcard`'s JSContact model is foreign; we exchange JSON text at the
+//! Pattern: Adapter — `calcard-next`'s JSContact model is foreign; we exchange JSON text at the
 //! boundary and own the typed `Card`. The imported text is kept as the original (ADR 0030).
 
-use calcard::vcard::VCard;
+use calcard_next::vcard::VCard;
 use fs_objects::Blob;
 
 use super::split::scan;
@@ -16,7 +16,7 @@ use crate::validate::{check_exact_numbers, validate};
 /// Media type of the stored original.
 pub const VCARD_MEDIA_TYPE: &str = "text/vcard";
 
-/// Convert one vCard (any version calcard understands: 2.1, 3.0, 4.0) to a validated card.
+/// Convert one vCard (any version calcard-next understands: 2.1, 3.0, 4.0) to a validated card.
 pub fn card_from_vcard(vcard_text: &str) -> Result<Card> {
     let vcard =
         VCard::parse(vcard_text).map_err(|e| Error::VCard(format!("cannot parse vCard: {e:?}")))?;

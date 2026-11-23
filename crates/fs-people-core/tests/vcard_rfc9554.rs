@@ -1,6 +1,6 @@
 //! vCard with the RFC 9554 parameters against the whole of RFC 9553: a card with every property goes out
-//! as vCard 4.0 and comes back through `calcard`. What does not come back is named here, so that a
-//! better `calcard` shows up as a failing test instead of an unnoticed change (`Unsupported`, DESIGN.md).
+//! as vCard 4.0 and comes back through `calcard-next`. What does not come back is named here, so that a
+//! better `calcard-next` shows up as a failing test instead of an unnoticed change (`Unsupported`, DESIGN.md).
 
 use fs_people_core::Card;
 use fs_people_core::vcard::{card_from_vcard, card_to_vcard};
@@ -8,9 +8,9 @@ use serde_json::Value;
 
 const FULL: &str = include_str!("fixtures/full_card.json");
 
-/// What `calcard` 0.3.14 does not bring back, by JSON path.
+/// What `calcard-next` 3.0.1 does not bring back, by JSON path.
 const NOT_BACK: &[&str] = &[
-    // ORG-DIRECTORY: calcard writes `label;uri` as the value and reads it back as the uri; the
+    // ORG-DIRECTORY: calcard-next writes `label;uri` as the value and reads it back as the uri; the
     // parameters (CONTEXTS, MEDIATYPE) do not come back.
     "/directories/d1/uri",
     "/directories/d1/contexts",
@@ -90,7 +90,7 @@ fn the_ids_of_the_sub_objects_survive_the_round_trip() {
 fn a_vcard_without_a_property_we_know_still_comes_in_whole() {
     let vcf = "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Mirela\r\nX-FUTURE;FOO=1:bar\r\nEND:VCARD\r\n";
     let card = card_from_vcard(vcf).unwrap();
-    // What calcard cannot place stays on the card (extension `vCard`), so it can go out again.
+    // What calcard-next cannot place stays on the card (extension `vCard`), so it can go out again.
     let out = card_to_vcard(&card).unwrap();
     assert!(out.contains("X-FUTURE"), "{out}");
 }

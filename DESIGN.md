@@ -21,7 +21,7 @@ Version 0.0.5 (Person on RFC 9553 in full, type description, patch / check / sug
 | Search by name / nickname / e-mail / phone / organisation (substring, case-insensitive) | done **in the store**: one query with an OR-group of `Op::Contains` (name, `name_sort`, nickname, e-mail, org, phone digits); Unicode case-insensitive, `%` `_` literal |
 | Listing / ordering | `list` ordered by the `name_sort` index ("surname, given") case-insensitively, limit/offset in the store (no Rust sort) |
 | Formats behind `Importer` / `Exporter` traits (`VCardFormat`, `JsContactFormat`); `PeopleRepo::import(&dyn Importer, ..)` / `export(&dyn Exporter, ..)` | done |
-| vCard 4.0 import/export via `calcard` (also reads 2.1/3.0); original kept per card (`text/vcard`, ADR 0030); re-import skips known `uid`s | done |
+| vCard 4.0 import/export via `calcard-next` (also reads 2.1/3.0); original kept per card (`text/vcard`, ADR 0030); re-import skips known `uid`s | done |
 | Groups / folders: `kind: group` + `members` (ADR 0037); add/remove member, resolve members, groups of a card | done |
 | Same-person proposals (ADR 0019/0029) as a `MatchStrategy` (default `SharedContactPoint`, swappable with `with_match_strategy`): shared normalised e-mail or phone, same `kind`, never for sensitive cards, groups, or already linked pairs; confirm creates an AS2 `Relationship` (`owl:sameAs`); unlink; deleting a card removes its links | done |
 | **Linking profiles (ADR 0058)**, provisional: every contact is a profile, linked to a person or not. The rules are Specifications, one per feature (`MatchRule`: shared e-mail, shared phone of six digits or more, same name at the same organisation), combined by `RuleMatcher` (default `standard()`); a proposal is only ever a question. A pair stands `Proposed`, `Confirmed` or `Rejected` (`ProposalState`, one table for `confirm_same_person`, `reject_same_person`, `reopen_same_person`, `unlink`); a rejected pair is not proposed again, and the user can link it by hand at any time, which removes the rejection. **Unlinking counts as a rejection** (decision of this thread, to be confirmed by the owner: asking again right after the user took a link back would nag); `reopen_same_person` takes it back. Rejections are AS2 `Reject` objects that name no card (sensitive cards cannot be rejected), deleted with the cards they name and when a card turns sensitive. Linking writes the link, then removes the rejection: two writes, so after a failure in between both exist and the state reads `Confirmed`. Taking over what a person shares after a link is **only an interface** (`Adoption`: `offered`, `adopt`, every method `Unsupported`, no capability id): it depends on the release of the person, and linking copies nothing | done, draft; contract `rejectSame`, `reopenSame`, `sameState` in `fs-interfaces` v0.50.0 |
@@ -45,7 +45,7 @@ Version 0.0.5 (Person on RFC 9553 in full, type description, patch / check / sug
 | Compare-and-set: `People::update_checked(id, Revision, card)` and `Persons.updateIf`; every `Person` carries `revision` (derived from the stored time and card, not stored; compare for equality only). A stale revision is `people/conflict` (409) whose detail starts `conflict:` and names no revision; nothing is written. Atomic inside one process (the write turn) | done, draft |
 | **Person on RFC 9553 in full (thread P, 2026-11-10)** | `Card` types every property of the table in `description.md` (`prodId`, `language`, `speakAs`, `onlineServices`, `preferredLanguages`, `calendars`, `schedulingAddresses`, `cryptoKeys`, `directories`, `media`, `localizations`, `anniversaries`, `personalInfo`, and the missing members of `name`, `address`, `link`, `note`), each sub-object in `card/{parts,resources,about}.rs`; unknown members stay in `extra`. Test `tests/rfc9553.rs`: one fixture with a value for every property comes back equal and leaves nothing in an `extra` map; a card stored before (the properties sat in `extra`) comes back byte-equal. Rules for the new sub-objects (required members, `@type`, `pref` 1 to 100) in `validate/resources.rs` | done |
 | **Type description `Person`** | `impl DescribesType for Card` (`fs-types`, `person/describe.rs`): 29 fields, from one table (`person/fields.rs`) that the check reads too; commands `create`, `find`, `delete`, `check`, `suggest` (`patch` left out, `change` in; see below). Served as `People.types` (`TypeCatalog`, `people.capnp` in `fs-interfaces` v0.0.4). `People::patch` (PatchObject, RFC 8984 section 1.4.9: all or nothing, never into arrays, parent must exist), `People::check` (RFC rules, then each field by its basic type; findings are path + code), `People::suggest` (the rule of the basic type with the known values of the book: e-mail domains, most used first; at most 20; never learns from a sensitive card; reads at most the first 1000 cards in name order) | done, draft |
-| vCard against all of RFC 9553 (RFC 9554 parameters via `calcard` 0.3.14) | `tests/vcard_rfc9554.rs`: the full card goes out and comes back; what does not come back is a named list (see "Unsupported" below), so a better `calcard` makes the test fail on purpose | done |
+| vCard against all of RFC 9553 (RFC 9554 parameters via `calcard-next` 0.3.14) | `tests/vcard_rfc9554.rs`: the full card goes out and comes back; what does not come back is a named list (see "Unsupported" below), so a better `calcard-next` makes the test fail on purpose | done |
 | Tests | 142 in the core, 60 for the server (the app has its own: `crates/fs-people-app/tests`): over a real socket against the real store, one of them the real binary across a restart. Two small providers beside the real one, only for what it cannot show: the provider rule (a read-only source) and a feed whose reads fail |
 | ADR 0043 refactor | done: no file over the hard limit of 300 lines, five test files over the guideline of 200 (`check_rust_rules.py`: 0 errors, 5 warnings: app tests keeps and people, core tests guards and role_forms, server test roles), `//! Pattern:` in every module, `#![deny(missing_docs)]`, `#![warn(clippy::pedantic)]` clean |
 
@@ -128,7 +128,7 @@ its inherent methods, so callers that do not import the trait keep working. Ever
 | `repo/envelope.rs` | Adapter | card to AS2 `Profile` envelope + index fields (ADR 0020, 0032) |
 | `repo/transfer.rs` | Template method | fixed import flow (parse, skip known uid, validate, store, report); parsing is the `Importer` |
 | `repo/proposals.rs`, `matching/*` | Strategy | `MatchStrategy` decides who looks alike (`SharedContactPoint`); the repository keeps the ADR 0029 policy |
-| `format/*`, `vcard/*` | Adapter (+ Strategy) | `Importer` / `Exporter` traits; vCard (calcard) and JSContact JSON behind them, more formats plug in |
+| `format/*`, `vcard/*` | Adapter (+ Strategy) | `Importer` / `Exporter` traits; vCard (calcard-next) and JSContact JSON behind them, more formats plug in |
 | `card/*` | Value objects / Template method (macro) | typed JSContact with lossless `extra`; `sub_object!` fixes the shared skeleton |
 | `card/display.rs` | Chain of responsibility | display name fallback chain (ADR 0032) |
 | `card/vendor.rs` | Visitor | recursive search for the sensitive marking (ADR 0029) |
@@ -176,8 +176,8 @@ So a client no longer needs `split_once(": ")`, `strip_prefix("stored data: ")`,
 ## Crates
 
 * `fs-objects` (git tag v0.4.0). `fs-interfaces` (git tag v0.43.0): `Capabilities`, `Unsupported`; the server also takes the contract and `rpc` from it.
-* `calcard =0.3.14` (Apache-2.0 OR MIT): vCard <-> JSContact following RFC 9554. **Pinned exactly**: Stalwart moved later
-  versions to AGPL, which we must not use. Pulls `jmap-tools` (Apache-2.0 OR MIT), `chrono`, `mail-parser` etc., all permissive.
+* `calcard-next =3.0.1` (Apache-2.0 OR MIT, maintained fork of calcard 0.3.14): vCard <-> JSContact following RFC 9554. **Pinned exactly**: the upstream calcard moved later
+  versions to AGPL, which we must not use (nothing is ever taken from the AGPL Stalwart monorepo). Pulls `jmap-tools`, `jiff` 0.2 etc., all permissive.
   Its JSON model is separate from ours: we exchange JSON text at the boundary and own the typed `Card`.
 * `fs-components-app`, `fs-components-workbenches` (frontend only; git `rev`, provisional until a tag exists).
 * `serde`, `serde_json`, `chrono` (timestamps), `thiserror`, `async-trait` (MIT OR Apache-2.0, already used by fs-objects); dev: `tokio`, `proptest`.
@@ -207,7 +207,7 @@ So a client no longer needs `split_once(": ")`, `strip_prefix("stored data: ")`,
 * **Link, don't merge.** The `Relationship` object has `subject`/`object` IRIs, `relationship: "owl:sameAs"` and index fields `subject`/`object`
   (object ids) for lookup. Both cards stay. `relatedTo` is not used.
 * **Groups** are normal cards of `kind: group`; `members` maps member `uid` -> `true` (RFC 9553). Folder = group = mailing list (ADR 0037).
-* **vCard export** strips nested `@type` members (no vCard meaning) and relies on calcard's RFC 9554 parameters (`PROP-ID`, `JSCOMPS`, `JSPROP`)
+* **vCard export** strips nested `@type` members (no vCard meaning) and relies on calcard-next's RFC 9554 parameters (`PROP-ID`, `JSCOMPS`, `JSPROP`)
   for lossless return. Unknown vendor properties are exported as `JSPROP`.
 
 Unsupported in the role files (nothing pretends otherwise): export of an `org:Role` assignment as `org:Membership`; the context file `roles.jsonld` (the string in `@context` is not fetched, only `@base` is read); SHACL and value types of `fields`; `closeMatch` and `broader` are stored and returned, never followed or checked; hierarchy queries; friends, partners (relations) and clubs (research open); a lead's move to prospect or customer (end one assignment, start the next).
@@ -257,7 +257,7 @@ Still wanted:
 * Sync token / CardDAV (RFC 6352) is not part of the core.
 * Field-level `freesynergy.net:sensitive` is detected, but export/sharing filtering by field (ADR 0029 point 2) is a hub/frontend concern.
 * JSContact `PatchObject` updates (RFC 9553) are not implemented; `update` replaces the whole card.
-* The vCard `PHOTO`/`KEY` handling is whatever calcard does (not tested here).
+* The vCard `PHOTO`/`KEY` handling is whatever calcard-next does (not tested here).
 * "Dismissed" proposals are not remembered; a person who rejects one will see it again.
 
 ## After the sprint (strategy list, 2026-11-07)
@@ -313,7 +313,7 @@ Missing for "the window shows the standard" (in this order, from the hand test o
 * `suggest` takes the field name as `text` (the keys of a `choice` cannot be camel case); fields without a completion (`name`, `phone`, `date`, `image`, `text`) answer an empty list, as `fs-types` does.
 * The CLI and the window have no `patch`, `check` or `suggest` command yet; the server has.
 
-**vCard (RFC 9554 via `calcard` 0.3.14, pinned: later versions are AGPL).** Whole card out and back: what does not come back is the members of a directory (`ORG-DIRECTORY` is written as `label;uri`; the uri comes back with the label in front, the contexts, label and media type are lost); `name.sortAs` as a map now comes back, and the calendar scale of a birth date moves from the date to the anniversary. Nested `@type` members are dropped on the way out (RFC 9553 section 1.4.5 makes them optional). The imported text is kept as the original (ADR 0030) in any case, so nothing of an import is lost, whatever `calcard` does with it.
+**vCard (RFC 9554 via `calcard-next` 0.3.14, pinned: later versions are AGPL).** Whole card out and back: what does not come back is the members of a directory (`ORG-DIRECTORY` is written as `label;uri`; the uri comes back with the label in front, the contexts, label and media type are lost); `name.sortAs` as a map now comes back, and the calendar scale of a birth date moves from the date to the anniversary. Nested `@type` members are dropped on the way out (RFC 9553 section 1.4.5 makes them optional). The imported text is kept as the original (ADR 0030) in any case, so nothing of an import is lost, whatever `calcard-next` does with it.
 
 **Decisions provisional (for the strategy):** (1) `PersonProblem` is path + code, codes from `fs-types` (`TypeProblem::code`) or `unknown-field`; RFC 9553 structure problems of the card still travel as the sentence the core wrote (they are not yet codes, `coding.md` section 2a: to do when the core is translated). (2) `check` is a command of its own; `create` and `update` do not judge the basic-type rules (the window judges only what the person changed). (3) `People.types` builds the registry per call; it is tiny.
 

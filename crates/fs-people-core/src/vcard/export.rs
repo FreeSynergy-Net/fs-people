@@ -1,9 +1,9 @@
-//! [`Card`] to vCard 4.0 text through `calcard`.
+//! [`Card`] to vCard 4.0 text through `calcard-next`.
 //!
 //! Pattern: Adapter — the typed card is handed to the foreign JSContact -> vCard converter as
 //! JSON; RFC 9554 parameters (`PROP-ID`, `JSCOMPS`, `JSPROP`) carry the lossless return.
 
-use calcard::jscontact::JSContact;
+use calcard_next::jscontact::JSContact;
 use serde_json::Value;
 
 use crate::card::Card;
@@ -23,7 +23,7 @@ pub fn card_to_vcard(card: &Card) -> Result<String> {
         .map_err(|e| Error::VCard(format!("JSContact rejected: {e}")))?;
     let v = js
         .into_vcard()
-        .ok_or_else(|| Error::VCard("card cannot be expressed as vCard".into()))?;
+        .map_err(|e| Error::VCard(format!("card cannot be expressed as vCard: {e}")))?;
     Ok(v.to_string())
 }
 
