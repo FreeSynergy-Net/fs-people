@@ -1649,15 +1649,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fs-people-directory"
-version = "0.0.14"
-dependencies = [
- "async-trait",
- "fs-types",
- "tokio",
-]
-
-[[package]]
 name = "fs-people-server"
 version = "0.0.14"
 dependencies = [
