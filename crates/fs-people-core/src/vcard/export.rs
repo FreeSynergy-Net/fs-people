@@ -6,6 +6,7 @@
 use calcard_next::jscontact::JSContact;
 use serde_json::Value;
 
+use super::shield::shielded;
 use crate::card::Card;
 use crate::error::{Error, Result};
 use crate::validate::validate;
@@ -19,12 +20,14 @@ pub fn card_to_vcard(card: &Card) -> Result<String> {
         o.values_mut().for_each(strip_nested_types);
     }
     let json = serde_json::to_string(&value)?;
-    let js = JSContact::<String, String>::parse(&json)
-        .map_err(|e| Error::VCard(format!("JSContact rejected: {e}")))?;
-    let v = js
-        .into_vcard()
-        .map_err(|e| Error::VCard(format!("card cannot be expressed as vCard: {e}")))?;
-    Ok(v.to_string())
+    shielded(|| {
+        let js = JSContact::<String, String>::parse(&json)
+            .map_err(|e| Error::VCard(format!("JSContact rejected: {e}")))?;
+        let v = js
+            .into_vcard()
+            .map_err(|e| Error::VCard(format!("card cannot be expressed as vCard: {e}")))?;
+        Ok(v.to_string())
+    })
 }
 
 fn strip_nested_types(v: &mut Value) {

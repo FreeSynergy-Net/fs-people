@@ -6,6 +6,7 @@
 use calcard_next::vcard::VCard;
 use fs_objects::Blob;
 
+use super::shield::shielded;
 use super::split::scan;
 use super::uid::uid_from_text;
 use crate::card::Card;
@@ -18,10 +19,11 @@ pub const VCARD_MEDIA_TYPE: &str = "text/vcard";
 
 /// Convert one vCard (any version calcard-next understands: 2.1, 3.0, 4.0) to a validated card.
 pub fn card_from_vcard(vcard_text: &str) -> Result<Card> {
-    let vcard =
-        VCard::parse(vcard_text).map_err(|e| Error::VCard(format!("cannot parse vCard: {e:?}")))?;
-    let js = vcard.into_jscontact::<String, String>();
-    let json = js.to_string_pretty();
+    let json = shielded(|| {
+        let vcard = VCard::parse(vcard_text)
+            .map_err(|e| Error::VCard(format!("cannot parse vCard: {e:?}")))?;
+        Ok(vcard.into_jscontact::<String, String>().to_string_pretty())
+    })?;
     check_exact_numbers(&json)?;
     let mut card: Card = serde_json::from_str(&json)?;
     if card.uid.trim().is_empty() {

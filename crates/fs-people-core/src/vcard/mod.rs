@@ -5,6 +5,7 @@
 
 mod export;
 mod import;
+mod shield;
 mod split;
 mod uid;
 
