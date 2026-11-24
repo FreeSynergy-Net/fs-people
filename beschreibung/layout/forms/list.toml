@@ -1,0 +1,33 @@
+# layout-nur (placeholder values, no binding, no colour/font). Model: KAddressBook screenshot (katalog-plan/bilder/people/vorbild/Kaddressbook_screenshot.png)
+schema = 1
+kind = "frontend"
+id = "layout-nur"
+extends = "net.freesynergy.People"
+exec = "fs-forms-run"
+title = "people-layout-title"
+style = "default"
+message = [
+  { key = "people-layout-title", lang = "de", text = "Personen (Platzhalter)" },
+  { key = "people-layout-title", lang = "en", text = "People (placeholder)" },
+]
+
+[[page]]
+page = "list"
+frame = "app-window"
+navigation = "list-detail"
+
+[[page.block]]
+place = "nav"
+block = "sidebar"
+
+[[page.block]]
+place = "main"
+block = "workbench"
+
+[[page.block]]
+place = "side"
+block = "contact-row"
+
+[[page.block]]
+place = "detail"
+block = "field-card"
