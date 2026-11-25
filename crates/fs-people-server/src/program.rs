@@ -6,7 +6,8 @@
 use std::ffi::OsString;
 use std::sync::Arc;
 
-use fs_objects::{Store, TursoStore};
+use fs_interfaces::owner::LocalOwner;
+use fs_objects::{OpenOptions, Store, TursoStore};
 use fs_people_core::PeopleRepo;
 use fs_rpc::{ServerOptions, prepare_data_dir, run_until_signal};
 
@@ -24,17 +25,25 @@ pub enum ServeError {
     Failed(String),
 }
 
-/// Serve `people.capnp` until a signal arrives. `args` are the words after `serve`.
+/// Serve `people.capnp` until a signal arrives. `args` are the words after `serve`. `owner` is the source of the owner of
+/// the store (Strategy: the person "me" of the module person, asked once before anything is bound or opened); every object
+/// written belongs to that person, and without one the server does not start.
 ///
 /// # Errors
 /// [`ServeError::Usage`] for unknown or incomplete words, [`ServeError::Failed`] for everything else.
-pub fn serve(args: impl IntoIterator<Item = OsString>) -> Result<(), ServeError> {
+pub fn serve(
+    args: impl IntoIterator<Item = OsString>,
+    owner: &dyn LocalOwner,
+) -> Result<(), ServeError> {
     let (lease, args) =
         crate::lease::take_lease(args.into_iter().collect()).map_err(ServeError::Usage)?;
     let Some(options) = ServerOptions::parse("people", args).map_err(ServeError::Usage)? else {
         println!("{HELP}");
         return Ok(());
     };
+    let owner = owner
+        .owner()
+        .map_err(|why| ServeError::Failed(format!("no owner for the store: {why}")))?;
     let ServerOptions {
         socket,
         data,
@@ -62,9 +71,12 @@ pub fn serve(args: impl IntoIterator<Item = OsString>) -> Result<(), ServeError>
             });
         }
         prepare_data_dir(&data)?;
-        let store = TursoStore::open(data.join("objects.db"))
-            .await
-            .map_err(std::io::Error::other)?;
+        let store = TursoStore::open_with(
+            data.join("objects.db"),
+            OpenOptions::default().with_owner(owner),
+        )
+        .await
+        .map_err(std::io::Error::other)?;
         let store: Arc<dyn Store> = Arc::new(store);
         let repo = PeopleRepo::new(store, actor);
         let repo = Arc::new(match instance {

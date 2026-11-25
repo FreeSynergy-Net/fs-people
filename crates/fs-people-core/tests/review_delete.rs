@@ -63,7 +63,11 @@ impl ObjectQuery for Failing {
 }
 
 async fn with_failing_store() -> (PeopleRepo, Arc<Failing>) {
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(":memory:", fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let failing = Arc::new(Failing {
         store,
         fail_cards: AtomicBool::new(false),

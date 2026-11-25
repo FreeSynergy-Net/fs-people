@@ -25,7 +25,11 @@ fn start_server(socket: &Path) -> Arc<PeopleRepo> {
             .build()
             .unwrap();
         tokio::task::LocalSet::new().block_on(&runtime, async move {
-            let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+            let store: Arc<dyn Store> = Arc::new(
+                TursoStore::open_with(":memory:", fs_objects::testing::options())
+                    .await
+                    .unwrap(),
+            );
             let repo = Arc::new(PeopleRepo::new(store, "https://local.invalid/users/owner"));
             let root: people::Client =
                 PeopleServer::new(repo.clone(), repo.clone(), repo.clone()).into_client();

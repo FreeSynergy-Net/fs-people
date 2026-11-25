@@ -29,7 +29,11 @@ where
         .run_until(async {
             let dir = tempfile::tempdir().unwrap();
             let path = dir.path().join("people.sock");
-            let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+            let store: Arc<dyn Store> = Arc::new(
+                TursoStore::open_with(":memory:", fs_objects::testing::options())
+                    .await
+                    .unwrap(),
+            );
             let backend = Arc::new(Backend {
                 store,
                 pause,

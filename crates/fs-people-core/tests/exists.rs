@@ -6,7 +6,11 @@ use std::sync::Arc;
 
 #[tokio::test]
 async fn a_duplicate_uid_names_the_existing_card() {
-    let store = Arc::new(TursoStore::open_in_memory().await.unwrap());
+    let store = Arc::new(
+        TursoStore::open_with(":memory:", fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let r = PeopleRepo::new(store, "https://example.org/users/admin");
     let first = r.create(Card::individual("First")).await.unwrap();
     let mut again = Card::individual("Second");

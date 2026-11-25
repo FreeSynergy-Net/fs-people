@@ -96,7 +96,11 @@ fn writes() -> Vec<(&'static str, Second)> {
 }
 
 async fn fixture() -> (Fixture, Arc<Gated>) {
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(":memory:", fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let gated = Arc::new(Gated::new(store));
     let r = PeopleRepo::with_backend(gated.clone(), gated.clone(), ME);
     let amara = r

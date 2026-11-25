@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 use program::wait_for;
 
 fn serve(dir: &std::path::Path, lease: Option<&std::path::Path>) -> std::process::Child {
-    let mut command = Command::new(env!("CARGO_BIN_EXE_fs-people"));
+    let mut command = Command::new(env!("CARGO_BIN_EXE_fs-people-fixed-owner"));
     command
         .arg("serve")
         .arg("--socket")

@@ -22,6 +22,8 @@ serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
 [dev-dependencies]
+# Test owner of the store (`testing::options()`): every write needs an owner.
+fs-objects = { git = "https://github.com/FreeSynergy-Net/fs-objects", rev = "e38093f1ec61b7c9faaa6f6046f65addb11dcf46", version = "0.0.11", features = ["testing"] }
 fs-people-server = { path = "../fs-people-server", version = "0.0.14" }
 tempfile = "3"
 # provisional: becomes a tag once reviewed

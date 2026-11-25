@@ -20,7 +20,11 @@ pub async fn repo() -> PeopleRepo {
 
 /// The repository and a handle to its store (for undo, log and count checks).
 pub async fn setup() -> (PeopleRepo, Arc<dyn Store>) {
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(":memory:", fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     (PeopleRepo::new(store.clone(), ME), store)
 }
 

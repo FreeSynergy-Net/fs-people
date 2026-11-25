@@ -25,7 +25,7 @@ pub fn start(socket: &Path, data: &Path) -> Server {
 
 pub fn start_with(socket: &Path, data: &Path, more: &[&str]) -> Server {
     Server(
-        Command::new(env!("CARGO_BIN_EXE_fs-people"))
+        Command::new(env!("CARGO_BIN_EXE_fs-people-fixed-owner"))
             .arg("serve")
             .arg("--socket")
             .arg(socket)

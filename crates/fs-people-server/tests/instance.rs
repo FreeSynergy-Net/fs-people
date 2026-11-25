@@ -38,7 +38,11 @@ async fn the_report_carries_the_id_of_the_store_and_the_log_does_not() {
 }
 
 async fn serve_file(path: &std::path::Path) -> (Uuid, Uuid) {
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open(path).await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(path, fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let repo = Arc::new(PeopleRepo::new(store.clone(), ME));
     let root = PeopleServer::new(repo.clone(), repo.clone(), repo).into_client();
     let told = std::rc::Rc::new(std::cell::Cell::new(None));

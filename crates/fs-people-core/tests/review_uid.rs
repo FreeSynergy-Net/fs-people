@@ -14,7 +14,11 @@ use fs_people_core::{Card, PeopleRepo};
 const V4: &str = "9f8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d";
 
 async fn with_old_card(uid: &str) -> (PeopleRepo, Arc<dyn Store>) {
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(":memory:", fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let r = PeopleRepo::new(store.clone(), ME);
     let mut card = Card::individual("Old");
     card.uid = uid.into();
@@ -84,7 +88,11 @@ async fn another_uid_that_only_contains_the_uuid_is_not_the_same_card() {
 
 #[tokio::test]
 async fn get_by_uid_goes_by_the_uid_not_by_the_object_id_and_create_still_will_not_overwrite() {
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(":memory:", fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let r = PeopleRepo::new(store, ME);
     let mut card = person("Plain", "p@x.org");
     card.uid = "plain-uid".into();

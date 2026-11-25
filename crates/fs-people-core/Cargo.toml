@@ -22,6 +22,8 @@ async-trait = "0.1"
 tokio = { version = "1", features = ["sync", "rt"] }
 
 [dev-dependencies]
+# Test owner of the store (`testing::options()`): every write needs an owner.
+fs-objects = { git = "https://github.com/FreeSynergy-Net/fs-objects", rev = "e38093f1ec61b7c9faaa6f6046f65addb11dcf46", version = "0.0.11", features = ["testing"] }
 tokio = { version = "1", features = ["full"] }
 proptest = "1"
 tempfile = "3"

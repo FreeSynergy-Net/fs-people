@@ -196,7 +196,11 @@ async fn item_4_an_import_keeps_a_card_with_an_unclear_marking_names_it_and_trea
 async fn item_4_a_plain_store_reports_an_unclear_marking_as_failed_with_its_reason() {
     // Removed when `dir` is dropped, also when an assert below fails.
     let dir = tempfile::tempdir().unwrap();
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open(dir.path().join("c.db")).await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(dir.path().join("c.db"), fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let r = PeopleRepo::new(store, ME);
     let mut card = person("Unclear", "u@x.org");
     card.extra

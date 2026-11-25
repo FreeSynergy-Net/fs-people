@@ -25,14 +25,21 @@ impl World {
     /// Over a fresh in-memory store.
     pub fn in_memory() -> Self {
         let runtime = Runtime::new().unwrap();
-        let store = runtime.block_on(TursoStore::open_in_memory()).unwrap();
+        let store = runtime
+            .block_on(TursoStore::open_with(
+                ":memory:",
+                fs_objects::testing::options(),
+            ))
+            .unwrap();
         Self::over(runtime, Arc::new(store))
     }
 
     /// Over a plain store file, which refuses sensitive cards.
     pub fn in_file(path: &Path) -> Self {
         let runtime = Runtime::new().unwrap();
-        let store = runtime.block_on(TursoStore::open(path)).unwrap();
+        let store = runtime
+            .block_on(TursoStore::open_with(path, fs_objects::testing::options()))
+            .unwrap();
         Self::over(runtime, Arc::new(store))
     }
 

@@ -8,25 +8,57 @@ authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
+[lib]
+name = "fs_people"
+
 [[bin]]
 name = "fs-people"
 path = "src/main.rs"
+
+# The same program with a fixed owner (`FixedOwner`) for the tests that run it as a process; never part of a build without the feature.
+[[bin]]
+name = "fs-people-fixed-owner"
+path = "src/bin_fixed_owner.rs"
+required-features = ["fake-owner"]
+
+[[test]]
+name = "binary"
+required-features = ["fake-owner"]
+
+[[test]]
+name = "binary_marks"
+required-features = ["fake-owner"]
+
+[[test]]
+name = "binary_restore"
+required-features = ["fake-owner"]
+
+[[test]]
+name = "lease"
+required-features = ["fake-owner"]
 
 [features]
 default = ["gui"]
 # The window (Blinc). Without it the binary has the commands and the server only:
 # `cargo build --no-default-features`.
 gui = ["dep:fs-people-app"]
+# The test owners of the process tests (`FixedOwner`, `fs_objects::testing`); never in a shipped build.
+fake-owner = ["fs-interfaces/fake", "fs-objects/testing"]
 
 [dependencies]
 fs-people-cli = { path = "../fs-people-cli", version = "0.0.14" }
 fs-people-server = { path = "../fs-people-server", version = "0.0.14" }
 fs-people-app = { path = "../fs-people-app", version = "0.0.14", optional = true }
 
-[dev-dependencies]
-fs-rpc = { git = "https://github.com/FreeSynergy-Net/fs-rpc", rev = "9cbce63c73045a2ea32b88038fd35732c4762624", version = "0.1.4" }
+# The owner of the store is the person "me" of the module person, asked from its service and never made up (ADR 0104 E9); the same
+# pin and the same source as the planning module (one source per library).
+fs-person-service = { git = "https://github.com/FreeSynergy-Net/fs-modules-person", rev = "8b2b16273771839119bf1e070328fd099923929e", version = "0.0.1", features = ["client"] }
 fs-interfaces = { git = "https://github.com/FreeSynergy-Net/fs-interfaces", rev = "2bb70d826681403894ec6d65a7fad9d3a3f51ac2", version = "0.2.0" }
 fs-objects = { git = "https://github.com/FreeSynergy-Net/fs-objects", rev = "e38093f1ec61b7c9faaa6f6046f65addb11dcf46", version = "0.0.11" }
+
+[dev-dependencies]
+fs-objects = { git = "https://github.com/FreeSynergy-Net/fs-objects", rev = "e38093f1ec61b7c9faaa6f6046f65addb11dcf46", version = "0.0.11", features = ["testing"] }
+fs-rpc = { git = "https://github.com/FreeSynergy-Net/fs-rpc", rev = "9cbce63c73045a2ea32b88038fd35732c4762624", version = "0.1.4" }
 fs-people-core = { path = "../fs-people-core", version = "0.0.14" }
 capnp = "0.27"
 serde_json = "1"

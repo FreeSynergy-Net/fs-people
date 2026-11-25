@@ -144,7 +144,7 @@ async fn people_survive_a_restart_and_a_second_start_is_refused() {
 }
 
 fn exit_code(args: &[&str], data: Option<&Path>, socket: Option<&Path>) -> Option<i32> {
-    let mut command = Command::new(env!("CARGO_BIN_EXE_fs-people"));
+    let mut command = Command::new(env!("CARGO_BIN_EXE_fs-people-fixed-owner"));
     command
         .arg("serve")
         .args(args)

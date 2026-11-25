@@ -51,7 +51,11 @@ impl ObjectQuery for Yielding {
 }
 
 pub async fn yielding_repo() -> Arc<PeopleRepo> {
-    let store: Arc<dyn Store> = Arc::new(TursoStore::open_in_memory().await.unwrap());
+    let store: Arc<dyn Store> = Arc::new(
+        TursoStore::open_with(":memory:", fs_objects::testing::options())
+            .await
+            .unwrap(),
+    );
     let backend = Arc::new(Yielding(store));
     Arc::new(PeopleRepo::with_backend(
         backend.clone(),

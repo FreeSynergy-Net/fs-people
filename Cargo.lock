@@ -1774,6 +1774,7 @@ dependencies = [
  "fs-people-cli",
  "fs-people-core",
  "fs-people-server",
+ "fs-person-service",
  "fs-rpc",
  "serde_json",
  "tempfile",
@@ -1856,6 +1857,35 @@ dependencies = [
  "rustix 1.1.6",
  "serde_json",
  "tempfile",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "fs-person"
+version = "0.0.1"
+source = "git+https://github.com/FreeSynergy-Net/fs-modules-person?rev=8b2b16273771839119bf1e070328fd099923929e#8b2b16273771839119bf1e070328fd099923929e"
+dependencies = [
+ "async-trait",
+ "fs-interfaces",
+ "fs-objects",
+ "fs-types",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "fs-person-service"
+version = "0.0.1"
+source = "git+https://github.com/FreeSynergy-Net/fs-modules-person?rev=8b2b16273771839119bf1e070328fd099923929e#8b2b16273771839119bf1e070328fd099923929e"
+dependencies = [
+ "capnp",
+ "capnp-rpc",
+ "fs-interfaces",
+ "fs-objects",
+ "fs-person",
+ "fs-rpc",
+ "fs-types",
  "tokio",
  "uuid",
 ]

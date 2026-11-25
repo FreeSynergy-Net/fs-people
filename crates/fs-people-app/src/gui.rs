@@ -7,7 +7,8 @@ use std::path::Path;
 use std::sync::Arc;
 
 use fs_components_app::{Status, WindowOptions, launch};
-use fs_objects::{Store, TursoStore};
+use fs_interfaces::owner::LocalOwner;
+use fs_objects::{OpenOptions, Store, TursoStore};
 use fs_people_core::PeopleRepo;
 use fs_rpc::{default_data_dir, default_socket, prepare_data_dir};
 
@@ -18,11 +19,12 @@ use crate::{PeopleAdapter, RemotePeople, app_widget, export_all, import_file};
 const ACTOR: &str = "https://localhost/actors/owner";
 
 /// Open the window (or do the one thing the words ask for). `words` are the words without the
-/// program name.
+/// program name. `owner` is the source of the owner of a store this process opens itself (Strategy: the person "me" of the
+/// module person); it is asked only for such a store, never when a server is used.
 ///
 /// # Errors
 /// The message for the person: bad words, a store that does not open, a file that cannot be read.
-pub fn run(words: &[String]) -> Result<(), String> {
+pub fn run(words: &[String], owner: &dyn LocalOwner) -> Result<(), String> {
     let args = parse(words)?;
     if args.help {
         println!("{HELP}");
@@ -39,7 +41,7 @@ pub fn run(words: &[String]) -> Result<(), String> {
         || args.export.is_some();
     let mut status = None;
     let adapter = if local {
-        let repo = open_local(&runtime, &args)?;
+        let repo = open_local(&runtime, &args, owner)?;
         if let Some(file) = &args.import {
             let summary = import_file(repo.as_ref(), &handle, file)?;
             eprintln!("{}", summary.message());
@@ -88,7 +90,11 @@ pub fn run(words: &[String]) -> Result<(), String> {
 /// The people kept in this process: in the file of `--store`; else, for a picture only, in memory;
 /// else (also for an export) in `app.db` in the data folder of the user (`$XDG_DATA_HOME/freesynergy/people`), so the
 /// people are there at the next start.
-fn open_local(runtime: &tokio::runtime::Runtime, args: &Args) -> Result<Arc<PeopleRepo>, String> {
+fn open_local(
+    runtime: &tokio::runtime::Runtime,
+    args: &Args,
+    owner: &dyn LocalOwner,
+) -> Result<Arc<PeopleRepo>, String> {
     let file = match (
         &args.store,
         args.snapshot.is_some() || args.export.is_some(),
@@ -102,11 +108,22 @@ fn open_local(runtime: &tokio::runtime::Runtime, args: &Args) -> Result<Arc<Peop
             Some(dir.join("app.db"))
         }
     };
+    let owner = owner
+        .owner()
+        .map_err(|why| format!("no owner for the store: {why}"))?;
+    let options = OpenOptions::default().with_owner(owner);
     let store: Arc<dyn Store> = runtime
         .block_on(async {
             match &file {
-                Some(file) => TursoStore::open(file).await,
-                None => TursoStore::open_in_memory().await,
+                Some(file) => TursoStore::open_with(file, options).await,
+                // As `open_in_memory`: nothing is kept, so sensitive objects need no encryption.
+                None => {
+                    let options = OpenOptions {
+                        allow_sensitive_unencrypted: true,
+                        ..options
+                    };
+                    TursoStore::open_with(":memory:", options).await
+                }
             }
         })
         .map(|s| Arc::new(s) as Arc<dyn Store>)
