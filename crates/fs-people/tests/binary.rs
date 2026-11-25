@@ -1,5 +1,6 @@
 //! The real program: started, used, stopped and started again; what it holds is still there.
 
+use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
