@@ -11,6 +11,7 @@ jobs:
     uses: FreeSynergy-Net/fs-release/.github/workflows/release.yml@9eed5c95eb7311f2b68266a012ec778f51e3ac38
     with:
       binaries: fs-people
+      ignore-binaries: fs-people-fixed-owner   # the test program with a fixed owner (feature fake-owner), never shipped
       cargo-package: fs-people
       name: fs-people
       kind: app
