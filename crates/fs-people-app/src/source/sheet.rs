@@ -17,8 +17,7 @@ pub(super) fn first_email(card: &Card) -> String {
     card.emails
         .values()
         .min_by_key(|e| e.pref.unwrap_or(u32::MAX))
-        .map(|e| e.address.clone())
-        .unwrap_or_default()
+        .map_or_default(|e| e.address.clone())
 }
 
 /// The sheet of `card`, stored as `object`.

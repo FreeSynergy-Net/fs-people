@@ -4,8 +4,8 @@
 mod common;
 
 use common::{TOO_LARGE, expect_problem, name_of, persons_of, roles_of, with_server};
-use fs_rpc::{MAX_INTAKE_BYTES, write_uuid};
 use fs_people_core::MAX_CARD_BYTES;
+use fs_rpc::{MAX_INTAKE_BYTES, write_uuid};
 use serde_json::json;
 
 const BIG: usize = 12 * 1024 * 1024;

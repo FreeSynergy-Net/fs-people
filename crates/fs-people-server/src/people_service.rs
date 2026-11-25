@@ -9,9 +9,9 @@ use std::sync::Arc;
 
 use capnp_rpc::new_client;
 use fs_interfaces::people_capnp::people;
-use fs_rpc::write_uuid;
 use fs_people_core::{Card, People, PeopleFeed, RoleBook};
 use fs_rpc::catalog::CatalogServer;
+use fs_rpc::write_uuid;
 use fs_types::TypeRegistry;
 
 use crate::feed::subscribe;

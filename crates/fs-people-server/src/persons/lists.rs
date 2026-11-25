@@ -5,8 +5,8 @@
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::persons as wire;
-use fs_rpc::read_object_id;
 use fs_people_core::People;
+use fs_rpc::read_object_id;
 
 use crate::errors::{finish, rpc_error};
 use crate::wire::{intake, unpaged, write_person, write_persons};

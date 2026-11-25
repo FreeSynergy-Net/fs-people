@@ -5,8 +5,8 @@
 
 use fs_interfaces::common_capnp;
 use fs_interfaces::people_capnp::{people, person, persons};
-use fs_rpc::{read_envelope, write_uuid};
 use fs_objects::ObjectId;
+use fs_rpc::{read_envelope, write_uuid};
 use serde_json::json;
 
 use crate::args::Command;

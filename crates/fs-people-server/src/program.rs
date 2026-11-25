@@ -6,9 +6,9 @@
 use std::ffi::OsString;
 use std::sync::Arc;
 
-use fs_rpc::{ServerOptions, prepare_data_dir, run_until_signal};
 use fs_objects::{Store, TursoStore};
 use fs_people_core::PeopleRepo;
+use fs_rpc::{ServerOptions, prepare_data_dir, run_until_signal};
 
 use crate::PeopleServer;
 

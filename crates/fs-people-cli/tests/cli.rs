@@ -3,11 +3,11 @@
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::people;
-use fs_rpc::{bind_socket, connect, serve};
 use fs_objects::{Store, TursoStore};
 use fs_people_cli::{Command, run};
 use fs_people_core::PeopleRepo;
 use fs_people_server::PeopleServer;
+use fs_rpc::{bind_socket, connect, serve};
 
 async fn with_cli<F, Fut>(test: F)
 where

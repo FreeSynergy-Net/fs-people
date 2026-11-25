@@ -5,10 +5,10 @@
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::{people, person, persons, roles};
-use fs_rpc::{Problem, bind_socket, connect, read_envelope, read_uuid, serve};
 use fs_objects::{Store, TursoStore};
 use fs_people_core::PeopleRepo;
 use fs_people_server::PeopleServer;
+use fs_rpc::{Problem, bind_socket, connect, read_envelope, read_uuid, serve};
 use uuid::Uuid;
 
 pub const ME: &str = "https://local.invalid/users/owner";

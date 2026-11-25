@@ -6,8 +6,8 @@
 use std::sync::Arc;
 
 use fs_interfaces::common_capnp::{change_listener, subscription};
-use fs_rpc::{ChangeSender, Notice, change_channel, forward};
 use fs_people_core::{People, PeopleFeed, PersonChange, PersonListener};
+use fs_rpc::{ChangeSender, Notice, change_channel, forward};
 
 use crate::errors::rpc_error;
 

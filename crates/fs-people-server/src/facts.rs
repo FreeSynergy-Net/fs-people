@@ -4,9 +4,9 @@
 //! the detail text (`coding.md` §2a) is stated here as `id`, `kind`, `issue` and a few keys of the
 //! people problem types; the detail text stays as it was. The table is in `DESIGN.md`.
 
-use fs_rpc::{Problem, problem_keys as keys};
 use fs_objects::Error as StoreError;
 use fs_people_core::Error;
+use fs_rpc::{Problem, problem_keys as keys};
 
 /// The key of the number that cannot be kept exactly (`invalid`).
 pub(crate) const VALUE: &str = "value";
