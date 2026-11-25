@@ -38,7 +38,10 @@ impl World {
     pub fn in_file(path: &Path) -> Self {
         let runtime = Runtime::new().unwrap();
         let store = runtime
-            .block_on(TursoStore::open_with(path, fs_objects::testing::options()))
+            .block_on(TursoStore::open_with(
+                path,
+                fs_objects::OpenOptions::default().with_owner(fs_objects::testing::owner()),
+            ))
             .unwrap();
         Self::over(runtime, Arc::new(store))
     }

@@ -128,9 +128,12 @@ async fn sensitive_card_needs_encrypted_store() {
     let dir = std::env::temp_dir().join(format!("fs-contacts-{}", fs_objects::ObjectId::new()));
     std::fs::create_dir_all(&dir).unwrap();
     let store: Arc<dyn Store> = Arc::new(
-        TursoStore::open_with(dir.join("c.db"), fs_objects::testing::options())
-            .await
-            .unwrap(),
+        TursoStore::open_with(
+            dir.join("c.db"),
+            fs_objects::OpenOptions::default().with_owner(fs_objects::testing::owner()),
+        )
+        .await
+        .unwrap(),
     );
     let r = PeopleRepo::new(store, ME);
     let mut c = person("Secret", "s@example.org");

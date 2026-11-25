@@ -19,9 +19,12 @@ const ME: &str = "https://local.invalid/users/owner";
 async fn seed(data: &Path, contents: &[serde_json::Value]) {
     std::fs::create_dir(data).unwrap();
     std::fs::set_permissions(data, PermissionsExt::from_mode(0o700)).unwrap();
-    let store = TursoStore::open_with(data.join("objects.db"), fs_objects::testing::options())
-        .await
-        .unwrap();
+    let store = TursoStore::open_with(
+        data.join("objects.db"),
+        fs_objects::OpenOptions::default().with_owner(fs_objects::testing::owner()),
+    )
+    .await
+    .unwrap();
     for content in contents {
         let mut env = Envelope::new("RoleConfig", "stored");
         env.context = Some(CONTEXT.into());

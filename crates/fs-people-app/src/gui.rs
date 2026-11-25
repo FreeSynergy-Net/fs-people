@@ -114,16 +114,15 @@ fn open_local(
     let options = OpenOptions::default().with_owner(owner);
     let store: Arc<dyn Store> = runtime
         .block_on(async {
-            match &file {
-                Some(file) => TursoStore::open_with(file, options).await,
+            if let Some(file) = &file {
+                TursoStore::open_with(file, options).await
+            } else {
                 // As `open_in_memory`: nothing is kept, so sensitive objects need no encryption.
-                None => {
-                    let options = OpenOptions {
-                        allow_sensitive_unencrypted: true,
-                        ..options
-                    };
-                    TursoStore::open_with(":memory:", options).await
-                }
+                let options = OpenOptions {
+                    allow_sensitive_unencrypted: true,
+                    ..options
+                };
+                TursoStore::open_with(":memory:", options).await
             }
         })
         .map(|s| Arc::new(s) as Arc<dyn Store>)

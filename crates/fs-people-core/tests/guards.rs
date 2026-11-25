@@ -188,9 +188,12 @@ async fn a_refused_card_does_not_stop_the_import() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("objects.db");
     let store: std::sync::Arc<dyn fs_objects::Store> = std::sync::Arc::new(
-        fs_objects::TursoStore::open_with(path, fs_objects::testing::options())
-            .await
-            .unwrap(),
+        fs_objects::TursoStore::open_with(
+            path,
+            fs_objects::OpenOptions::default().with_owner(fs_objects::testing::owner()),
+        )
+        .await
+        .unwrap(),
     );
     let r = fs_people_core::PeopleRepo::new(store, common::ME);
     let cards = json!([

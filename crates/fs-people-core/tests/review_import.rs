@@ -43,9 +43,12 @@ async fn item_7_a_store_refusal_is_one_failure_and_the_rest_of_the_file_arrives(
     let dir = std::env::temp_dir().join(format!("fs-review-{}", ObjectId::new()));
     std::fs::create_dir_all(&dir).unwrap();
     let store: Arc<dyn Store> = Arc::new(
-        TursoStore::open_with(dir.join("c.db"), fs_objects::testing::options())
-            .await
-            .unwrap(),
+        TursoStore::open_with(
+            dir.join("c.db"),
+            fs_objects::OpenOptions::default().with_owner(fs_objects::testing::owner()),
+        )
+        .await
+        .unwrap(),
     );
     let r = PeopleRepo::new(store, ME);
     let mut secret = person("Secret", "s@x.org");

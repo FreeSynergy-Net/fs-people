@@ -1,6 +1,5 @@
 //! The real program: started, used, stopped and started again; what it holds is still there.
 
-use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
@@ -165,12 +164,12 @@ fn the_exit_code_says_what_happened() {
     assert_eq!(exit_code(&["--nonsense"], None, None), Some(2));
     assert_eq!(exit_code(&["--socket"], None, None), Some(2));
 
-    // A data directory others can reach is refused, and nothing is put into it.
+    // A data "directory" that is a file is refused, and nothing is put into it. (fs-rpc 0.1.4 no longer refuses a folder of this
+    // user that others can reach: it takes those rights away and serves.)
     let dir = tempfile::tempdir().unwrap();
-    let open = dir.path().join("open");
-    std::fs::create_dir(&open).unwrap();
-    std::fs::set_permissions(&open, PermissionsExt::from_mode(0o755)).unwrap();
+    let file = dir.path().join("not-a-directory");
+    std::fs::write(&file, b"mine").unwrap();
     let socket = dir.path().join("people.sock");
-    assert_eq!(exit_code(&[], Some(&open), Some(&socket)), Some(1));
-    assert_eq!(std::fs::read_dir(&open).unwrap().count(), 0);
+    assert_eq!(exit_code(&[], Some(&file), Some(&socket)), Some(1));
+    assert_eq!(std::fs::read(&file).unwrap(), b"mine");
 }
