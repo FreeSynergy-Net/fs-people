@@ -5,7 +5,7 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 use fs_interfaces::people_capnp::people;
-use fs_interfaces::rpc::{Problem, connect, read_uuid, write_uuid};
+use fs_rpc::{Problem, connect, read_uuid, write_uuid};
 use program::{start, terminate, wait_for};
 use serde_json::json;
 

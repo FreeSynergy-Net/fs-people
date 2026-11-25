@@ -6,7 +6,7 @@ use common::{
     CLUB, NOT_FOUND, SENSITIVE_LINK, create, expect_problem, id_of, json_of, name_of, persons_of,
     roles_of, with_server,
 };
-use fs_interfaces::rpc::{read_uuid, write_uuid};
+use fs_rpc::{read_uuid, write_uuid};
 
 #[tokio::test(flavor = "current_thread")]
 async fn no_answer_about_a_person_carries_a_role() {

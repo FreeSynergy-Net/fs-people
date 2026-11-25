@@ -7,7 +7,7 @@ use common::{
     with_server,
 };
 use fs_interfaces::people_capnp::RoleScope;
-use fs_interfaces::rpc::write_uuid;
+use fs_rpc::write_uuid;
 
 #[tokio::test(flavor = "current_thread")]
 async fn what_a_personal_role_and_a_held_one_answer() {

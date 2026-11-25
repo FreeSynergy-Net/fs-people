@@ -11,7 +11,7 @@ use std::time::Duration;
 use backend::Backend;
 use common::{ME, card, create, persons_of, roles_of, uuids};
 use fs_interfaces::people_capnp::people;
-use fs_interfaces::rpc::{Problem, bind_socket, connect, serve, write_uuid};
+use fs_rpc::{Problem, bind_socket, connect, serve, write_uuid};
 use fs_objects::{Store, TursoStore};
 use fs_people_core::PeopleRepo;
 use fs_people_server::PeopleServer;

@@ -54,5 +54,7 @@ pub(super) fn code_of(problem: RecordProblem) -> &'static str {
         RecordProblem::NestedPath => "nested-path",
         RecordProblem::ReadOnly => "read-only",
         RecordProblem::DuplicatePath => "duplicate-path",
+        // `RecordProblem` is non-exhaustive: a problem added later gets this fallback key.
+        _ => "unknown",
     }
 }

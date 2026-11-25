@@ -4,7 +4,7 @@
 mod common;
 
 use common::{TOO_LARGE, expect_problem, name_of, persons_of, roles_of, with_server};
-use fs_interfaces::rpc::{MAX_INTAKE_BYTES, write_uuid};
+use fs_rpc::{MAX_INTAKE_BYTES, write_uuid};
 use fs_people_core::MAX_CARD_BYTES;
 use serde_json::json;
 

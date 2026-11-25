@@ -7,7 +7,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::roles;
-use fs_interfaces::rpc::{check_intake, read_object_id};
+use fs_rpc::{check_intake, read_object_id};
 use fs_people_core::RoleBook;
 
 use crate::errors::{finish, rpc_error};

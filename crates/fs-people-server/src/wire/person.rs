@@ -11,7 +11,7 @@ use fs_interfaces::common_capnp;
 use fs_interfaces::people_capnp::{
     person, person_filter, person_page, relation, same_person_proposal,
 };
-use fs_interfaces::rpc::{
+use fs_rpc::{
     DEFAULT_PAGE_SIZE, Page, check_answer, check_intake, envelope_weight, invalid_request,
     write_envelope, write_object_id,
 };

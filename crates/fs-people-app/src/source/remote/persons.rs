@@ -4,7 +4,7 @@
 
 use fs_interfaces::common_capnp;
 use fs_interfaces::people_capnp::persons;
-use fs_interfaces::rpc::write_uuid;
+use fs_rpc::write_uuid;
 use fs_objects::{ObjectId, StoredObject};
 use fs_people_core::{ListFilter, Result};
 

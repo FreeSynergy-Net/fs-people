@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 use fs_interfaces::people_capnp::{
     RoleScope as Wire, localized, role_assignment, role_definition, role_field,
 };
-use fs_interfaces::rpc::{check_answer, check_intake, invalid_request, write_object_id};
+use fs_rpc::{check_answer, check_intake, invalid_request, write_object_id};
 use fs_people_core::validate::check_exact_numbers;
 use fs_people_core::{RoleAssignment, RoleDefinition, RoleField, RoleScope};
 use serde_json::{Map, Value};

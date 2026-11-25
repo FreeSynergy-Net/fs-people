@@ -7,7 +7,7 @@ use std::path::Path;
 use std::sync::Arc;
 
 use fs_components_app::{Status, WindowOptions, launch};
-use fs_interfaces::rpc::{default_data_dir, default_socket, prepare_data_dir};
+use fs_rpc::{default_data_dir, default_socket, prepare_data_dir};
 use fs_objects::{Store, TursoStore};
 use fs_people_core::PeopleRepo;
 

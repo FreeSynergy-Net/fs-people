@@ -3,7 +3,7 @@
 //! Pattern: Adapter — each role question as a request on the server's roles capability.
 
 use fs_interfaces::people_capnp::roles;
-use fs_interfaces::rpc::{read_object_id, write_uuid};
+use fs_rpc::{read_object_id, write_uuid};
 use fs_objects::ObjectId;
 use fs_people_core::{Result, RoleAssignment, RoleDefinition, RoleScope};
 

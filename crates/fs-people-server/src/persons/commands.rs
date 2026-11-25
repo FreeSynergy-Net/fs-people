@@ -5,7 +5,7 @@
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::persons as wire;
-use fs_interfaces::rpc::{check_answer, check_intake, invalid_request, read_object_id};
+use fs_rpc::{check_answer, check_intake, invalid_request, read_object_id};
 use fs_people_core::validate::check_card_numbers;
 use fs_people_core::{PatchObject, People};
 

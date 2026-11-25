@@ -6,7 +6,7 @@
 use std::sync::Arc;
 
 use fs_interfaces::people_capnp::{SameState, persons as wire};
-use fs_interfaces::rpc::{check_intake, read_object_id, write_object_id};
+use fs_rpc::{check_intake, read_object_id, write_object_id};
 use fs_people_core::{People, ProposalState};
 
 use crate::errors::{finish, rpc_error};

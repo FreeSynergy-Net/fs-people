@@ -5,7 +5,7 @@
 //! address (which the core cannot keep) is refused instead of dropped silently.
 
 use fs_interfaces::people_capnp::role_definition;
-use fs_interfaces::rpc::invalid_request;
+use fs_rpc::invalid_request;
 use fs_people_core::{RoleDefinition, RoleKind};
 
 use super::person::count;

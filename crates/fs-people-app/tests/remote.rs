@@ -9,7 +9,7 @@ use std::sync::Arc;
 use fs_components_workbenches::ErrorKind;
 use fs_components_workbenches::people::PeopleSource;
 use fs_interfaces::people_capnp::people;
-use fs_interfaces::rpc::{bind_socket, serve};
+use fs_rpc::{bind_socket, serve};
 use fs_objects::{Store, TursoStore};
 use fs_people_app::{NoRoles, PeopleAdapter, RemotePeople};
 use fs_people_core::PeopleRepo;

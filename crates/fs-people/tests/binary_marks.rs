@@ -4,7 +4,7 @@
 mod program;
 
 use fs_interfaces::people_capnp::people;
-use fs_interfaces::rpc::{Problem, connect, read_uuid, write_uuid};
+use fs_rpc::{Problem, connect, read_uuid, write_uuid};
 use program::{start_with, terminate, wait_for};
 use serde_json::json;
 

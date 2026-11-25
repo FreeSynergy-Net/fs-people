@@ -7,7 +7,7 @@
 
 use std::future::Future;
 
-use fs_interfaces::rpc::{Problem, failed, run_to_end, too_large, unsupported};
+use fs_rpc::{Problem, failed, run_to_end, too_large, unsupported};
 use fs_objects::Error as StoreError;
 use fs_people_core::Error;
 

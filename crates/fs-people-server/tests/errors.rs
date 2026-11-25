@@ -6,7 +6,7 @@ use common::{
     BAD_REQUEST, CLUB, CONFLICT, INVALID, ME, NOT_FOUND, STORED_DATA, card, create, expect_problem,
     id_of, json_of, persons_of, roles_of, unknown_id, with_server, with_store,
 };
-use fs_interfaces::rpc::write_uuid;
+use fs_rpc::write_uuid;
 use fs_objects::{Envelope, StoredObject};
 use fs_people_server::CONTRACT_VERSION;
 use serde_json::json;

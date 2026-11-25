@@ -64,5 +64,7 @@ pub(crate) fn problem(problem: fs_people_core::values::ValueProblem) -> &'static
         }
         P::AddressTooLong => "The whole address is longer than 254 characters.",
         P::PhoneLength => "A phone number has 7 to 15 digits after the +, the first not 0.",
+        // `ValueProblem` is non-exhaustive: a problem added later gets a general sentence.
+        _ => "This value is not valid.",
     }
 }

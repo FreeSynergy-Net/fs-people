@@ -4,7 +4,7 @@ mod common;
 
 use common::{CLUB, card, create, id_of, json_of, name_of, persons_of, roles_of, with_server};
 use fs_interfaces::people_capnp::persons;
-use fs_interfaces::rpc::write_uuid;
+use fs_rpc::write_uuid;
 use serde_json::json;
 
 #[tokio::test(flavor = "current_thread")]

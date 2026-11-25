@@ -3,7 +3,7 @@
 mod common;
 
 use common::{CONFLICT, create, expect_problem, id_of, json_of, persons_of, roles_of, with_server};
-use fs_interfaces::rpc::write_uuid;
+use fs_rpc::write_uuid;
 
 #[tokio::test(flavor = "current_thread")]
 async fn ai_marking_shows_in_kind_and_role() {

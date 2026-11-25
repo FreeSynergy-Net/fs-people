@@ -4,7 +4,7 @@
 //! calls [`command_line`]; the exit code is the answer.
 
 use fs_interfaces::people_capnp::people;
-use fs_interfaces::rpc::{connect, default_socket};
+use fs_rpc::{connect, default_socket};
 
 use crate::{HELP, parse, run};
 

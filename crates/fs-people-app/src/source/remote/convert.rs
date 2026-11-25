@@ -6,7 +6,7 @@ use std::sync::PoisonError;
 
 use fs_interfaces::Unsupported;
 use fs_interfaces::people_capnp::person;
-use fs_interfaces::rpc::{Problem, read_envelope};
+use fs_rpc::{Problem, read_envelope};
 use fs_objects::{ObjectId, StoredObject};
 use fs_people_core::Error;
 
