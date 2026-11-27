@@ -1,3 +1,5 @@
+# Release of the data package fs-people on a version tag (fs-release caller, pinned): ONE noarch RPM `fs-people` (kind data, built from scaffold.toml).
+# No binary, no Cargo package: the program is data (forms/, styles/) plus the modules named in scaffold.toml.
 name: release
 on:
   push: { tags: ["v*"] }
@@ -8,16 +10,13 @@ permissions:
   packages: write
 jobs:
   release:
-    uses: FreeSynergy-Net/fs-release/.github/workflows/release.yml@9eed5c95eb7311f2b68266a012ec778f51e3ac38
+    uses: FreeSynergy-Net/fs-release/.github/workflows/release.yml@8033f1d1cdc4cd7da83222ea41b5a0d9ea37b6fa
     with:
-      binaries: fs-people
-      ignore-binaries: fs-people-fixed-owner   # the test program with a fixed owner (feature fake-owner), never shipped
-      cargo-package: fs-people
+      kind: data
       name: fs-people
-      kind: app
-      app-id: net.freesynergy.People
+      binaries: ""
       macos: false
-      windows-targets: ""   # Unix sockets and Unix paths for now
+      windows-targets: ""
     secrets:
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

@@ -1,4 +1,4 @@
-# Copy to <repo>/.github/workflows/check.yml - runs fmt, clippy (pedantic), tests and the coding rules on every push.
+# fs-release caller (pinned): checks the data package.
 name: check
 on:
   push:
@@ -9,7 +9,6 @@ permissions:
 
 jobs:
   check:
-    uses: FreeSynergy-Net/fs-release/.github/workflows/check.yml@9eed5c95eb7311f2b68266a012ec778f51e3ac38
-    # with:
-    #   working-directory: "."
-    #   apt-packages: "libssl-dev"
+    uses: FreeSynergy-Net/fs-release/.github/workflows/check.yml@8033f1d1cdc4cd7da83222ea41b5a0d9ea37b6fa
+    with:
+      blueprint: warn

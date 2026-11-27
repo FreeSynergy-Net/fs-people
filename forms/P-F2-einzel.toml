@@ -1,0 +1,111 @@
+# forms description of the people frontend "people-detail" (single person). IMPORT FORM ONLY (ADR 0096 point 6), Format 4.
+# Draft of C5 25.11.2026 (Merkuro Contact as the model), corrected and built by C2 26.11.2026 (workflow frontend-round, step build) after the check
+# against the real block catalog (fs-forms-run tests/people_descriptions.rs): no block on a place that does not take it, one child in `main`.
+# Source: the module `person` (the one that is installed; contract `person@>=0.0.1, <0.1.0`), type `Profile` (RFC 9553 card). ONE person = ONE record (the real
+# account; a written-down contact is only a profile of it). The module offers rows@1.0.0 and tiles@1.1.0 with the scope `all` and single-record@1.2.0 ONLY with the
+# id of one profile as the scope (`urn:uuid:<uuid>` or the bare UUID), never `all`: one record is one view. The sample `person-directory.sample` (fixed source of
+# fs-forms-testdata, the fixed people of the module) gives the same fields as the module (`name`, `emails`, `phones`, `addresses`, `organizations`, `titles`,
+# `nicknames`; names as in catalog/types.bin). No command is written here: the module offers none for these forms; what the model can do comes as cards.
+# The four people frontends show DIFFERENT data of the same module: P-F1 rows@1.0.0 (table: name + the short fields), P-F2 single-record@1.2.0 (all contact fields of one person), P-F3 tiles@1.1.0 (cards), P-F4 rows@1.0.0 (contacts workbench: the list of faces and names, and the sheet of the chosen person).
+# STATE 26.11.2026 (host on fs-components 4a923bbc): the block `detail-page` is drawn as a page of ONE person (widget `DetailPage`, view of single-record@^1.2.0): head with the face and the name, every field under its own label, a repeated path (two e-mails) as several cards under ONE label, a field without a value is not drawn. A card has no command yet (copy, mail: card to C4 "actions of single-record on the cards"). The same block is also the frame of other descriptions (fs-tasks list.toml), both work.
+schema = 4
+kind = "frontend"
+id = "people-detail"
+extends = "net.freesynergy.People"
+exec = "fs-forms-run"
+title = "people-detail-title"
+style = "default"
+
+[[requires]]
+elem = "requires:1"
+contract = "person@>=0.0.1, <0.1.0"
+
+[[source]]
+elem = "source:1"
+n = 1
+contract = "person@>=0.0.1, <0.1.0"
+type = "Profile"
+scope = "urn:uuid:00000000-0000-7000-8000-000000000001"
+
+[[menu]]
+elem = "menu:0"
+kind = "standard-program"
+
+[[menu]]
+elem = "menu:1"
+kind = "menu"
+label = "menu-view"
+
+[[menu.entries]]
+elem = "menu:1.0"
+kind = "view"
+label = "view-person"
+view = "person"
+
+[[menu]]
+elem = "menu:9"
+kind = "standard-help"
+
+# Merkuro Contact (ContactPage): ONE person with all contact fields: name, every e-mail, every phone, nicknames, organizations, titles, the postal address `addresses` (`fields` of single-record@1.2.0 repeats, one value per item). The scope is the id of ONE profile (Amara Zolenko, entry 1 of the sample); the module refuses single-record without it.
+[[page]]
+elem = "page:person"
+page = "person"
+frame = "workbench"
+navigation = "single"
+
+[[page.place]]
+elem = "block:person/main"
+at = "main"
+block = "detail-page"
+source = 1
+
+[[view]]
+elem = "view:person"
+view = "person"
+
+# Sample data for pictures and development (--sample-data), never real entries and never written out: the fixed people of the sample of the
+# contract `person_directory_v1` (fixed source `person-directory.sample`). No count, no seed: the data are the same on every run.
+[sample]
+anchor = { month = "2026-11", zone = "Europe/Berlin" }
+
+[[sample.set]]
+source = 1
+form = "single-record@^1.2.0"
+type = "Profile"
+fixed = "person-directory.sample"
+
+[[message]]
+elem = "message:people-detail-title/de"
+key = "people-detail-title"
+lang = "de"
+text = "FreeSynergy Personen: Einzelansicht"
+
+[[message]]
+elem = "message:people-detail-title/en"
+key = "people-detail-title"
+lang = "en"
+text = "FreeSynergy People: single person"
+
+[[message]]
+elem = "message:menu-view/de"
+key = "menu-view"
+lang = "de"
+text = "Ansicht"
+
+[[message]]
+elem = "message:menu-view/en"
+key = "menu-view"
+lang = "en"
+text = "View"
+
+[[message]]
+elem = "message:view-person/de"
+key = "view-person"
+lang = "de"
+text = "Person"
+
+[[message]]
+elem = "message:view-person/en"
+key = "view-person"
+lang = "en"
+text = "Person"

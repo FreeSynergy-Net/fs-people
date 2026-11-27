@@ -1,10 +1,10 @@
-# Blueprint of fs-people (schema 2, ADR 0099 addendum 2026-11-18). Written ahead of the conversion: fs-people owns the person
-# (ADR 0098 point 3: "Person: RFC 9553 Card; gehört fs-people"), so the types are the program's own, without a module.
+# Blueprint of fs-people (schema 2, ADR 0099 addendum 2026-11-18). Data-only package;
+# the person (RFC 9553 card, type Profile) is owned by the module person (fs-modules-person, tag v0.0.3); the forms descriptions lie in forms/.
 schema = 2
 
 [program]
 name = "people"
-version = "0.0.1"
+version = "0.0.15"
 skeleton = "0.1.0"
 capability = "people"
 summary = { en = "People, roles and contacts", de = "Menschen, Rollen und Kontakte" }
@@ -16,267 +16,19 @@ version = "0.1"
 id = "0xf41de01e6495cb24"
 provides = [{ contract = "people.persons", version = "0.1" }]
 
-[[type]]
-name = "Person"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2"
-envelope = "Profile"
-media_type = "application/jscontact+json"
-label = { en = "Person", de = "Person" }
-
-[[type.field]]
-name = "uid"
-basic = "text"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.1.9"
-label = { en = "Identifier", de = "Kennung" }
-
-[[type.field]]
-name = "kind"
-basic = "choice"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.1.4"
-label = { en = "Kind", de = "Art" }
-
-[[type.field]]
-name = "language"
-basic = "language"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.1.5"
-label = { en = "Language", de = "Sprache" }
-
-[[type.field]]
-name = "members"
-basic = "reference"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.1.6"
-label = { en = "Members", de = "Mitglieder" }
-
-[[type.field]]
-name = "relatedTo"
-basic = "reference"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.1.8"
-label = { en = "Related to", de = "In Beziehung zu" }
-
-[[type.field]]
-name = "created"
-basic = "dateTime"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.1.3"
-label = { en = "Created", de = "Erstellt" }
-
-[[type.field]]
-name = "updated"
-basic = "dateTime"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.1.10"
-label = { en = "Updated", de = "Geändert" }
-
-[[type.field]]
-name = "name"
-basic = "name"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.2.1"
-label = { en = "Name", de = "Name" }
-
-[[type.field]]
-name = "nicknames"
-basic = "text"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.2.2"
-label = { en = "Nicknames", de = "Spitznamen" }
-
-[[type.field]]
-name = "organizations"
-basic = "text"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.2.3"
-label = { en = "Organisations", de = "Organisationen" }
-
-[[type.field]]
-name = "titles"
-basic = "text"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.2.5"
-label = { en = "Titles", de = "Titel" }
-
-# RFC 9553 section 2.2.4 is the property speakToAs; pronouns is its sub-field (the field here holds that sub-field).
-[[type.field]]
-name = "pronouns"
-basic = "text"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.2.4"
-label = { en = "Pronouns", de = "Pronomen" }
-
-[[type.field]]
-name = "emails"
-basic = "email"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.3.1"
-label = { en = "E-mail", de = "E-Mail" }
-
-[[type.field]]
-name = "phones"
-basic = "phone"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.3.3"
-label = { en = "Phone", de = "Telefon" }
-
-[[type.field]]
-name = "onlineServices"
-basic = "link"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.3.2"
-label = { en = "Online services", de = "Online-Dienste" }
-
-[[type.field]]
-name = "preferredLanguages"
-basic = "language"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.3.4"
-label = { en = "Preferred languages", de = "Bevorzugte Sprachen" }
-
-[[type.field]]
-name = "calendars"
-basic = "link"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.4.1"
-label = { en = "Calendars", de = "Kalender" }
-
-[[type.field]]
-name = "schedulingAddresses"
-basic = "link"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.4.2"
-label = { en = "Scheduling addresses", de = "Einladungsadressen" }
-
-[[type.field]]
-name = "addresses"
-basic = "address"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.5.1"
-label = { en = "Addresses", de = "Anschriften" }
-
-[[type.field]]
-name = "cryptoKeys"
-basic = "link"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.6.1"
-label = { en = "Keys", de = "Schlüssel" }
-
-[[type.field]]
-name = "directories"
-basic = "link"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.6.2"
-label = { en = "Directories", de = "Verzeichnisse" }
-
-[[type.field]]
-name = "links"
-basic = "link"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.6.3"
-label = { en = "Links", de = "Verweise" }
-
-[[type.field]]
-name = "media"
-basic = "image"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.6.4"
-label = { en = "Pictures", de = "Bilder" }
-
-[[type.field]]
-name = "anniversaries"
-basic = "date"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.8.1"
-label = { en = "Anniversaries", de = "Jahrestage" }
-
-[[type.field]]
-name = "keywords"
-basic = "keywords"
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.8.2"
-label = { en = "Keywords", de = "Schlagwörter" }
-
-[[type.field]]
-name = "notes"
-basic = "multilineText"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.8.3"
-label = { en = "Notes", de = "Notizen" }
-
-[[type.field]]
-name = "personalInfo"
-basic = "text"
-multiple = true
-standard = "https://www.rfc-editor.org/rfc/rfc9553#section-2.8.4"
-label = { en = "Personal information", de = "Persönliche Angaben" }
-
-# A role is a SKOS concept or a W3C org:Role; the role assignment is an AS2 Relationship (never on the card, ADR 0058).
-[[type]]
-name = "Role"
-standard = "https://www.w3.org/TR/vocab-org/#class-role"
-envelope = "Object"
-media_type = "application/vnd.freesynergy.role"
-label = { en = "Role", de = "Rolle" }
-
-[[type.field]]
-name = "names"
-basic = "text"
-multiple = true
-standard = "https://www.w3.org/TR/skos-reference/#labels"
-label = { en = "Names", de = "Namen" }
-
-[[type.field]]
-name = "broader"
-basic = "reference"
-standard = "https://www.w3.org/TR/skos-reference/#semantic-relations"
-label = { en = "More general role", de = "Allgemeinere Rolle" }
-
-[[type.field]]
-name = "closeMatch"
-basic = "reference"
-standard = "https://www.w3.org/TR/skos-reference/#mapping"
-label = { en = "Close match", de = "Nahe Entsprechung" }
+# Art 1: the module person (fs-modules-person) owns the type Profile (JSContact card, RFC 9553). The RPM requires fs-module-person >= 0.0.3.
+[[module]]
+name = "person"
+kind = "standard"
+version = "0.0.3"
 
 [[type]]
-name = "RoleAssignment"
-standard = "https://www.w3.org/TR/activitystreams-vocabulary/#dfn-relationship"
-envelope = "Relationship"
-media_type = "application/vnd.freesynergy.role-assignment"
-label = { en = "Role assignment", de = "Rollenzuweisung" }
+name = "Profile"
+module = "person"
 
-[[type.field]]
-name = "subject"
-basic = "reference"
-standard = "https://www.w3.org/TR/activitystreams-vocabulary/#dfn-subject"
-label = { en = "Person", de = "Person" }
-
-[[type.field]]
-name = "object"
-basic = "reference"
-standard = "https://www.w3.org/TR/activitystreams-vocabulary/#dfn-object"
-label = { en = "Role", de = "Rolle" }
-
-[[type.field]]
-name = "context"
-basic = "reference"
-standard = "https://www.w3.org/TR/activitystreams-vocabulary/#dfn-context"
-label = { en = "Group", de = "Gruppe" }
-
-# The main view is a forms description (written by task V-F).
+# Main frontend: P-F1 (list). The schema allows ONE [frontend] block (fs-blueprint model.rs `frontend: Frontend`); the other three descriptions are in
+# forms/ and NOT yet named here: forms/P-F2-einzel.toml (people-detail), forms/P-F3-karten.toml (people-cards), forms/P-F4-kontakte.toml (people-contacts).
 [frontend]
 standard = "list"
-layout = "forms/list.toml"
+layout = "forms/P-F1-liste.toml"
 covers = "all"
-
-# Exceptions: rules without a standard. The talk records lie in fs-documentation (conventions/talks/), decisions of the owner 2026-11-18.
-[[exception]]
-what = "Same-person proposals: match rules (shared e-mail, shared phone, same name at the same organisation) and the link state; decision of the owner: a proposal only, with a dialog Yes/No/For all/Remember, every link can be undone"
-why = "no standard describes proposing that two profiles are one person (ADR 0019/0029/0058); owl:sameAs only states the result"
-checked = ["JSContact RFC 9553", "owl:sameAs", "schema.org sameAs"]
-alternatives = ["no proposals, manual link only", "proposal dialog (Yes/No/For all/Remember) in a building block"]
-talk = "conventions/talks/2026-11-18-people-gleiche-person.md"
-paths = ["crates/fs-people-core/src/matching/", "crates/fs-people-core/src/repo/proposals.rs", "crates/fs-people-core/src/repo/rejections.rs"]
-
-[[exception]]
-what = "Sensitive mark of a card and release per recipient at export (ADR 0029)"
-why = "the mark and the explicit release are a project rule for protected data (decision of the owner: sensitive is a protection building block with DPV vocabulary); DPV is a vocabulary candidate, not a W3C recommendation"
-checked = ["DPVCG (W3C Data Privacy Vocabularies and Controls CG)", "ADR 0029"]
-alternatives = ["DPV categories only (kit Schutzangabe, ADR 0098)"]
-talk = "conventions/talks/2026-11-18-people-sensibel-markierung.md"
-paths = ["crates/fs-people-core/src/card/vendor.rs", "crates/fs-people-core/src/card/marks.rs", "crates/fs-people-core/src/people.rs"]
